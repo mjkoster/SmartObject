@@ -1,0 +1,49 @@
+SmartObject base classes module
+
+The base abstract class is Resource, from which the specific 
+content types are derived for the various functional resources.
+
+The SmartObject is itself a Resource that contains the other resource
+types
+
+For a description of the functional roles of the specific resource
+types, see http://iot-datamodels.blogspot.com
+
+The structure of a SmartObject is derived through semantic indirection 
+or simple URI-Path mapping. Resources contained within a SmartObject
+are by default available at the URL ../SmartObject/Resource which
+corresponds to the Object notation SmartObject.Resource
+
+All Resource types potentially have Create, Delete, Set, and Get 
+methods for interacting with their default functional properties.
+The precise semantic definition of those operations is content 
+dependent and defined by overriding the default methods for each 
+specific resource type. For Example, the GET method for a default 
+PropertOfInterest returns the list type containing a single instance 
+of a string or scalar. The GET method for a Description returns
+a list of RDF triples matching an abstract description. 
+
+These content-specific methods may be directly exposed through
+URL-Path and URI-query mapping e.g. 
+coap:// or http:// GET from ../SmartObject/Resource?spec
+invokes the method SmartObject.Resource.get(spec)
+
+An example URI-Path mapping for a PropertyOfInterest would be 
+GET ..SmartRoom/Temperature which would be the default mapping for 
+SmartRoom.Temperature.SensorValue.get()
+
+In addition, resource mapping can use the semantic tags from the Description 
+class instances to route SmartObject Resources. In cases where both 
+URI-Path mapping and semantic mapping are used, the semantic mapping 
+should follow the URI-Path mapping convention.
+
+SmartObject
+  |
+SmartObject/Description (Default Property)
+SmartObject/Agent
+SmartObject/ObservableProperty
+				|
+			SmartObject/ObservableProperty/PropertyOfInterest (Default Property)
+			SmartObject/ObservableProperty/Description
+			SmartObject/ObservableProperty/Subscription
+
