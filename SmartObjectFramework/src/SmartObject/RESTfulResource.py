@@ -1,7 +1,7 @@
 '''
 Created on Sep 29, 2012
 
-Abstract Class for RESTfulResources in SmartObject
+Base Class for RESTfulResources in SmartObject
 
 Extends the Resource class
 
