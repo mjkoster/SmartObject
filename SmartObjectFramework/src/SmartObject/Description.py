@@ -24,8 +24,9 @@ class Description (RESTfulResource, Graph):
     def __get__(self, (s,p,o)):
         return Graph.triples((s,p,o))
     
-    def __Set__(self, (s,p,o)):
-        Graph.set(s,p,o)
+    @property
+    def __set__(self, (s,p,o)):
+        Graph.set((s,p,o))
         return
     
     @property

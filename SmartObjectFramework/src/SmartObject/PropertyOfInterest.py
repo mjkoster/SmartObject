@@ -19,6 +19,11 @@ class PropertyOfInterest(RESTfulResource):
         return self.value
     
     @property
+    def __set__(self,newValue):
+        self.value=newValue
+        return
+        
+    @property
     def get(self):
         return self.value
     
