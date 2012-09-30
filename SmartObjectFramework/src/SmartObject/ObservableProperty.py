@@ -31,19 +31,15 @@ class ObservableProperty(RESTfulResource):
     def __init__(self):
         RESTfulResource.__init__(self) 
         self.PropertyOfInterest = PropertyOfInterest(self)  
-    
-    @property    
+      
     def __get__(self):
         return self.PropertyOfInterest
     
-    @property
     def __set__(self,newValue):
         self.PropertyOfInterest - newValue
-        
-    @property    
+          
     def get(self):
         return self.PropertyOfInterest.get()
     
-    @property
     def set(self, newValue):
         self.PropertyOfInterest = newValue # use Descriptor Property interface

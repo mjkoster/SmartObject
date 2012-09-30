@@ -17,19 +17,16 @@ class Description (RESTfulResource, Graph):
         RESTfulResource.__init__(self)
         Graph.__init__(self)
     
-    # Descriptor method returns triples can be invoked via the 
+    # Description method returns triples can be invoked via the 
     # property interface: SmartObject.Description  
     # Does the property decorator work for this?
-    @property 
     def __get__(self, (s,p,o)):
         return self.triples((s,p,o))
     
-    @property
     def __set__(self, (s,p,o)):
         self.set((s,p,o))
         return
     
-    @property
     def get(self, (s,p,o)):
         return self.triples((s,p,o))
     

@@ -7,16 +7,12 @@ The SmartObject is the top level Resource pointed to by the URL
 
 The base resource is a description, which for linked data is the default
 resource returned by SmartObject.get() and is the object Descriptor 
-(default return value)  The following equivalent references return all 
+The following equivalent references return all 
 triples in the SmertObject.Description resource:
 
-SmartObject.Description.get()
 SmartObject.Description.get
-SmartObject.Description()
 SmartObject.Description
-SmartObject.get()
 SmartObject.get
-SmartObject()
 SmartObject
 
 Practical instances of SmartObject will have additional resources 
@@ -41,16 +37,13 @@ class SmartObject(RESTfulResource):
     # to provide linked data compatibility
     # This is also available via the property interface: SmartObject
     
-    @property
     def __get__(self):
         return self.Description.get()
     
-    @property
     def __set__(self, (s,p,o)):
         self.Description.set((s,p,o))
         return
     
-    @property
     def get(self):
         return self.Description.get()
     

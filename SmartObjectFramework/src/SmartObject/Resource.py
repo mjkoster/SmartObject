@@ -19,36 +19,37 @@ class Resource(object) :
         self.resources = {}
         self.value = []
 
-    # when this resource is deleted
+    # when this resource is deleted, recursively delete all internal resources
     def __del__(self):
-        pass
+        for self.__resource in self.resources :
+            del self.__resource
         
-    @property
     def __get__(self):
         return self.get
     
-    @property
     def __set__(self, newValue):
         self.set(newValue)
         return
 
     # return the default contents of this resource
-    @property
+    #@Resource.getter - would this decorator work?
     def get(self) :
         return(self.value)
 
     # update the default contents of this resource
-    @property
+    #@Resource.setter
     def set(self, newValue) :
         self.value=newValue
         return
       
     # for adding resources inside this resource
-    def create(self, resource) :
-        self.resources.add(resource)
+    def create(self, resourceName, className) :
+        self.resourceName = className(self) # make instance of named class
+        self.resources.add(resourceName) # add instance name to resources 
         return
 
     # for removing resources inside this resource
-    def delete(self, resource) :
-        self.resources.remove(resource)
+    def delete(self, resourceName) :
+        del self.resourceName 
+        self.resources.remove(resourceName)
         return
