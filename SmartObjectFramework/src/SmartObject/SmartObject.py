@@ -10,10 +10,10 @@ resource returned by SmartObject.get() and is the object Descriptor
 The following equivalent references return all 
 triples in the SmertObject.Description resource:
 
-SmartObject.Description.get
-SmartObject.Description
-SmartObject.get
 SmartObject
+SmartObject.get()
+SmartObject.Description
+SmartObject.Description.get()
 
 Practical instances of SmartObject will have additional resources 
 such as ObservableProperty and Agent instances dynamically created
@@ -26,6 +26,8 @@ constructors of other SmartObjects
 '''
 from RESTfulResource import RESTfulResource
 from Description import Description
+from Agent import Agent
+from ObservableProperty import ObservableProperty
 
 class SmartObject(RESTfulResource):
     
@@ -38,10 +40,10 @@ class SmartObject(RESTfulResource):
     # This is also available via the property interface: SmartObject
     
     def __get__(self):
-        return self.Description.get()
+        return self.get()
     
     def __set__(self, (s,p,o)):
-        self.Description.set((s,p,o))
+        self.set((s,p,o))
         return
     
     def get(self):
@@ -50,12 +52,3 @@ class SmartObject(RESTfulResource):
     def set(self, (s,p,o)):
         self.Description.set((s,p,o))
         return
-    
-    def create(self,resource):
-        super(SmartObject,self).create(resource) # override this?
-        return
-    
-    def delete(self,resource):
-        super(SmartObject,self).delete(resource) # override this?
-        return
-    

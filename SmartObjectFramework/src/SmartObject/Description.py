@@ -10,6 +10,7 @@ work on the sub-graphs used by get and set methods for discovery and linkage
 
 from RESTfulResource import RESTfulResource
 from rdflib.graph import Graph
+from Observers import Observers
 
 class Description (RESTfulResource, Graph):
     
@@ -20,8 +21,9 @@ class Description (RESTfulResource, Graph):
     # Description method returns triples can be invoked via the 
     # property interface: SmartObject.Description  
     # Does the property decorator work for this?
+    
     def __get__(self, (s,p,o)):
-        return self.triples((s,p,o))
+        return self.get((s,p,o))
     
     def __set__(self, (s,p,o)):
         self.set((s,p,o))

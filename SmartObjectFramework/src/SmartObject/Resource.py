@@ -16,7 +16,7 @@ class Resource(object) :
     
     # when this resource is created
     def __init__(self):
-        self.resources = {}
+        self.resources = {} # the visible directory of resource names
         self.value = []
 
     # when this resource is deleted, recursively delete all internal resources
@@ -45,11 +45,11 @@ class Resource(object) :
     # for adding resources inside this resource
     def create(self, resourceName, className) :
         self.resourceName = className(self) # make instance of named class
-        self.resources.add(resourceName) # add instance name to resources 
+        self.resources.add(resourceName) # add instance name to directory 
         return
 
     # for removing resources inside this resource
     def delete(self, resourceName) :
-        del self.resourceName 
-        self.resources.remove(resourceName)
+        del self.resourceName # remove object reference
+        self.resources.remove(resourceName) # remove visible directory entry
         return

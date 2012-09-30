@@ -25,6 +25,8 @@ ObservableProperty being manually set
 '''
 from RESTfulResource import RESTfulResource
 from PropertyOfInterest import PropertyOfInterest
+from Description import Description
+from Observers import Observers
 
 class ObservableProperty(RESTfulResource):
     
