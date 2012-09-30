@@ -16,18 +16,18 @@ class Resource(object) :
     
     # when this resource is created
     def __init__(self):
-        self.resources = {} # the visible directory of resource names
+        self.resources = {} # the visible directory of resource names 
         self.value = []
 
     # when this resource is deleted, recursively delete all internal resources
-    def __del__(self):
+    def __del__(self, instance):
         for self.__resource in self.resources :
             del self.__resource
         
-    def __get__(self):
-        return self.get
+    def __get__(self, instance, cls):
+        return self.get()
     
-    def __set__(self, newValue):
+    def __set__(self, instance, newValue):
         self.set(newValue)
         return
 

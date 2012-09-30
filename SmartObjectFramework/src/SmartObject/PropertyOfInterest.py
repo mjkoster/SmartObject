@@ -14,13 +14,13 @@ class PropertyOfInterest(RESTfulResource):
         RESTfulResource.__init__(self)
         
     # descriptor method?
-    def __get__(self):
+    def __get__(self, instance, cls):
         return self.value
     
-    def __set__(self,newValue):
+    def __set__(self, instance, newValue):
         self.value=newValue
         return
-        
+    
     def get(self):
         return self.value
     
