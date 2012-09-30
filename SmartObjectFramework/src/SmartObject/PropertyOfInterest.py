@@ -6,8 +6,22 @@ instances of arbitrary types
 
 @author: mjkoster
 '''
-import Resource
+from RESTfulResource import RESTfulResource
 
-class PropertyOfInterest(Resource):
-    {}
+class PropertyOfInterest(RESTfulResource):
     
+    def __init__(self):
+        RESTfulResource.__init__(self)
+        
+    # Descriptor property
+    @property 
+    def __get__(self):
+        return self.value
+    
+    @property
+    def get(self):
+        return self.value
+    
+    def set(self,newValue):
+        self.value=newValue
+        return

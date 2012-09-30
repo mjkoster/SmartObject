@@ -45,5 +45,5 @@ SmartObject/ObservableProperty
 				|
 			SmartObject/ObservableProperty/PropertyOfInterest (Default Property)
 			SmartObject/ObservableProperty/Description
-			SmartObject/ObservableProperty/Subscription
+			SmartObject/ObservableProperty/Observers
 

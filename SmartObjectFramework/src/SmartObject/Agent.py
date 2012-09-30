@@ -6,7 +6,9 @@ Agent class
 @author: mjkoster
 '''
 
-import Resource
+from RESTfulResource import RESTfulResource
 
-class Agent(Resource):
-    {}
+class Agent(RESTfulResource):
+    
+    def __init__(self):
+        RESTfulResource.__init__(self)

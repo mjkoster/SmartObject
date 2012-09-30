@@ -1,27 +1,23 @@
 '''
 Created on Sep 15, 2012
 
-Abstract Class for Resources in SmartObject
+Abstract Class for Base Resources in SmartObject
 
-This class will be extended by Description, Subscription,
-ObservableProperty, PropertyOfInterest, and Agent classes
+This class will be extended by RESTfulResource to add content-type support
 
-Instances of this class are created and deleted from within 
-the scope of enclosing classes
-
-Contains methods for RESTful resource-oriented services:
+Contains methods for resource-oriented services:
 create, delete, set, and get are meant to be 
 extended or overridden by concrete class instances 
 for content-specific interaction
 
 @author: mjkoster
 '''
-class Resource :
+class Resource(object) :
     
     # when this resource is created
     def __init__(self):
-        self.resources = {};
-        self.value = [];
+        self.resources = {}
+        self.value = []
 
     # when this resource is deleted
     def __del__(self):
@@ -30,14 +26,17 @@ class Resource :
     # for adding resources inside this resource
     def create(self, resource) :
         self.resources.add(resource);
+        return
 
     # for removing resources inside this resource
     def delete(self, resource) :
         self.resources.remove(resource);
+        return
     
     # update the default contents of this resource
     def set(self, newValue) :
         self.value=newValue;
+        return
      
     # return the default contents of this resource
     def get(self) :
