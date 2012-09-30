@@ -46,6 +46,11 @@ class SmartObject(RESTfulResource):
         return self.Description.get()
     
     @property
+    def __set__(self, (s,p,o)):
+        self.Description.set((s,p,o))
+        return
+    
+    @property
     def get(self):
         return self.Description.get()
     

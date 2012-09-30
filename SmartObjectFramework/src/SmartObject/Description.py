@@ -22,30 +22,34 @@ class Description (RESTfulResource, Graph):
     # Does the property decorator work for this?
     @property 
     def __get__(self, (s,p,o)):
-        return Graph.triples(self, (s,p,o))
+        return Graph.triples((s,p,o))
+    
+    def __Set__(self, (s,p,o)):
+        Graph.set(s,p,o)
+        return
     
     @property
     def get(self, (s,p,o)):
-        return Graph.triples(self, (s,p,o))
+        return Graph.triples((s,p,o))
     
     def set(self, (s,p,o)):
-        Graph.set(self, (s,p,o))
+        Graph.set((s,p,o))
         return
     
     def create(self, (s,p,o)):
-        Graph.add(self,(s,p,o))
+        Graph.add((s,p,o))
         return
     
     def delete(self, (s,p,o)):
-        Graph.remove(self, (s,p,o))
+        Graph.remove((s,p,o))
         return
     
     def parse(self,source,fmt):
         g = Graph()
-        return g.parse(self,source,format=fmt)
+        return g.parse(source,format=fmt)
     
     def serialize(self,graph,fmt):
-        return graph.serialize(self,format=fmt)
+        return graph.serialize(format=fmt)
     
     
         
