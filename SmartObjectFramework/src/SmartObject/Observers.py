@@ -14,7 +14,10 @@ class Observers(RESTfulResource):
         RESTfulResource.__init__(self)
         self.__schemes = ['http', 'coap', 'callback']
         self.__observers = []
-        
+ 
+        self.httpNotifyHandler = []
+        self.coapNotifyHandler = []
+       
     def __get__(self, instance, cls):
         return self.get()
     
@@ -28,27 +31,29 @@ class Observers(RESTfulResource):
         for self.__observer in self.__observers:
             self.__notify(self.__observer, resource)
     
-    def __notify(self, targetURL, resource):
-        urlObject = urlparse(targetURL)
+    def __notify(self, targetURI, resource):
+        urlObject = urlparse(targetURI)
         if urlObject.scheme == 'http' :
-            self.__httpPostNotify(targetURL, resource)
+            self.__httpNotify(targetURI, resource)
         elif urlObject.scheme == 'coap' :
-            self.__coapGetNotify(targetURL, resource)
+            self.__coapNotify(targetURI, resource)
         elif urlObject.scheme == 'callback' :
-            self.__callbackNotify(targetURL, resource)
+            self.__callbackNotify(targetURI, resource)
             
-    def __httpPostNotify(self, targetURL, resource):
-        pass # invoke method from http client interface
+    def __httpNotify(self, targetURI, resource):
+        # invoke method from http client interface
+        self.__httpNotifyHandler(targetURI, resource)
     
-    def __coapGetNotify(self, targetURL, resource):
-        pass # invoke method from CoAP server interface
+    def __coapNotify(self, targetURI, resource):
+        # invoke method from CoAP server interface
+        self.__coapNotifyHandler(targetURI, resource)
     
     def __callbackNotify(self, targetURL, resource):
         #call the fuction registered and pass the resource
         self.__handler = urlparse(targetURL).path
-        self.__handler(resource)        #invoke the handler global 
+        self.__handler(resource)        #invoke the handler pass resource
     
-    # match returns the supplied URL. Supplying None returns all Observers
+    # match returns the supplied URL, else none. Supplying None returns all Observers
     def get(self, targetURI):
         if targetURI != None:
             if targetURI in self.__observers:
