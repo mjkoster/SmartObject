@@ -33,8 +33,9 @@ class SmartObject(RESTfulResource):
     
     def __init__(self):
         RESTfulResource.__init__(self)
+        #Create a default instance of a Description resource for linked data
         self.Description = Description(self)
-        self.resources.add(self.Description.__name__)
+        self.resources += {self.Description.__name__, self.Description}
         
     # Descriptor for SmartObject is the Description resource, 
     # to provide linked data compatibility

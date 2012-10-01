@@ -12,6 +12,7 @@ class PropertyOfInterest(RESTfulResource):
     
     def __init__(self):
         RESTfulResource.__init__(self)
+        self.value=[]
 
     def __get__(self, instance, cls):
         return self.value
