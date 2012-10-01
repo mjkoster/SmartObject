@@ -44,12 +44,12 @@ class Resource(object) :
       
     # for adding resources inside this resource
     def create(self, resourceName, className) :
-        self.resourceName = className(self) # make instance of named class
-        self.resources.add(resourceName) # add instance name to directory 
+        self.__resourceName = className(self) # make instance of named class
+        self.resources += {resourceName : self.__resourceName} # add instance name to directory 
         return
 
     # for removing resources inside this resource
     def delete(self, resourceName) :
-        del self.resourceName # remove object reference
+        del self.resources[resourceName] # remove object reference
         self.resources.remove(resourceName) # remove visible directory entry
         return
