@@ -21,7 +21,7 @@ class Resource(object) :
 
     # when this resource is deleted, recursively delete all internal resources
     def __del__(self, instance):
-        for self.__resource in self.resources :
+        for self.__resource in self.resources.values :
             del self.__resource
         
     def __get__(self, instance, cls):
@@ -44,8 +44,8 @@ class Resource(object) :
       
     # for adding resources inside this resource
     def create(self, resourceName, className) :
-        self.__resourceName = className(self) # make instance of named class
-        self.resources += {resourceName : self.__resourceName} # add instance name to directory 
+        self.__resource = className(self) # make instance of named class
+        self.resources += {resourceName : self.__resource} # add instance name to directory 
         return
 
     # for removing resources inside this resource
