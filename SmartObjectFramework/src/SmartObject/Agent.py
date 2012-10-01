@@ -32,10 +32,12 @@ class Agent(RESTfulResource):
         return self.__agent
     @agent.setter
     def agent(self, agent): # creates a new agent
-        self.agent
         self.__handlers.clear # no observers
         self.create(agent)
         return
+    @agent.deleter
+    def agent (self, agent):
+        self.delete(agent)
     
     @property
     def handlers(self):
@@ -61,6 +63,11 @@ class Agent(RESTfulResource):
     
     def create(self, agent):
         self.__agent = agent()
+        return
+        
+    def delete(self, agent):
+        self.handlers.clear
+        return
         # need to import and create instance of code module
         # creating instance init module should register observers as needed
         
