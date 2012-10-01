@@ -34,7 +34,7 @@ class SmartObject(RESTfulResource):
     def __init__(self):
         RESTfulResource.__init__(self)
         self.Description = Description(self)
-        self.resources.add("Description")
+        self.resources.add(self.Description.__name__)
         
     # Descriptor for SmartObject is the Description resource, 
     # to provide linked data compatibility

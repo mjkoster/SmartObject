@@ -33,7 +33,7 @@ class ObservableProperty(RESTfulResource):
     def __init__(self):
         RESTfulResource.__init__(self) 
         self.PropertyOfInterest = PropertyOfInterest(self)  
-        self.resources.add("PropertyOfInterest")
+        self.resources.add(self.PropertyOfInterst.__name__)
       
     def __get__(self, instance, cls):
         return self.PropertyOfInterest

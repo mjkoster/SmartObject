@@ -2,7 +2,7 @@
 Created on Sep 15, 2012
 
 PropertyOfInterest class for exposing custom methods for 
-instances of arbitrary types
+instances of arbitrary types. Typed property pattern
 
 @author: mjkoster
 '''
@@ -12,8 +12,7 @@ class PropertyOfInterest(RESTfulResource):
     
     def __init__(self):
         RESTfulResource.__init__(self)
-        
-    # descriptor method?
+
     def __get__(self, instance, cls):
         return self.value
     
