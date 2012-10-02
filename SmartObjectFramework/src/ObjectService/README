@@ -1,0 +1,12 @@
+ObjectService Base Classes
+
+ObjectService is a SmartObject instance which is used to store a 
+Description for the service and a number of SmartObject instances
+
+ObjectServiceGateway is an ObjectService with two interfaces, for example 
+one interface for a constrained network e.g. a sensor net using CoAP, and 
+another interface for the internet using http.
+
+The interface classes add URL-resource mapping, and content-type negotiation 
+and generation by invoking parse and serialize methods from the specific 
+resource classes.

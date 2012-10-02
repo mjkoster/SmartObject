@@ -5,8 +5,8 @@ ObjectGatewayService is an ObjectService with two interfaces, an http web interf
 and a coap constrained network interface
 
 @author: mjkoster
-
 '''
+
 from httpInterface import httpInterface
 from coapInterface import coapInterface
 from ObjectService import ObjectService
