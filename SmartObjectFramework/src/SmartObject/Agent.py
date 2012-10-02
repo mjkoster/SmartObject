@@ -1,11 +1,18 @@
 '''
 Created on Sep 15, 2012
 
-Agent class. Contains reference to instance of 
-class containing observer handlers and agent code 
+Agent class. Contains reference to instance of class containing observer 
+handlers and agent code 
 
-Contains references to observer handlers
+Contains references to observer handlers which are expected to be used only
+by Agent code i.e. not exposed to service interfaces but may allow inspection 
+for debug. 
 
+Setting a new Agent class instance currently has the effect of removing the 
+handlers from the current agent instance and starting a new instance of the 
+new class. This is for development
+
+Agents are meant to be created with objects
 @author: mjkoster
 '''
 
@@ -27,9 +34,9 @@ class Agent(RESTfulResource):
     def __del__(self): # clean up any references on removal of agent
         pass
     
+    # Descriptor methods allow inspection and modification of Agent
     def __get__(self, instance, cls):
         return self.agent
-    # Descript
 
     def __set__(self, instance, newAgent):
         self.agent = newAgent
@@ -39,12 +46,12 @@ class Agent(RESTfulResource):
         return self.__agent
     @agent.setter
     def agent(self, agent): # creates a new agent
-        self.__handlers.clear # no observers
+        self.delete() # removes handlers
         self.create(agent)
         return
     @agent.deleter
-    def agent (self, agent):
-        self.delete(agent)
+    def agent (self):
+        self.delete()
     
     @property
     def handlers(self):
@@ -60,7 +67,6 @@ class Agent(RESTfulResource):
             return handler
         return None # return none to indicate no match
         
-        
     def get(self):
         return self.__handlers
     
@@ -74,7 +80,7 @@ class Agent(RESTfulResource):
         # need to import and create instance of code module
         # creating instance init module should register observers as needed
       
-    def delete(self, agent):
+    def delete(self):
         self.handlers.clear        
         return
         # need to destroy instance of code module
