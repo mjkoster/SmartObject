@@ -4,18 +4,16 @@ Created on Oct 1, 2012
 Service layer for SmartObjects usable for any RESTful objects 
 Adds registry and methods for creating and removing objects
 
+The service is itself based on a SmartObject resource pattern with 
+SmartObjects as the created resources with a description consisting 
+of the descriptions of all contained SmartObjects
+
 @author: mjkoster
 '''
-from SmartObject import Resource
+from SmartObject.SmartObject import SmartObject
 
-class ObjectService(Resource):
-    '''
-    classdocs
-    '''
+class ObjectService(SmartObject):
 
     def __init__(self):
-        '''
-        Constructor
-        '''
-        pass
-    
+        SmartObject.__init__(self)
+        
