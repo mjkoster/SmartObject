@@ -16,7 +16,7 @@ class Agent(RESTfulResource):
     def __init__(self, agent):
         RESTfulResource.__init__(self)
         # reference to the code class to create an instance of 
-        # can be passed in, or default on init, or be changed later
+        # can be passed in on the constructor, or default on init, or be changed later
         if agent != None :
             self.create(agent)
         else :
