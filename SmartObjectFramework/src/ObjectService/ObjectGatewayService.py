@@ -14,5 +14,8 @@ from ObjectService import ObjectService
 class ObjectGatewayService(ObjectService, httpInterface, coapInterface):
     
     def __init__(self):
-        pass
+        ObjectService.__init__(self)
+        httpInterface.__init__(self)
+        coapInterface.__init__(self)
+    
     
