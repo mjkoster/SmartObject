@@ -26,9 +26,11 @@ class Agent(RESTfulResource):
         
     def __del__(self): # clean up any references on removal of agent
         pass
+    
     def __get__(self, instance, cls):
         return self.agent
-    
+    # Descript
+
     def __set__(self, instance, newAgent):
         self.agent = newAgent
         
