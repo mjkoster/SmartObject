@@ -16,6 +16,29 @@ from restlite import restlite
 from restlite import restObject
 from ObjectService import ObjectService
 
+class Request(restObject.Request):
+    def __init__(self, env, start_response):
+        restObject.Request.__init__(env, start_response)
+        
+
+class RestObject(restObject.RestObject):
+    def __init__(self, objDict, users):
+        RestObject.__init__(objDict, users)
+        
+    def _handleGET(self):
+        pass
+    
+    def _handlePUT(self):
+        pass
+    
+    def _handlePOST(self):
+        pass
+    
+    def _handleDELETE(self):
+        pass
+    
+    
+
 class HttpObjectService(ObjectService):
     
     def __init__(self):

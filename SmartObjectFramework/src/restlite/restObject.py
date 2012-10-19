@@ -1,9 +1,10 @@
 '''
-restObject 
+restObject module
 
 Based on the restdata module from restlite, the Request method sequences
 the URL path by resource and authenticates at each level. The bind method walks 
 the SmartObject directory structures according to the path segments
+exposes methods for HTTP verbs that can be overridden in the service laver
 (FIXME add semantic method based on structural triples?)
 '''
 
@@ -91,70 +92,71 @@ class RestObject(object):
     def __init__(self, objDict, users):
         self.objDict, self.users, self.realm = objDict, users, 'localhost'
         
-    def traverse(self, objDict, item):
-        if isinstance(objDict, dict): return objDict[item]
-        elif isinstance(objDict, list): 
-            try: index = int(item)
-            except: raise restlite.Status, '400 Bad Request'
-            if index < 0 or index >= len(objDict): raise restlite.Status, '400 Bad Request'
-            return objDict[index]
-        elif hasattr(objDict, item): return objDict.__dict__[item]
+    def traverse(self, objDict, resourceName):
+        if isinstance(objDict, dict): return objDict[resourceName]
         else: return None
-        
-    def handler(self, env, start_response):               
+    
+    def _handleGET(self, currentItem):    
+        result = self.request.represent(currentItem.get()) #represent 
+        type, value = restlite.represent(result, type=self.env.get('ACCEPT', 'application/json'))
+        self.start_response('200 OK', [('Content-Type', type)])
+        return [value]
+    
+    def _handlePUT(self, currentItem):
+        pass
+    
+    def _handlePOST(self, currentItem):
+        pass
+    
+    def _handleDELETE(self, currentItem):
+        pass
+    
+    
+    def handler(self, env, start_response):   
+        self.env, self.start_response = env, start_response
+                    
         print 'restdata.handler()', env['SCRIPT_NAME'], env['PATH_INFO']
-        request = Request(env, start_response)
-        user, reason = request.getAuthUser(self.users, self.realm, addIfMissing=True)
-        if not user or not reason.startswith('200'): 
-            return request.unauthorized(self.realm, reason)
-        current = self.data
-        while len(request.pathItems) > 1:
-            item = request.nextItem()
-            request.verifyAccess(user, 'x', current)
-            current = self.traverse(current, item)
-        item = request.nextItem()
         
-        if request.method == 'POST':
+        self.request = Request(env, start_response)
+        
+        user, reason = self.request.getAuthUser(self.users, self.realm, addIfMissing=True)
+        if not user or not reason.startswith('200'): 
+            return self.request.unauthorized(self.realm, reason)
+        # step through the path to the endpoint using the nextItem method, verify each resource
+        currentDict = self.objDict
+        while len(self.request.pathItems) > 1:
+            item = self.request.nextItem()
+            self.request.verifyAccess(user, 'x', currentDict) # Check "dir" permission for next
+            currentDict = currentDict[item].resources # point to next resource dict
+        item = self.request.nextItem() #last item in the path should be the resource name
+
+        if item:
+            self.request.verifyAccess(user, 'x', currentDict)
+            currentResource = currentDict[item]
+        if not isinstance(currentResource.resources, dict): 
+            raise restlite.Status, '400 Bad Request'
+        currentDict = currentResource.resources # make the current dict the endpoint dict
+        
+        if self.request.method == 'POST':
             if item:
-                request.verifyAccess(user, 'x', current)
-                current = self.traverse(current, item)
-            if not isinstance(current, list): 
-                raise restlite.Status, '405 Method Not Allowed'
-            value = request.getBody()
-            current += value
-        elif request.method == 'PUT':
-            value = request.getBody()
-            request.verifyAccess(user, 'w', current)
-            if isinstance(current, dict): 
-                current[item] = value
-            elif isinstance(current, list): 
-                try: index = int(item)
-                except: raise restlite.Status, '400 Bad Request'
-                if index < 0: current.insert(0, value)
-                elif index >= len(current): current.append(value)
-                else: current[index] = value
-            else: 
-                current.__dict__[item] = value
-        elif request.method == 'DELETE':
-            request.verifyAccess(user, 'w', current)
-            if isinstance(current, dict): 
-                del current[item]
-            elif isinstance(current, list): 
-                try: index = int(item)
-                except: raise restlite.Status, '400 Bad Request'
-                if index < 0 or index >= len(current): raise restlite.Status, '400 Bad Request'
-                else: del current[index]
-            elif hasattr(current, item): 
-                del current.__dict__[item]
-        elif request.method == 'GET':
+                self.request.verifyAccess(user, 'x', currentDict) # create priv
+            return self._handlePOST(currentResource)
+        
+        elif self.request.method == 'PUT':
             if item:
-                request.verifyAccess(user, 'x', current)
-                current = self.traverse(current, item)
-            request.verifyAccess(user, 'r', current)
-            result = request.represent(current)
-            type, value = restlite.represent(result, type=env.get('ACCEPT', 'application/json'))
-            start_response('200 OK', [('Content-Type', type)])
-            return [value]
+                self.request.verifyAccess(user, 'w', currentDict) # write priv
+            return self._handlePUT(currentResource)
+        
+        elif self.request.method == 'DELETE':
+            if item:
+                self.request.verifyAccess(user, 'x', currentDict) # create priv
+            return self._handleDELETE(currentResource)
+        
+        elif self.request.method == 'GET':
+            if item:
+                self.request.verifyAccess(user, 'r', currentDict) # read priv
+            return self._handleGET(currentResource)
+                
         else: raise restlite.Status, '501 Method Not Implemented'
 
 def bind(objDict, users=None):
