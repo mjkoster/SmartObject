@@ -9,7 +9,6 @@ maps to the python API identifier: object1.barometricPressure.Description.Observ
 @author: mjkoster
 '''
 
-
 import wsgiref
 import urllib
 from restlite import restlite
@@ -28,18 +27,17 @@ class RestObject(restObject.RestObject):
         
         
     def _handleGET(self, currentResource):
-        restObject.RestObject._handleGET(self, currentResource)
+        restObject.RestObject._handleGET(self, currentResource) # default GET
     
     def _handlePUT(self, currentResource):
-        pass
+        restObject.RestObject._handlePUT(self, currentResource) # default PUT
     
     def _handlePOST(self, currentResource):
-        pass
+        restObject.RestObject._handlePOST(self, currentResource) # default POST
     
     def _handleDELETE(self, currentResource):
-        pass
-    
-    
+        restObject.RestObject._handleDELETE(self, currentResource) # default DELETE
+
 
 class HttpObjectService(ObjectService):
     
