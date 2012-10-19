@@ -87,21 +87,21 @@ class Request(object):
             result = obj
         return result
         
-class Data(object):
-    def __init__(self, data, users):
-        self.data, self.users, self.realm = data, users, 'localhost'
+class RestObject(object):
+    def __init__(self, objDict, users):
+        self.objDict, self.users, self.realm = objDict, users, 'localhost'
         
-    def traverse(self, obj, item):
-        if isinstance(obj, dict): return obj[item]
-        elif isinstance(obj, list): 
+    def traverse(self, objDict, item):
+        if isinstance(objDict, dict): return objDict[item]
+        elif isinstance(objDict, list): 
             try: index = int(item)
             except: raise restlite.Status, '400 Bad Request'
-            if index < 0 or index >= len(obj): raise restlite.Status, '400 Bad Request'
-            return obj[index]
-        elif hasattr(obj, item): return obj.__dict__[item]
+            if index < 0 or index >= len(objDict): raise restlite.Status, '400 Bad Request'
+            return objDict[index]
+        elif hasattr(objDict, item): return objDict.__dict__[item]
         else: return None
         
-    def handler(self, env, start_response):
+    def handler(self, env, start_response):               
         print 'restdata.handler()', env['SCRIPT_NAME'], env['PATH_INFO']
         request = Request(env, start_response)
         user, reason = request.getAuthUser(self.users, self.realm, addIfMissing=True)
@@ -157,13 +157,13 @@ class Data(object):
             return [value]
         else: raise restlite.Status, '501 Method Not Implemented'
 
-def bind(data, users=None):
+def bind(objDict, users=None):
     '''The bind method to bind the returned wsgi application to the supplied data and users.
     @param data the original Python data structure which is used and updated as needed.
     @param users the optional users dictionary. If missing, it disables access control.
     @return:  the wsgi application that can be used with restlite.
     '''
-    data = Data(data, users)
+    restObject = RestObject(objDict, users)
     def handler(env, start_response):
-        return data.handler(env, start_response)
+        return restObject.handler(env, start_response)
     return handler

@@ -17,5 +17,6 @@ class ObjectService(SmartObject):
 
     def __init__(self):
         SmartObject.__init__(self)
+        return self.resources # return a handle to the resources directory 
         
     
