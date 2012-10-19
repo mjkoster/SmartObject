@@ -14,7 +14,7 @@ Dependencies: Python 2.6.
 '''
 
 import sys, json, base64, hashlib
-from restlite import restlite
+import restlite
 
 def hash(user, realm, password):
     '''MD5(user:realm:password) is used for storing user's encrypted password.'''
