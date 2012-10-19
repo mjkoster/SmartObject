@@ -1,21 +1,21 @@
 '''
 Created on Oct 1, 2012
 
-ObjectGatewayService is an ObjectService with two interfaces, an http web interface
-and a coap constrained network interface
+GatewayObjectService is an ObjectService with two interfaces, an http web interface
+and a coap constrained network interface, constructed of the two interface services 
+referencing a common ObjectService
 
 @author: mjkoster
 '''
 
-from httpInterface import httpInterface
-from coapInterface import coapInterface
+from HttpObjectService import HttpObjectService
+from CoapObjectService import CoapObjectService
 from ObjectService import ObjectService
 
-class ObjectGatewayService(ObjectService, httpInterface, coapInterface):
+class GatewayObjectService(HttpObjectService, CoapObjectService):
     
     def __init__(self):
-        ObjectService.__init__(self)
-        httpInterface.__init__(self)
-        coapInterface.__init__(self)
+        HttpObjectService.__init__(self)
+        CoapObjectService.__init__(self)
     
     

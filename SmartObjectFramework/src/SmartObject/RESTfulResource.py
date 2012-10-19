@@ -30,13 +30,13 @@ class RESTfulResource(Resource) :
     def __del__(self):
         Resource.__del__(self)
     
-    # for adding resources inside this resource
+    # Convert representation to native type
     def parse(self, content) :
         def types(self):
             return(self.content_types)
         return content.value ;
 
-    # for removing resources inside this resource
+    # Convert native type to representation
     def serialize(self, resource) :
         def types(self):
             return(self.content_types)

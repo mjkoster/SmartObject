@@ -3,7 +3,10 @@ Created on Oct 1, 2012
 
 @author: mjkoster
 '''
-class coapInterface(object):
+
+import ObjectService
+
+class CoapObjectService(ObjectService):
     
     def __init__(self):
         pass
