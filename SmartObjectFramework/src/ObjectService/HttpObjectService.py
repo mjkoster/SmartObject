@@ -18,7 +18,8 @@ from ObjectService import ObjectService
 
 class Request(restObject.Request):
     def __init__(self, env, start_response):
-        restObject.Request.__init__(env, start_response)
+        self.env, self.start_response = env, start_response
+        restObject.Request.__init__(self.env, self.start_response)
         
 
 class RestObject(restObject.RestObject):
@@ -48,7 +49,7 @@ class HttpObjectService(ObjectService):
         #bind returns the RestObject handler which uses the Request object
         # the handler calls the overriding _handleXX methods in this module
         
-        restlite.routes = [('rGET,PUT,POST,DELETE /.*',objectHandler() )]
+        restlite.routes = [(r'GET,PUT,POST,DELETE /.*',objectHandler() )]
                   
         
     

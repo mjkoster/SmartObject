@@ -31,6 +31,7 @@ class Request(object):
         
     # returns (user, None) or (None, '401 Unauthorized')
     def getAuthUser(self, users, realm, addIfMissing=False):
+        ''' Authorize OK for now
         hdr = self.env.get('HTTP_AUTHORIZATION', None)
         if not hdr: 
             return (None, '401 Missing Authorization')
@@ -47,6 +48,8 @@ class Request(object):
                 return (user, '404 User Not Found')
         if hash_recv != users[user]: 
             return (user, '401 Not Authorized')
+        '''
+        user = None # short out the auth for now
         return (user, '200 OK')
         
     # throw the 401 response with appropriate header
@@ -76,28 +79,16 @@ class Request(object):
         index = {'r': 1, 'w': 2, 'x': 3}[type]
         if not (user == self.user and self.access[index] != '-' \
                 or user != self.user and self.access[6+index] != '-'):
-            raise restlite.Status, '403 Forbidden'
+            return # verify everything for now
+            # raise restlite.Status, '403 Forbidden'
     
-    def represent(self, obj):
-        prefix = self.env['SCRIPT_NAME'] + self.env['PATH_INFO']
-        if isinstance(obj, list):
-            result = [(':id', '%s/%d'%(prefix, i,)) if isinstance(v, dict) and '_access' in v else self.represent(v) for i, v in enumerate(obj)]
-        elif isinstance(obj, dict):
-            result = tuple([('%s:id'%(k,), '%s/%s'%(prefix, k)) if isinstance(v, dict) and '_access' in v else (k, self.represent(v)) for k, v in obj.iteritems() if not k.startswith('_')])
-        else:
-            result = obj
-        return result
-        
+            
 class RestObject(object):
     def __init__(self, objDict, users):
         self.objDict, self.users, self.realm = objDict, users, 'localhost'
-        
-    def traverse(self, objDict, resourceName):
-        if isinstance(objDict, dict): return objDict[resourceName]
-        else: return None
-    
+            
     def _handleGET(self, currentItem):    
-        result = self.request.represent(currentItem.get()) #represent 
+        result = currentItem.get() 
         type, value = restlite.represent(result, type=self.env.get('ACCEPT', 'application/json'))
         self.start_response('200 OK', [('Content-Type', type)])
         return [value]
@@ -115,7 +106,7 @@ class RestObject(object):
     def handler(self, env, start_response):   
         self.env, self.start_response = env, start_response
                     
-        print 'restdata.handler()', env['SCRIPT_NAME'], env['PATH_INFO']
+        print 'restObject.handler()', env['SCRIPT_NAME'], env['PATH_INFO']
         
         self.request = Request(env, start_response)
         
