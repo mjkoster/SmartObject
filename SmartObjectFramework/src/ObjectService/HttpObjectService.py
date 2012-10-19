@@ -25,16 +25,17 @@ class RestObject(restObject.RestObject):
     def __init__(self, objDict, users):
         RestObject.__init__(objDict, users)
         
-    def _handleGET(self):
+        
+    def _handleGET(self, currentResource):
+        restObject.RestObject._handleGET(self, currentResource)
+    
+    def _handlePUT(self, currentResource):
         pass
     
-    def _handlePUT(self):
+    def _handlePOST(self, currentResource):
         pass
     
-    def _handlePOST(self):
-        pass
-    
-    def _handleDELETE(self):
+    def _handleDELETE(self, currentResource):
         pass
     
     
@@ -44,6 +45,9 @@ class HttpObjectService(ObjectService):
     def __init__(self):
         objectHandler = restObject.bind(ObjectService.__init__(self), users=None) 
         #bind to root resource dictionary returned by ObjectService init method  
+        #bind returns the RestObject handler which uses the Request object
+        # the handler calls the overriding _handleXX methods in this module
+        
         restlite.routes = [('rGET,PUT,POST,DELETE /.*',objectHandler() )]
                   
         
