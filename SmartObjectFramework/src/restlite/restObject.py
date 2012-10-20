@@ -1,7 +1,7 @@
 '''
 restObject module
 
-Based on the restdata module from restlite, the Request method sequences
+Based on the restdata module from restlite, the Request object sequences
 the URL path by resource and authenticates at each level. The bind method walks 
 the SmartObject directory structures according to the path segments
 exposes methods for HTTP verbs that can be overridden in the service laver
@@ -49,7 +49,7 @@ class Request(object):
         if hash_recv != users[user]: 
             return (user, '401 Not Authorized')
         '''
-        user = None # short out the auth for now
+        user = None # short out the auth for now, make all OK
         return (user, '200 OK')
         
     # throw the 401 response with appropriate header
