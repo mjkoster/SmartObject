@@ -9,4 +9,4 @@ import ObjectService
 class CoapObjectService(ObjectService):
     
     def __init__(self):
-        pass
+        return
