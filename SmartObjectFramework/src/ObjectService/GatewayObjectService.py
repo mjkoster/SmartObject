@@ -30,25 +30,27 @@ class GatewayObjectService(object):
         except KeyboardInterrupt: pass
     
     def _startCoapObjectService(self):
-        """
-        Use similar pattern for CoAP service
+        # Use similar pattern for CoAP service, emulate with another http server for now
         from wsgiref.simple_server import make_server
-        routes = CoapObjectService(self.objectService)
-        self.coapd = make_server('', 61616, restlite.router(routes))
+        # routes = CoapObjectService(self.objectService)
+        # self.coapd = make_server('', 61616, restlite.router(routes))
+        routes = HttpObjectService(self.objectService)
+        self.coapd = make_server('', 8001, restlite.router(routes))
         try: self.coapd.serve_forever()
         except KeyboardInterrupt: pass
-        """
         
             
 if __name__ == '__main__' :
+    
     gateway = GatewayObjectService() # make an instance of the gateway and start threads 
+    
     httpThread = threading.Thread(target = gateway._startHttpObjectService)
-    # coapThread = threading.Thread(target = gateway._startCoapObjectService)
     httpThread.daemon = True
     httpThread.start()
-    # coapThread.daemon = True
-    # coapThread.start()
     
+    coapThread = threading.Thread(target = gateway._startCoapObjectService)
+    coapThread.daemon = True
+    coapThread.start()
     # start agents here
     try:
         # register handlers etc.
