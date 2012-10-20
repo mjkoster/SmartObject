@@ -44,7 +44,7 @@ class Resource(object) :
       
     # for adding resources inside this resource
     def create(self, resourceName, className) :
-        self.__resource = className(self) # make instance of named class
+        self.__resource = className(self) # make instance of named class invoke constructor
         self.resources += {resourceName : self.__resource} # add instance name to directory 
         return
 

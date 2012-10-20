@@ -27,3 +27,11 @@ class PropertyOfInterest(RESTfulResource):
     def set(self,newValue):
         self.value=newValue
         return
+    
+    def create(self, newProperty): 
+        self.resources.add(newProperty)
+        
+    def delete(self, oldProperty):
+        self.resources.remove(oldProperty)
+        
+        

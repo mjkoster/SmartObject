@@ -77,8 +77,7 @@ class Agent(RESTfulResource):
     def create(self, agent):
         self.__agent = agent()
         return
-        # need to import and create instance of code module
-        # creating instance init module should register observers as needed
+        # need to import and create instance of code module 
       
     def delete(self):
         self.handlers.clear        
