@@ -86,21 +86,23 @@ class Request(object):
 class RestObject(object):
     def __init__(self, objDict, users):
         self.objDict, self.users, self.realm = objDict, users, 'localhost'
-            
+    #default GET does simple JSON and XML content negotiation, defaults to JSON        
     def _handleGET(self, currentItem):    
-        result = currentItem.get() 
-        type, value = restlite.represent(result, type=self.env.get('ACCEPT', 'application/json'))
-        self.start_response('200 OK', [('Content-Type', type)])
+        respType, value = restlite.represent(currentItem.get(), type=self.env.get('ACCEPT', 'application/json'))
+        self.start_response('200 OK', [('Content-Type', respType)])
         return [value]
-    
+    #default PUT accepts JSON
     def _handlePUT(self, currentItem):
-        pass
-    
+        currentItem.create(self.request.getBody())
+        return
+    #default POST accepts JSON
     def _handlePOST(self, currentItem):
-        pass
+        currentItem.set(self.request.getBody())
+        return
     
     def _handleDELETE(self, currentItem):
-        pass
+        currentItem.delete()
+        return
     
     
     def handler(self, env, start_response):   
