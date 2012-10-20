@@ -12,11 +12,15 @@ SmartObjects
 @author: mjkoster
 '''
 from SmartObject.SmartObject import SmartObject
+from SmartObject.Description import Description
 
 class ObjectService(SmartObject):
 
     def __init__(self):
-        SmartObject.__init__(self)
-        return self.resources # return a handle to the resources directory 
+        SmartObject.__init__(self) 
+        # Use a smart object instance as a container for SmartObjects 
+        # and create a Description resource for the RDF registry
+        self.create('Description', Description)
+        return self.resources # return a handle to the root resources dictionary
         
     
