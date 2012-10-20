@@ -39,23 +39,24 @@ class RestObject(restObject.RestObject):
         restObject.RestObject._handleDELETE(self, currentResource) # default DELETE
 
 
-class HttpObjectService(ObjectService):
+class HttpObjectService(object):
     
-    def __init__(self):
-        objectHandler = restObject.bind(ObjectService.__init__(self), users=None) 
-        #bind to root resource dictionary returned by ObjectService constructor  
+    def __init__(self, objectService):
+        self.objectService = objectService
+        objectHandler = restObject.bind(self.objectService, users=None) 
+        #bind to root resource dictionary passed to constructor  
         #bind returns the RestObject handler which uses the Request object
         # the handler calls the overriding _handleXX methods in this module
         routes = [(r'GET,PUT,POST,DELETE /.*',objectHandler() )]
         return routes
                   
-        
+# Standalone service mode
 if __name__ == '__main__' :
     import sys
     from wsgiref.simple_server import make_server
-    # HttpObjectService constructor method creates a Smart Object service and 
-    # returns a constructor for a restlite router instance
-    routes = HttpObjectService()
+    # Create a Smart Object service, returns a reference to the top level resources dict
+    objectService = ObjectService()
+    routes = HttpObjectService(objectService)
     httpd = make_server('', 8000, restlite.router(routes))
     try: httpd.serve_forever()
     except KeyboardInterrupt: pass

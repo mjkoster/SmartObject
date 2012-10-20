@@ -21,6 +21,6 @@ class ObjectService(SmartObject):
         # Use a smart object instance as a container for SmartObjects 
         # and create a Description resource for the RDF registry
         self.create('Description', Description)
-        return self.resources # return a handle to the root resources dictionary
+        return self.resources # return a reference to the root resources dictionary
         
     
