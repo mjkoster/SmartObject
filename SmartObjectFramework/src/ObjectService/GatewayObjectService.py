@@ -17,25 +17,24 @@ import threading
 class GatewayObjectService(object):
     
     def __init__(self):
-        self.objectService = ObjectService.__init__(self)
-        # objectService constructor returns ref to it's resources dictionary
+        self.objectService = ObjectService()
     
     def _startHttpObjectService(self):
         from wsgiref.simple_server import make_server
         # HttpObjectService constructor method creates a Smart Object service and 
         # returns a constructor for a restlite router instance
-        routes = HttpObjectService(self.objectService)
-        self.httpd = make_server('', 8000, restlite.router(routes))
+        httpObjectService = HttpObjectService(self.objectService.resources)
+        self.httpd = make_server('', 8000, restlite.router(httpObjectService.routes))
         try: self.httpd.serve_forever()
         except KeyboardInterrupt: pass
     
     def _startCoapObjectService(self):
         # Use similar pattern for CoAP service, emulate with another http server for now
         from wsgiref.simple_server import make_server
-        # routes = CoapObjectService(self.objectService)
-        # self.coapd = make_server('', 61616, restlite.router(routes))
-        routes = HttpObjectService(self.objectService)
-        self.coapd = make_server('', 8001, restlite.router(routes))
+        # coapObjectServices = CoapObjectService(self.objectService)
+        # self.coapd = make_server('', 61616, restlite.router(coapObjectService.routes))
+        coapObjectService = HttpObjectService(self.objectService.resources)
+        self.coapd = make_server('', 8001, restlite.router(coapObjectService.routes))
         try: self.coapd.serve_forever()
         except KeyboardInterrupt: pass
         

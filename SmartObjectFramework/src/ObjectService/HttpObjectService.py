@@ -43,20 +43,20 @@ class HttpObjectService(object):
     
     def __init__(self, objectService):
         self.objectService = objectService
-        objectHandler = restObject.bind(self.objectService, users=None) 
+        self.objectHandler = restObject.bind(self.objectService, users=None) 
         #bind to root resource dictionary passed to constructor  
         #bind returns the RestObject handler which uses the Request object
         # the handler calls the overriding _handleXX methods in this module
-        routes = [(r'GET,PUT,POST,DELETE /.*',objectHandler() )]
-        return routes
+        self.routes = [(r'GET,PUT,POST,DELETE /.*', self.objectHandler )]
+        return 
                   
 # Standalone service mode
 if __name__ == '__main__' :
     import sys
     from wsgiref.simple_server import make_server
-    # Create a Smart Object service, returns a reference to the top level resources dict
+    # Create a Smart Object service,, return a reference to the top level resources dict
     objectService = ObjectService()
-    routes = HttpObjectService(objectService)
+    routes = HttpObjectService(objectService.resources)
     httpd = make_server('', 8000, restlite.router(routes))
     try: httpd.serve_forever()
     except KeyboardInterrupt: pass
