@@ -49,7 +49,7 @@ class Request(object):
         if hash_recv != users[user]: 
             return (user, '401 Not Authorized')
         '''
-        user = None # short out the auth for now, make all OK
+        user = 'test' # short out the auth for now, make all OK
         return (user, '200 OK')
         
     # throw the 401 response with appropriate header
@@ -70,6 +70,7 @@ class Request(object):
         return self.env['BODY']
     
     def verifyAccess(self, user, type, obj):
+        return
         if not obj: 
             raise restlite.Status, '404 Not Found'
         if '_access' in obj: 
@@ -79,16 +80,16 @@ class Request(object):
         index = {'r': 1, 'w': 2, 'x': 3}[type]
         if not (user == self.user and self.access[index] != '-' \
                 or user != self.user and self.access[6+index] != '-'):
-            return # verify everything for now
-            # raise restlite.Status, '403 Forbidden'
+            raise restlite.Status, '403 Forbidden'
     
             
 class RestObject(object):
     def __init__(self, objDict, users):
         self.objDict, self.users, self.realm = objDict, users, 'localhost'
     #default GET does simple JSON and XML content negotiation, defaults to JSON        
-    def _handleGET(self, currentItem):    
-        respType, value = restlite.represent(currentItem.get(), type=self.env.get('ACCEPT', 'application/json'))
+    def _handleGET(self, currentItem): 
+        itemValue = currentItem.get() 
+        respType, value = restlite.represent(itemValue, type=self.env.get('ACCEPT', 'application/json'))
         self.start_response('200 OK', [('Content-Type', respType)])
         return [value]
     #default PUT accepts JSON
@@ -108,9 +109,8 @@ class RestObject(object):
     def handler(self, env, start_response):   
         self.env, self.start_response = env, start_response
                     
-        print 'restObject.handler()', env['SCRIPT_NAME'], env['PATH_INFO']
-        
-        self.request = Request(env, start_response)
+        print 'restObject.handler()', self.env['SCRIPT_NAME'], self.env['REQUEST_METHOD'], self.env['PATH_INFO'] 
+        self.request = Request(self.env, self.start_response)
         
         user, reason = self.request.getAuthUser(self.users, self.realm, addIfMissing=True)
         if not user or not reason.startswith('200'): 
@@ -126,10 +126,10 @@ class RestObject(object):
         if item:
             self.request.verifyAccess(user, 'x', currentDict)
             currentResource = currentDict[item]
-        if not isinstance(currentResource.resources, dict): 
+        if not isinstance(currentResource.resources, dict): # endpoint must have a resources dict for auth info
             raise restlite.Status, '400 Bad Request'
-        currentDict = currentResource.resources # make the current dict the endpoint dict
-        
+        currentDict = currentResource.resources # make the current dict the endpoint dict for auth info
+
         if self.request.method == 'POST':
             if item:
                 self.request.verifyAccess(user, 'x', currentDict) # create priv

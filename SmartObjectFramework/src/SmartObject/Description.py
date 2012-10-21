@@ -29,7 +29,7 @@ class Description (RESTfulResource, Graph):
         self.set((s,p,o))
         return
     
-    def get(self, (s,p,o)):
+    def get(self, (s,p,o) = ('','','')):
         return self.triples((s,p,o))
     
     def set(self, (s,p,o)):
