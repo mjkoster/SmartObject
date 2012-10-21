@@ -32,19 +32,17 @@ class Resource(object) :
         return
 
     # return the default contents of this resource
-    #@Resource.getter - would this decorator work?
     def get(self) :
-        return(self.value)
+        return self.value 
 
     # update the default contents of this resource
-    #@Resource.setter
     def set(self, newValue) :
         self.value=newValue
         return
       
     # for adding resources inside this resource
     def create(self, resourceName, className) :
-        # create new instance of the named class and add to resources directory 
+        # create new instance of the named class and add to resources directory, return the ref
         self.resources.update({resourceName : className()}) 
         return self.resources[resourceName]
 

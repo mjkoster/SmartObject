@@ -22,9 +22,12 @@ class ObjectService(SmartObject):
         SmartObject.__init__(self) 
         # Use a smart object instance as a container for SmartObjects 
         # and create a Description resource for the RDF registry
-        self.create('Description', Description)
+        self.Description = self.create('Description', Description)
         self.testProperty = self.create('testProperty', ObservableProperty) #make a decorator for resourceName
-        self.testProperty.create('PropertyOfInterest', PropertyOfInterest)
+        self.testProperty.PropertyOfInterest = \
+            self.testProperty.create('PropertyOfInterest', PropertyOfInterest)
         self.testProperty.set('happy birthday Catt')
+        self.testProperty = 'happy birthday Catt' # doesn't work 
+        print self.testProperty
         
     
