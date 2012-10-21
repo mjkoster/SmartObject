@@ -13,6 +13,8 @@ SmartObjects
 '''
 from SmartObject.SmartObject import SmartObject
 from SmartObject.Description import Description
+from SmartObject.ObservableProperty import ObservableProperty
+from SmartObject.PropertyOfInterest import PropertyOfInterest
 
 class ObjectService(SmartObject):
 
@@ -21,5 +23,9 @@ class ObjectService(SmartObject):
         # Use a smart object instance as a container for SmartObjects 
         # and create a Description resource for the RDF registry
         self.create('Description', Description)
+        self.create('testProperty', ObservableProperty)
+        self.resources['testProperty'].create('PropertyOfInterest', PropertyOfInterest)
+        self.resources['testProperty'].set(1234)
+        #self.resources['testProperty'].resources['PropertyOfInterest'].set(1234)
         
     

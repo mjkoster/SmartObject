@@ -70,7 +70,7 @@ class Request(object):
         return self.env['BODY']
     
     def verifyAccess(self, user, type, obj):
-        return
+        return # short out for now
         if not obj: 
             raise restlite.Status, '404 Not Found'
         if '_access' in obj: 

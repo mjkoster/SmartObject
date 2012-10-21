@@ -36,18 +36,14 @@ class ObservableProperty(RESTfulResource):
         # self.create('PropertyOfInterest', PropertyOfInterest)
       
     def __get__(self, instance, cls):
-        if self.hasattr('PropertyOfInterest'):
-            return self.PropertyOfInterest
+        return self.resources['PropertyOfInterest'].get()
     
     def __set__(self, instance, newValue):
-        if self.hasattr('PropertyOfInterest'):
-            self.PropertyOfInterest = newValue
+        self.resources['PropertyOfInterest'].set(newValue)
           
     def get(self):
-        if self.hasattr('PropertyOfInterest'):
-            return self.PropertyOfInterest
+        return self.resources['PropertyOfInterest'].get()
     
     def set(self, newValue):
-        if self.hasattr('PropertyOfInterest'):
-            self.PropertyOfInterest = newValue
+        self.resources['PropertyOfInterest'].set(newValue)
         
