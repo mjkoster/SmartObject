@@ -32,15 +32,7 @@ class ObservableProperty(RESTfulResource):
     
     def __init__(self):
         RESTfulResource.__init__(self) 
-        # create an instance of PropetyOfInterest to hold the observable type default
-        # self.create('PropertyOfInterest', PropertyOfInterest)
-      
-    def __get__(self, instance, cls):
-        return self.resources['PropertyOfInterest'].get()
-    
-    def __set__(self, instance, newValue):
-        self.resources['PropertyOfInterest'].set(newValue)
-          
+        # default return property of interest
     def get(self):
         return self.resources['PropertyOfInterest'].get()
     

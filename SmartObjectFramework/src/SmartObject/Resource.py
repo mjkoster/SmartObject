@@ -48,5 +48,5 @@ class Resource(object) :
 
     # for removing resources inside this resource
     def delete(self, resourceName) :
-        del self.resources[resourceName] # remove dict entry
+        del self.resources[resourceName] # remove dict entry FIXME remove reference to instance
         return

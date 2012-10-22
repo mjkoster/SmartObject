@@ -25,11 +25,10 @@ class RESTfulResource(Resource) :
     def __init__(self):
         Resource.__init__(self)
         self.content_types = [] 
-        
-    # when this resource is deleted
-    def __del__(self):
-        Resource.__del__(self)
-    
+
+""" Default representation is JSON, XML also supported
+    Add parse and serialize for RDF graph, etc. for richer 
+    representation than JSON
     # Convert representation to native type
     def parse(self, content) :
         def types(self):
@@ -41,6 +40,6 @@ class RESTfulResource(Resource) :
         def types(self):
             return(self.content_types)
         return resource.str
-
+"""
 
 
