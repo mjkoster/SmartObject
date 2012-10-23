@@ -26,12 +26,15 @@ class ObjectService(SmartObject):
         self.description = self.create('description', Description)
         print self.description.__class__
         self.description.set((Literal('objectService'), Literal('path'), Literal('http://SmartObjectService.com:8000/')))
-        self.description.set((Literal('objectService'), Literal('has'), Literal('testObject')))
-        self.description.set((Literal('testObject/propertyOne'), Literal('represents'), Literal('Message')))
-        self.description.set((Literal('testObject/propertyTwo'), Literal('represents'), Literal('Integer')))
-        
         # TEST
-        # create an example property at the top level for a rough test
+        # create a SmeartObjectbject the top level for a rough test
+        # add some example triples describing the object and it's properties
+        self.description.set((Literal('testObject'), Literal('rt'), Literal('SmartObject')))
+        self.description.set((Literal('testObject/propertyOne'), Literal('rt'), Literal('logEntry')))
+        self.description.set((Literal('testObject/propertyOne'), Literal('if'), Literal('message')))
+        self.description.set((Literal('testObject/propertyTwo'), Literal('rt'), Literal('temperature')))
+        self.description.set((Literal('testObject/propertyTwo'), Literal('if'), Literal('sensor')))
+        # create the object and it's properties using create
         self.testObject = self.create('testObject', SmartObject)
         self.testObject.propertyOne = self.testObject.create('propertyOne', ObservableProperty)
         self.testObject.propertyOne.PropertyOfInterest = \
