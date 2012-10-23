@@ -12,36 +12,36 @@ from RESTfulResource import RESTfulResource
 from rdflib.graph import Graph
 from Observers import Observers
 
-class Description (RESTfulResource, Graph):
+class Description (RESTfulResource):
     
     def __init__(self):
         RESTfulResource.__init__(self)
-        Graph.__init__(self)
+        self.graph = Graph()
     
     # Description method returns triples can be invoked via the 
     # property interface: SmartObject.Description  
     # Does the property decorator work for this?
-    
+    """
     def __get__(self, (s,p,o)):
-        return self.get((s,p,o))
+        return self.graph.get((s,p,o))
     
     def __set__(self, (s,p,o)):
-        self.set((s,p,o))
+        self.graph.set((s,p,o))
         return
-    
+    """
     def get(self, (s,p,o) = ('','','')):
-        return self.triples((s,p,o))
+        return self.graph.triples((s,p,o))
     
     def set(self, (s,p,o)):
-        self.set((s,p,o))
+        self.graph.set((s,p,o))
         return
     
     def create(self, (s,p,o)):
-        self.add((s,p,o))
+        self.graph.add((s,p,o))
         return
     
     def delete(self, (s,p,o)):
-        self.remove((s,p,o))
+        self.graph.remove((s,p,o))
         return
     
     def parse(self,source,fmt):

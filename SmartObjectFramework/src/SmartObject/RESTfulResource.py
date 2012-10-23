@@ -24,7 +24,8 @@ class RESTfulResource(Resource) :
     # when this resource is created
     def __init__(self):
         Resource.__init__(self)
-        self.content_types = [] 
+        self.parserContent_types = [] 
+        self.serializerContent_types = []
 
 """ Default representation is JSON, XML also supported
     Add parse and serialize for RDF graph, etc. for richer 
@@ -32,13 +33,13 @@ class RESTfulResource(Resource) :
     # Convert representation to native type
     def parse(self, content) :
         def types(self):
-            return(self.content_types)
+            return(self.parserContent_types)
         return content.value ;
 
     # Convert native type to representation
     def serialize(self, resource) :
         def types(self):
-            return(self.content_types)
+            return(self.serializerContent_types)
         return resource.str
 """
 

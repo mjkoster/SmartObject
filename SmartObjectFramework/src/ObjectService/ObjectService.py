@@ -15,6 +15,7 @@ from SmartObject.SmartObject import SmartObject
 from SmartObject.Description import Description
 from SmartObject.ObservableProperty import ObservableProperty
 from SmartObject.PropertyOfInterest import PropertyOfInterest
+from rdflib.term import Literal
 
 class ObjectService(SmartObject):
 
@@ -22,12 +23,25 @@ class ObjectService(SmartObject):
         SmartObject.__init__(self) 
         # Use a smart object instance as a container for SmartObjects 
         # and create a Description resource for the RDF registry
-        self.Description = self.create('Description', Description)
-        self.testProperty = self.create('testProperty', ObservableProperty) #make a decorator for resourceName
-        self.testProperty.PropertyOfInterest = \
-            self.testProperty.create('PropertyOfInterest', PropertyOfInterest)
-        self.testProperty.set('happy birthday Catt')
-        self.testProperty = 'happy birthday Catt' # doesn't work 
-        print self.testProperty
+        self.description = self.create('description', Description)
+        print self.description.__class__
+        self.description.set((Literal('objectService'), Literal('path'), Literal('http://SmartObjectService.com:8000/')))
+        self.description.set((Literal('objectService'), Literal('has'), Literal('testObject')))
+        self.description.set((Literal('testObject/propertyOne'), Literal('represents'), Literal('Message')))
+        self.description.set((Literal('testObject/propertyTwo'), Literal('represents'), Literal('Integer')))
+        
+        # TEST
+        # create an example property at the top level for a rough test
+        self.testObject = self.create('testObject', SmartObject)
+        self.testObject.propertyOne = self.testObject.create('propertyOne', ObservableProperty)
+        self.testObject.propertyOne.PropertyOfInterest = \
+            self.testObject.propertyOne.create('PropertyOfInterest', PropertyOfInterest)
+        self.testObject.propertyTwo = self.testObject.create('propertyTwo', ObservableProperty)
+        self.testObject.propertyTwo.PropertyOfInterest = \
+            self.testObject.propertyTwo.create('PropertyOfInterest', PropertyOfInterest)
+        self.testObject.propertyOne.set('Hello World')
+        self.testObject.propertyTwo.set(1234)
+        print self.testObject.propertyOne.get() # PropertyOfInterest.get()
+        print self.testObject.propertyTwo.get() # PropertyOfInterest.get()
         
     
