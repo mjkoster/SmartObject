@@ -15,6 +15,7 @@ from restlite import restlite
 from restlite import restObject
 from ObjectService import ObjectService
 
+# Extend restObject classes with content handlers and provide a local bind method to pick up local extensions
 class Request(restObject.Request):
     def __init__(self, env, start_response):
         self.env, self.start_response = env, start_response
@@ -27,6 +28,14 @@ class RestObject(restObject.RestObject):
         
         
     def _handleGET(self, currentResource):
+        # if it's a Dictionary class, invoke the serializer
+        if hasattr(currentResource,'serialize') :
+            serialize = currentResource.serialize
+            respType = currentResource.serializeContentTypes # use fixed type for now
+            resourceValue = currentResource.get() # do the get, returns a typed attribute
+            responseValue = currentResource.serialize( resourceValue, 'xml' ) # fixed type hack
+            self.start_response('200 OK', [('Content-Type', 'xml')]) # xml to display in browser for now
+            return responseValue
         return restObject.RestObject._handleGET(self, currentResource) # default GET
     
     def _handlePUT(self, currentResource):

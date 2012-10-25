@@ -15,7 +15,7 @@ from SmartObject.SmartObject import SmartObject
 from SmartObject.Description import Description
 from SmartObject.ObservableProperty import ObservableProperty
 from SmartObject.PropertyOfInterest import PropertyOfInterest
-from rdflib.term import Literal
+from rdflib.term import Literal, URIRef
 
 class ObjectService(SmartObject):
 
@@ -25,7 +25,7 @@ class ObjectService(SmartObject):
         # and create a Description resource for the RDF registry
         self.description = self.create('description', Description)
         print self.description.__class__
-        self.description.set((Literal('objectService'), Literal('path'), Literal('http://SmartObjectService.com:8000/')))
+        self.description.set((Literal('objectService'), Literal('path'), URIRef('http://SmartObjectService.com:8000/')))
         # TEST
         # create a SmeartObjectbject the top level for a rough test
         # add some example triples describing the object and it's properties

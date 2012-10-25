@@ -92,7 +92,7 @@ class RestObject(object):
         itemValue = currentItem.get() 
         respType, value = restlite.represent(itemValue, type=self.env.get('ACCEPT', 'application/json'))
         self.start_response('200 OK', [('Content-Type', respType)])
-        return [value]
+        return value
     
     #default PUT accepts JSON
     def _handlePUT(self, currentItem):
