@@ -16,6 +16,7 @@ from SmartObject.Description import Description
 from SmartObject.ObservableProperty import ObservableProperty
 from SmartObject.PropertyOfInterest import PropertyOfInterest
 from rdflib.term import Literal, URIRef
+from rdflib.namespace import RDF, RDFS, XSD, OWL
 
 class ObjectService(SmartObject):
 
@@ -24,16 +25,14 @@ class ObjectService(SmartObject):
         # Use a smart object instance as a container for SmartObjects 
         # and create a Description resource for the RDF registry
         self.description = self.create('description', Description)
-        print self.description.__class__
-        self.description.set((Literal('objectService'), Literal('path'), URIRef('http://SmartObjectService.com:8000/')))
         # TEST
         # create a SmeartObjectbject the top level for a rough test
         # add some example triples describing the object and it's properties
-        self.description.set((Literal('testObject'), Literal('rt'), Literal('SmartObject')))
-        self.description.set((Literal('testObject/propertyOne'), Literal('rt'), Literal('logEntry')))
-        self.description.set((Literal('testObject/propertyOne'), Literal('if'), Literal('message')))
-        self.description.set((Literal('testObject/propertyTwo'), Literal('rt'), Literal('temperature')))
-        self.description.set((Literal('testObject/propertyTwo'), Literal('if'), Literal('sensor')))
+        self.description.set((URIRef('testObject'), RDFS.Class, Literal('SmartObject')))
+        self.description.set((URIRef('testObject/propertyOne'), RDFS.Resource, Literal('logEntry')))
+        self.description.set((URIRef('testObject/propertyOne'), RDF.type, Literal('message')))
+        self.description.set((URIRef('testObject/propertyTwo'), RDFS.Resource, Literal('temperature')))
+        self.description.set((URIRef('testObject/propertyTwo'), RDF.type, Literal('sensor')))
         # create the object and it's properties using create
         self.testObject = self.create('testObject', SmartObject)
         self.testObject.propertyOne = self.testObject.create('propertyOne', ObservableProperty)

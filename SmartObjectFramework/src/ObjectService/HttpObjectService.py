@@ -30,11 +30,11 @@ class RestObject(restObject.RestObject):
     def _handleGET(self, currentResource):
         # if it's a Dictionary class, invoke the serializer
         if hasattr(currentResource,'serialize') :
-            serialize = currentResource.serialize
             respType = currentResource.serializeContentTypes # use fixed type for now
+            print respType
             resourceValue = currentResource.get() # do the get, returns a typed attribute
             responseValue = currentResource.serialize( resourceValue, 'xml' ) # fixed type hack
-            self.start_response('200 OK', [('Content-Type', 'xml')]) # xml to display in browser for now
+            self.start_response('200 OK', [('Content-Type', 'application/xml')]) # xml to display in browser for now
             return responseValue
         return restObject.RestObject._handleGET(self, currentResource) # default GET
     

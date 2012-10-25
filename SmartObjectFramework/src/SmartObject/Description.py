@@ -24,7 +24,7 @@ class Description (RESTfulResource):
     # property interface: SmartObject.Description  
     # Does the property decorator work for this?
 
-    def get(self, (s,p,o) = ('','','')):
+    def get(self, (s,p,o) = (None,None,None)):
         # return a graph consisting of the matching triples
         g = Graph()
         for triple in self.graph.triples((s,p,o)) :
@@ -49,7 +49,7 @@ class Description (RESTfulResource):
         return g.parse(source,format=fmt)
     
     def serialize(self,graph,fmt): 
-        return graph.serialize(format=fmt)
+        return graph.serialize(destination=None, format=fmt)
     
     
         
