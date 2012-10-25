@@ -23,11 +23,11 @@ class Request(restObject.Request):
 
 class RestObject(restObject.RestObject):
     def __init__(self, objDict, users):
-        RestObject.__init__(objDict, users)
+        restObject.RestObject.__init__(self, objDict, users)
         
         
     def _handleGET(self, currentResource):
-        restObject.RestObject._handleGET(self, currentResource) # default GET
+        return restObject.RestObject._handleGET(self, currentResource) # default GET
     
     def _handlePUT(self, currentResource):
         restObject.RestObject._handlePUT(self, currentResource) # default PUT
@@ -39,11 +39,23 @@ class RestObject(restObject.RestObject):
         restObject.RestObject._handleDELETE(self, currentResource) # default DELETE
 
 
+def bind(objDict, users=None):
+    '''The bind method to bind the returned wsgi application to the supplied data and users.
+    @param data the original Python data structure which is used and updated as needed.
+    @param users the optional users dictionary. If missing, it disables access control.
+    @return:  the wsgi application that can be used with restlite.
+    '''
+    restObject = RestObject(objDict, users)
+    def handler(env, start_response):
+        return restObject.handler(env, start_response)
+    return handler
+
+
 class HttpObjectService(object):
     
     def __init__(self, objectService): # get a handle to the Object Service root dictionary
         self.objectService = objectService
-        self.objectHandler = restObject.bind(self.objectService, users=None) 
+        self.objectHandler = bind(self.objectService, users=None) 
         #bind to root resource dictionary passed to constructor  
         #bind returns the RestObject handler which uses the Request object
         # the handler calls the overriding _handleXX methods in this module
