@@ -41,7 +41,7 @@ class RestObject(restObject.RestObject):
 
 class HttpObjectService(object):
     
-    def __init__(self, objectService):
+    def __init__(self, objectService): # get a handle to the Object Service root dictionary
         self.objectService = objectService
         self.objectHandler = restObject.bind(self.objectService, users=None) 
         #bind to root resource dictionary passed to constructor  

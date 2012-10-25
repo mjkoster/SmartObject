@@ -43,7 +43,7 @@ class ObjectService(SmartObject):
         self.testObject.propertyTwo.PropertyOfInterest = \
             self.testObject.propertyTwo.create('PropertyOfInterest', PropertyOfInterest)
         self.testObject.propertyOne.set('Hello World')
-        self.testObject.propertyTwo.set(1234)
+        self.testObject.propertyTwo.set(98.6)
         print self.testObject.propertyOne.get() # PropertyOfInterest.get()
         print self.testObject.propertyTwo.get() # PropertyOfInterest.get()
         

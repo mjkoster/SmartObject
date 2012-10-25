@@ -23,8 +23,8 @@ class GatewayObjectService(object):
         from wsgiref.simple_server import make_server
         # HttpObjectService constructor method creates a Smart Object service and 
         # returns a constructor for a restlite router instance
-        httpObjectService = HttpObjectService(self.objectService.resources)
-        self.httpd = make_server('', 8000, restlite.router(httpObjectService.routes))
+        self.httpObjectService = HttpObjectService(self.objectService.resources)
+        self.httpd = make_server('', 8000, restlite.router(self.httpObjectService.routes))
         try: self.httpd.serve_forever()
         except KeyboardInterrupt: pass
     
@@ -33,23 +33,27 @@ class GatewayObjectService(object):
         from wsgiref.simple_server import make_server
         # coapObjectServices = CoapObjectService(self.objectService)
         # self.coapd = make_server('', 61616, restlite.router(coapObjectService.routes))
-        coapObjectService = HttpObjectService(self.objectService.resources)
-        self.coapd = make_server('', 8001, restlite.router(coapObjectService.routes))
+        self.coapObjectService = HttpObjectService(self.objectService.resources)
+        self.coapd = make_server('', 8001, restlite.router(self.coapObjectService.routes))
         try: self.coapd.serve_forever()
         except KeyboardInterrupt: pass
         
             
 if __name__ == '__main__' :
     
-    gateway = GatewayObjectService() # make an instance of the gateway and start threads 
+    gateway = GatewayObjectService() # make an instance of the gateway and start a thread for each service interface  
+    print 'Gateway started'
     
     httpThread = threading.Thread(target = gateway._startHttpObjectService)
     httpThread.daemon = True
     httpThread.start()
-    
+    print 'httpd started'
+
     coapThread = threading.Thread(target = gateway._startCoapObjectService)
     coapThread.daemon = True
     coapThread.start()
+    print 'coapd started'
+
     # start agents here
     try:
         # register handlers etc.
