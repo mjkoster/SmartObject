@@ -39,14 +39,14 @@ class RestObject(restObject.RestObject):
     
     def _handlePUT(self, currentResource):
         if hasattr(currentResource, 'parse') :
-            requestType = self.env.get('Content-Type')
+            requestType = self.env.get('ACCEPT')
             if requestType in currentResource.parseContentTypes :
                 currentResource.set( currentResource.parse( self.getBody() , requestType ))
         restObject.RestObject._handlePUT(self, currentResource) # default PUT
     
     def _handlePOST(self, currentResource):
         if hasattr(currentResource, 'parse') :
-            requestType = self.env.get('Content-Type')
+            requestType = self.env.get('ACCEPT')
             if requestType in currentResource.parseContentTypes :
                 currentResource.create( currentResource.parse( self.getBody() , requestType ))
         restObject.RestObject._handlePOST(self, currentResource) # default POST
