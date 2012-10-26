@@ -37,43 +37,33 @@ class Description (RESTfulResource):
     # Does the property decorator work for this?
 
     def get(self, (s,p,o) = (None,None,None)):
-        # return a graph consisting of the matching triples
+        # return a sub-graph consisting of the matching triples
         g = RespGraph()
         for triple in self.graph.triples((s,p,o)) :
             g.add(triple)
         return g
     
+    # set existing triple (remove + add) or add sub-graph
     def set(self, newValue):
-        self.setTriple(newValue)
+        if type(newValue) is tuple :
+            self.graph.set(newValue)
+        else :
+            self.graph += newValue
     
+    # add new triple or replace graph
     def create(self, newValue):    
-        self.createTriple(newValue)
+        if type(newValue) is tuple :
+            self.graph.create(newValue)
+        else :
+            self.graph = newValue
     
+    # remove triple or remove sub-graph
     def delete(self, newValue):
-        self.deleteTriple(newValue)
+        if type(newValue) is tuple :
+            self.graph.remove(newValue)
+        else :
+            self.graph -= newValue
     
-    def setTriple(self, (s,p,o) ):
-        self.graph.set((s,p,o))
-        return
-            
-    def createTriple(self, (s,p,o) ):
-        self.graph.add( (s,p,o) )
-        
-    def deleteTriple(self, (s,p,o) ):
-        self.graph.remove( (s,p,o) )
-
-    def setGraph(self, g):
-        self.graph += g 
-        return
-    
-    def createGraph(self, g):
-        self.graph = g
-        return
-    
-    def deleteGraph(self, g):
-        self.graph -= g
-        return
-
     # exposed methods for converting sub graphs 
     def parse(self,source, cType):
         g = Graph()
