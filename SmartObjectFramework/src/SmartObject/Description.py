@@ -12,13 +12,25 @@ from RESTfulResource import RESTfulResource
 from rdflib.graph import Graph
 from Observers import Observers
 
+class RespGraph(Graph):
+    # add a method to convert to XML
+    def _xml_(self):
+        return self.serialize(format='xml')
+ 
 class Description (RESTfulResource):
     
     def __init__(self):
         RESTfulResource.__init__(self)
         self.graph = Graph()
-        self.parseContentTypes = 'application/rdf+xml'
-        self.serializeContentTypes = 'application/rdf+xml'
+        self.parseContentTypes = ['application/rdf+xml', 'text/rdf+n3' ]
+        self.serializeContentTypes = [ 'text/xml', 'application/rdf+xml', 'application/x-turtle' , 'text/rdf+n3' ]
+        self.fmt = { 'text/xml' : 'xml', 
+               'application/rdf+xml' : 'xml',
+               'application/x-turtle' : 'turtle',
+               'text/rdf+n3' : 'n3',
+               'text/plain' : 'nt'
+               }
+        
 
     # Description method returns triples can be invoked via the 
     # property interface: SmartObject.Description  
@@ -26,7 +38,7 @@ class Description (RESTfulResource):
 
     def get(self, (s,p,o) = (None,None,None)):
         # return a graph consisting of the matching triples
-        g = Graph()
+        g = RespGraph()
         for triple in self.graph.triples((s,p,o)) :
             g.add(triple)
         return g
@@ -44,12 +56,12 @@ class Description (RESTfulResource):
         return
     
     # exposed methods for converting sub graphs 
-    def parse(self,source,fmt):
+    def parse(self,source, cType):
         g = Graph()
-        return g.parse(source,format=fmt)
+        return g.parse(source,format=self.fmt[cType])
     
-    def serialize(self,graph,fmt): 
-        return graph.serialize(destination=None, format=fmt)
-    
+    def serialize(self,graph, cType): 
+        return graph.serialize(format=self.fmt[cType])
+       
     
         

@@ -90,7 +90,8 @@ class RestObject(object):
     #default GET does simple JSON and XML content negotiation, defaults to JSON   
     def _handleGET(self, currentItem): 
         itemValue = currentItem.get() 
-        respType, value = restlite.represent(itemValue, type=self.env.get('ACCEPT', 'application/json'))
+        # respType, value = restlite.represent(itemValue, type=self.env.get('ACCEPT', 'application/json'))
+        respType, value = restlite.represent(itemValue, type=self.env.get('ACCEPT', 'text/plain'))
         self.start_response('200 OK', [('Content-Type', respType)])
         return value
     
