@@ -35,7 +35,7 @@ class RestObject(restObject.RestObject):
             if responseType in responseTypes: # if requested type is in the set of types, return serialized type
                 self.start_response('200 OK', [('Content-Type', responseType)]) 
                 return currentResource.serialize( currentResource.get(), responseType )
-        return restObject.RestObject._handleGET(self, currentResource) # default GET
+        return restObject.RestObject._handleGET(self, currentResource) # default GET does JSON and XML
     
     def _handlePUT(self, currentResource):
         if hasattr(currentResource, 'parse') :
@@ -75,8 +75,16 @@ class HttpObjectService(object):
         #bind to root resource dictionary passed to constructor  
         #bind returns the RestObject handler which uses the Request object
         # the handler calls the overriding _handleXX methods in this module
-        self.routes = [(r'GET,PUT,POST,DELETE ', self.objectHandler )]
+        self.routes = [(r'GET /favicon.ico$', self.favicon_handler),(r'GET,PUT,POST,DELETE ', self.objectHandler )]
         return 
+    
+    def favicon_handler(self, env, start_response) :
+        start_response('200 OK', [('Content-Type', 'image/gif')]) 
+        try:
+            with open('favicon.ico', 'rb') as f: result = f.read()
+        except: raise restlite.Status, '400 Error Reading File'
+        return(result)
+
                   
 # Standalone service mode
 if __name__ == '__main__' :
