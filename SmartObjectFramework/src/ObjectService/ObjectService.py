@@ -14,6 +14,7 @@ SmartObjects
 from SmartObject.SmartObject import SmartObject
 from SmartObject.Description import Description
 from SmartObject.ObservableProperty import ObservableProperty
+from SmartObject.Observers import Observers
 from SmartObject.PropertyOfInterest import PropertyOfInterest
 from rdflib.term import Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD, OWL
@@ -45,5 +46,14 @@ class ObjectService(SmartObject):
         self.testObject.propertyTwo.set(98.6)
         print self.testObject.propertyOne.get() # PropertyOfInterest.get()
         print self.testObject.propertyTwo.get() # PropertyOfInterest.get()
+        
+        self.testObject.propertyThree = self.testObject.create('propertyThree', ObservableProperty)
+        self.testObject.propertyThree.PropertyOfInterest = \
+            self.testObject.propertyThree.create('PropertyOfInterest', PropertyOfInterest)       
+        self.testObject.propertyTwo.observers = \
+            self.testObject.propertyTwo.create('observers', Observers)
+        self.testObject.propertyTwo.observers.set('http://localhost:8000/testObject/propertyThree')
+        
+        self.testObject.propertyTwo.set(99.7)
         
     

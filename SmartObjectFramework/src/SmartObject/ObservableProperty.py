@@ -38,4 +38,5 @@ class ObservableProperty(RESTfulResource):
     
     def set(self, newValue):
         self.resources['PropertyOfInterest'].set(newValue)
-        
+        if self.resources.has_key('observers'):
+            self.resources['observers'].onUpdate(self)
