@@ -53,7 +53,7 @@ class Description (RESTfulResource):
     # add new triple or replace graph
     def create(self, newValue):    
         if type(newValue) is tuple :
-            self.graph.create(newValue)
+            self.graph.add(newValue)
         else :
             self.graph = newValue
     
