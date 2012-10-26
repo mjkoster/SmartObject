@@ -96,12 +96,12 @@ class RestObject(object):
     
     #default PUT accepts JSON
     def _handlePUT(self, currentItem):
-        currentItem.create(self.request.getBody())
+        currentItem.set(self.request.getBody())
         return
     
     #default POST accepts JSON
     def _handlePOST(self, currentItem):
-        currentItem.set(self.request.getBody())
+        currentItem.create(self.request.getBody())
         return
     
     def _handleDELETE(self, currentItem):
