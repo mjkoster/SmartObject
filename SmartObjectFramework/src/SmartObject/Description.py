@@ -13,7 +13,7 @@ from rdflib.graph import Graph
 from Observers import Observers
 
 class RespGraph(Graph):
-    # add a method to convert to XML
+    # add a method to convert to XML for RESTlite represent method
     def _xml_(self):
         return self.serialize(format='xml')
  
@@ -32,7 +32,7 @@ class Description (RESTfulResource):
                }
         
 
-    # Description method returns triples can be invoked via the 
+    # Description get method returns triples can be invoked via the 
     # property interface: SmartObject.Description  
     # Does the property decorator work for this?
 
@@ -42,19 +42,38 @@ class Description (RESTfulResource):
         for triple in self.graph.triples((s,p,o)) :
             g.add(triple)
         return g
+    
+    def set(self, newValue):
+        self.setTriple(newValue)
+    
+    def create(self, newValue):    
+        self.createTriple(newValue)
+    
+    def delete(self, newValue):
+        self.deleteTriple(newValue)
+    
+    def setTriple(self, (s,p,o) ):
+        self.graph.set((s,p,o))
+        return
+            
+    def createTriple(self, (s,p,o) ):
+        self.graph.add( (s,p,o) )
+        
+    def deleteTriple(self, (s,p,o) ):
+        self.graph.remove( (s,p,o) )
 
-    def set(self, (s,p,o)):
-        self.graph.set((s,p,o)) # remove and add
+    def setGraph(self, g):
+        self.graph += g 
         return
     
-    def create(self, (s,p,o)):
-        self.graph.add((s,p,o))
+    def createGraph(self, g):
+        self.graph = g
         return
     
-    def delete(self, (s,p,o)):
-        self.graph.remove((s,p,o))
+    def deleteGraph(self, g):
+        self.graph -= g
         return
-    
+
     # exposed methods for converting sub graphs 
     def parse(self,source, cType):
         g = Graph()

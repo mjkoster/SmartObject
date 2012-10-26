@@ -29,21 +29,26 @@ class RestObject(restObject.RestObject):
         
     def _handleGET(self, currentResource):
         # if it's a Dictionary class, invoke the serializer
-        if hasattr(currentResource,'serialize') :
-            respTypes = currentResource.serializeContentTypes 
-            respType = self.env.get( 'ACCEPT', respTypes[0]) # make default type if none requested
-            if respType in respTypes: # if requested type is in the set of types, return serialized type
-                self.start_response('200 OK', [('Content-Type', respType)]) 
-                return currentResource.serialize( currentResource.get(), respType )
+        if hasattr(currentResource,'serialize') : # see if the resource has a serialize method
+            responseTypes = currentResource.serializeContentTypes # get the list of content types 
+            responseType = self.env.get( 'ACCEPT', responseTypes[0]) # check requested type, make default type if none requested
+            if responseType in responseTypes: # if requested type is in the set of types, return serialized type
+                self.start_response('200 OK', [('Content-Type', responseType)]) 
+                return currentResource.serialize( currentResource.get(), responseType )
         return restObject.RestObject._handleGET(self, currentResource) # default GET
     
     def _handlePUT(self, currentResource):
         if hasattr(currentResource, 'parse') :
-            newValue = currentResource.parse()
-            pass
+            requestType = self.env.get('Content-Type')
+            if requestType in currentResource.parseContentTypes :
+                currentResource.set( currentResource.parse( self.getBody() , requestType ))
         restObject.RestObject._handlePUT(self, currentResource) # default PUT
     
     def _handlePOST(self, currentResource):
+        if hasattr(currentResource, 'parse') :
+            requestType = self.env.get('Content-Type')
+            if requestType in currentResource.parseContentTypes :
+                currentResource.create( currentResource.parse( self.getBody() , requestType ))
         restObject.RestObject._handlePOST(self, currentResource) # default POST
     
     def _handleDELETE(self, currentResource):
