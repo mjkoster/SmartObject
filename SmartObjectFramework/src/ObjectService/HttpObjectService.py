@@ -26,30 +26,49 @@ class RestObject(restObject.RestObject):
     def __init__(self, objDict, users):
         restObject.RestObject.__init__(self, objDict, users)
         
+    def contentTypeNegotiate(self, accepts, providedTypes):
+        accepts = accepts.split(',')
+        prefs = []
+        for accept in accepts:
+            accept = accept.split(';')
+            if len(accept) > 1:
+                accept[1] = int( float( accept[1].strip('q=') ) * 10 ) # scale q values to 0..10
+            else:
+                accept.append(10) # no q value means 1.0, scaled to 1..10
+            prefs.append(accept)
+        prefs.sort(lambda self,(x,y) : y )
+        for prefType in prefs : # try highest to lowest q values, header order if equal
+            for contentType in providedTypes : # scan provided types for a match
+                if contentType == prefType[0] :
+                    return contentType
+        if prefType[0] == '*/*' :
+            return providedTypes[0] # return our favorite type if we don't have a preferred type and */* is allowed
+        else:
+            raise restlite.Status('415 Unsupported Media Type') # no applicable type and client doesn't want whatever
         
     def _handleGET(self, currentResource):
-        # if it's a Dictionary class, invoke the serializer
+        # if it's a complex structure class, invoke the serializer
+        
         if hasattr(currentResource,'serialize') : # see if the resource has a serialize method
-            responseTypes = currentResource.serializeContentTypes # get the list of content types 
-            responseType = self.env.get( 'ACCEPT', responseTypes[0]) # check requested type, make default type if none requested
-            if responseType in responseTypes: # if requested type is in the set of types, return serialized type
-                self.start_response('200 OK', [('Content-Type', responseType)]) 
-                return currentResource.serialize( currentResource.get(), responseType )
-        return restObject.RestObject._handleGET(self, currentResource) # default GET does JSON and XML
+            responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.serializeContentTypes)
+            self.start_response('200 OK', [('Content-Type', responseType)]) 
+            return currentResource.serialize( currentResource.get(), responseType )
+        else:
+            return restObject.RestObject._handleGET(self, currentResource) # default GET does JSON and XML
     
     def _handlePUT(self, currentResource):
         if hasattr(currentResource, 'parse') :
-            requestType = self.env.get('ACCEPT')
-            if requestType in currentResource.parseContentTypes :
-                currentResource.set( currentResource.parse( self.getBody() , requestType ))
-        restObject.RestObject._handlePUT(self, currentResource) # default PUT
+            responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.parseContentTypes)
+            currentResource.set( currentResource.parse( self.getBody() , responseType ))
+        else :
+            restObject.RestObject._handlePUT(self, currentResource) # default PUT
     
     def _handlePOST(self, currentResource):
         if hasattr(currentResource, 'parse') :
-            requestType = self.env.get('ACCEPT')
-            if requestType in currentResource.parseContentTypes :
-                currentResource.create( currentResource.parse( self.getBody() , requestType ))
-        restObject.RestObject._handlePOST(self, currentResource) # default POST
+            responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.parseContentTypes)
+            currentResource.create( currentResource.parse( self.getBody() , responseType ))
+        else :
+            restObject.RestObject._handlePOST(self, currentResource) # default POST
     
     def _handleDELETE(self, currentResource):
         restObject.RestObject._handleDELETE(self, currentResource) # default DELETE
