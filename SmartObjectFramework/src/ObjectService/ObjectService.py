@@ -40,6 +40,10 @@ class ObjectService(SmartObject):
         self.testObject = self.create('testObject')
         self.testObject.description = self.testObject.create('Description')
         self.testObject.propertyOne = self.testObject.create('propertyOne')
+        self.testObject.testObject = self.testObject.create('SmartObject')
+        self.testObject.testObject.Description = self.testObject.testObject.create('Description')
+        self.testObject.propertyOne.testProperty = self.testObject.propertyOne.create('PropertyOfInterest')
+        self.testObject.propertyOne.testProperty.set(1234)
         '''
         self.testObject.propertyOne.PropertyOfInterest = \
             self.testObject.propertyOne.create('PropertyOfInterest', PropertyOfInterest)

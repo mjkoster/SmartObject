@@ -66,7 +66,9 @@ class SmartObject(RESTfulResource):
             else :
                 className = self.defaultClass 
         # create new instance of the named class and add to resources directory, return the ref
+        print className
         self.resources.update({resourceName : globals()[className]()}) 
+
         return self.resources[resourceName] # returns a reference to the created instance
 
     def serialize(self, graph, cType) : 

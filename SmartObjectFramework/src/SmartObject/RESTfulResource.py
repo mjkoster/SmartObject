@@ -27,6 +27,20 @@ class RESTfulResource(Resource) :
         self._parseContentTypes = [] 
         self._serializeContentTypes = []
         self.defaultClass = 'RESTfulResource' # class name, override in derived classes
+        self.wellKnownClasses = [ 'Description' , 'Observers' , 'PropertyOfInterest' , 'SmartObject' , 'RESTfulResource' , 'Agent' ]
+
+
+    def create(self, resourceName, className=None ) : 
+        if className == None :
+            if resourceName in self.wellKnownClasses :
+                className = resourceName
+            else :
+                className = self.defaultClass 
+        # create new instance of the named class and add to resources directory, return the ref
+        self.resources.update({resourceName : globals()[className]()}) 
+        print className
+        return self.resources[resourceName] # returns a reference to the created instance
+
 
 """ Default representation is JSON, XML also supported
     Add parse and serialize for RDF graph, etc. for richer 
