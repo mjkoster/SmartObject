@@ -18,12 +18,32 @@ from RESTfulResource import RESTfulResource
 
 class AppHandler(object): # template and convenience methods for raw app handlers. Python app handler should extend this class
     def __init__(self) :
-        self._propertyLinks = {}
+        self._propertyLinks = {} 
     
-    def _updateHandler(self):
+    def _updateHandler(self, updateRef = None ):
         pass
 
-
+# an example Handler 
+class additionHandler(AppHandler):
+    def __init__(self):
+        self._addend1Ref = None
+        self._addend2Ref = None
+        self._sumOutRef = None
+        self._propertyLinks = { 'addend1' : self._addend1Ref,
+                               'addend2' : self._addend2Ref,
+                               'sumOut' : self._sumOutRef
+                               }
+        # to test with simple property references 
+        
+        def _updateHandler(self, updateRef = None ):
+            if callable(self._addend1Ref) :
+                self.addend1 = self._addend1Ref.get()
+            if callable(self._addend2Ref) :
+                self.addend2 = self._addend2Ref.get()
+            if callable(self.sumOutRef) :
+                self.sumOut.set( self._addend1 + self._addend2 )
+            
+            
 class RESTfulEndpoint(object):
     def __init__(self, reference):
         self._resource = reference
@@ -40,9 +60,16 @@ class Handler(RESTfulResource):
     
     def __init__(self):
         RESTfulResource.__init__(self)
-        self._propertyLinks = {}
+        self._propertyLinks = None 
         self._appHandlerName = None
         self._updateHandler = None # reference to _updateHandler method of AppHandler
+
+    def importByName(self,classPath):
+        module = __import__(classPath)
+        components = classPath.split('.')
+        for component in components[1:]:
+            module = getattr(module, component)
+            return module
 
     def appHandlerName(self):
         return self._appHandlerName
@@ -58,16 +85,17 @@ class Handler(RESTfulResource):
     
     def set(self,appHandlerName): # create an instance of a code object in this handler object
         self._appHandlerName = appHandlerName
-        self._moduleName, self._className = self._appHandlerName.split('.')
-        # from <self._moduleName> import <self._className> get the code object into the namespace
-        self._appHandler = globals()[self._className]() # make instance of AppHandler by name
+        self._appHandlerClass = self.importByName(appHandlerName)
+        self._appHandler = self._appHandlerClass() # make instance of AppHandler by name
         # make a resource to read back the AppHandler class name
         self.resources.update( { 'AppHandler' : RESTfulEndpoint(self._appHandlerName)}) 
         # set up the property links resources
         if hasattr( self._appHandler, '_propertyLinks') :
             self._propertyLinks = self._appHandler._propertyLinks
+            self.resources.update( { 'propertyLinks' : RESTfulEndpoint(self._propertyLinks)})
             for self._propertyLinkName in self._propertyLinks.keys() : 
-                self.resources.update({self._propertyLinkName : self._propertyLinks[self._propertyLinkName]})
+                self.resources.update({self._propertyLinkName : \
+                                       RESTfulEndpoint(self._propertyLinks[self._propertyLinkName]) })
                 
         # set up the callable property to be invoked on callbacks
         if hasattr( self.appHandler, '_updateHandler' ) :
