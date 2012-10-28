@@ -34,9 +34,12 @@ class ObservableProperty(RESTfulResource):
         RESTfulResource.__init__(self) 
         # default return property of interest
     def get(self):
-        return self.resources['PropertyOfInterest'].get()
+        if 'PropertyOfInterest' in self.resources :
+            return self.resources['PropertyOfInterest'].get()
+        return None
     
     def set(self, newValue):
-        self.resources['PropertyOfInterest'].set(newValue)
-        if self.resources.has_key('observers'):
-            self.resources['observers'].onUpdate(self)
+        if 'PropertyOfInterest' in self.resources :
+            self.resources['PropertyOfInterest'].set(newValue)
+            if 'Observers' in self.resources :
+                self.resources['Observers'].onUpdate() # invoke the callable 

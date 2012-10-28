@@ -24,8 +24,9 @@ class RESTfulResource(Resource) :
     # when this resource is created
     def __init__(self):
         Resource.__init__(self)
-        self.parseContentTypes = [] 
-        self.serializeContentTypes = []
+        self._parseContentTypes = [] 
+        self._serializeContentTypes = []
+        self.defaultClass = 'RESTfulResource' # class name, override in derived classes
 
 """ Default representation is JSON, XML also supported
     Add parse and serialize for RDF graph, etc. for richer 

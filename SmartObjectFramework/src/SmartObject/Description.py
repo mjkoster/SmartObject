@@ -22,8 +22,8 @@ class Description (RESTfulResource):
     def __init__(self):
         RESTfulResource.__init__(self)
         self.graph = Graph()
-        self.parseContentTypes = [ 'text/plain' , 'application/rdf+xml' , 'text/rdf+n3' ]
-        self.serializeContentTypes = [ 'text/xml' , 'text/plain', 'application/rdf+xml' , 'application/x-turtle' , 'text/rdf+n3' ]
+        self._parseContentTypes = [ 'text/plain' , 'application/rdf+xml' , 'text/rdf+n3' ]
+        self._serializeContentTypes = [ 'text/xml' , 'text/plain', 'application/rdf+xml' , 'application/x-turtle' , 'text/rdf+n3' ]
         self.fmt = { 'text/xml' : 'xml', 
                'application/rdf+xml' : 'xml',
                'application/x-turtle' : 'turtle',
@@ -72,5 +72,10 @@ class Description (RESTfulResource):
     def serialize(self,graph, cType): 
         return graph.serialize(format=self.fmt[cType])
        
+    def serializeContentTypes(self) :
+        return self._serializeContentTypes
+    
+    def parseContentTypes(self) :
+        return self._parseContentTypes
     
         

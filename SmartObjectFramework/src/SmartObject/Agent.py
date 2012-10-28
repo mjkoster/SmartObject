@@ -2,21 +2,19 @@
 Created on Sep 15, 2012
 
 Agent class. Contains reference to instance of class containing observer 
-handlers and agent code 
+handlers and code 
 
 Contains references to observer handlers which are expected to be used only
 by Agent code i.e. not exposed to service interfaces but may allow inspection 
 for debug. 
 
-Setting a new Agent class instance currently has the effect of removing the 
-handlers from the current agent instance and starting a new instance of the 
-new class. This is for development
-
-Agents are meant to be created with objects
 @author: mjkoster
 '''
 
 from RESTfulResource import RESTfulResource
+
+class Handler(RESTfulResource):
+    pass
 
 class Agent(RESTfulResource):
     
@@ -24,63 +22,30 @@ class Agent(RESTfulResource):
         RESTfulResource.__init__(self)
         # reference to the code class to create an instance of 
         # can be passed in on the constructor, or default on init, or be changed later
-        if agent != None :
-            self.create(agent)
-        else :
-            self.__agent = self # self what? FIXME
-        # references to handler methods in the code class for observer notifications
         self.__handlers = []
         
-    def __del__(self): # clean up any references on removal of agent
-        pass
-    
-    # Descriptor methods allow inspection and modification of Agent
-    def __get__(self, instance, cls):
-        return self.agent
-
-    def __set__(self, instance, newAgent):
-        self.agent = newAgent
-        
-    @property
-    def agent(self):
-        return self.__agent
-    @agent.setter
-    def agent(self, agent): # creates a new agent
-        self.delete() # removes handlers
-        self.create(agent)
-        return
-    @agent.deleter
-    def agent (self):
-        self.delete()
-    
-    @property
-    def handlers(self):
-        return self.__handlers
-    @handlers.setter
-    def handlers(self, handler):
-        self.__handlers += handler
-        return
-    @handlers.deleter
-    def handlers(self, handler):
-        if handler in self.__handlers:
-            self.__handlers.remove(handler)
-            return handler
-        return None # return none to indicate no match
-        
-    def get(self):
-        return self.__handlers
+    def get(self, handler=None):
+        if handler == None:
+            return self.__handlers
+        else:
+            if self[handler] :
+                return self.__handlers[handler]
+        return None
     
     def set(self, handler):
-        self.__handlers += handler
+        self.handler.set # what to do, what to do...
         return
     
-    def create(self, agent):
-        self.__agent = agent()
-        return
-        # need to import and create instance of code module 
-      
-    def delete(self):
-        self.handlers.clear        
+    def create(self, resourceName, className) :
+        # create new instance of the named class and add to resources directory, return the ref
+        self.resources.update({resourceName : className()}) 
+        if className == 'Handler' :
+            handler = Handler() # where is code object
+        return self.resources[resourceName]
+     
+    def delete(self, handlerName):
+        RESTfulResource.delete(handlerName)    
+        # and more...
         return
         # need to destroy instance of code module
         

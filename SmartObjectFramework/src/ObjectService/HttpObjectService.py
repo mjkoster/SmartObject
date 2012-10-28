@@ -50,7 +50,7 @@ class RestObject(restObject.RestObject):
         # if it's a complex structure class, invoke the serializer
         
         if hasattr(currentResource,'serialize') : # see if the resource has a serialize method
-            responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.serializeContentTypes)
+            responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.serializeContentTypes() )
             self.start_response('200 OK', [('Content-Type', responseType)]) 
             return currentResource.serialize( currentResource.get(), responseType )
         else:
@@ -58,14 +58,14 @@ class RestObject(restObject.RestObject):
     
     def _handlePUT(self, currentResource):
         if hasattr(currentResource, 'parse') :
-            responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.parseContentTypes)
+            responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.parseContentTypes() )
             currentResource.set( currentResource.parse( self.getBody() , responseType ))
         else :
             restObject.RestObject._handlePUT(self, currentResource) # default PUT
     
     def _handlePOST(self, currentResource):
         if hasattr(currentResource, 'parse') :
-            responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.parseContentTypes)
+            responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.parseContentTypes() )
             currentResource.create( currentResource.parse( self.getBody() , responseType ))
         else :
             restObject.RestObject._handlePOST(self, currentResource) # default POST

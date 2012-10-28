@@ -13,6 +13,7 @@ from CoapObjectService import CoapObjectService
 from ObjectService import ObjectService
 from restlite import restlite
 import threading
+from time import sleep
 
 class GatewayObjectService(object):
     
@@ -57,7 +58,7 @@ if __name__ == '__main__' :
     # start agents here
     try:
         # register handlers etc.
-        while 1: pass
+        while 1: sleep(1)
     except KeyboardInterrupt: pass
-    
+    print 'got KeyboardInterrupt'
     

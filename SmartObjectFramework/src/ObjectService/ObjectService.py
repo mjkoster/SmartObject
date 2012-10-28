@@ -23,9 +23,10 @@ class ObjectService(SmartObject):
 
     def __init__(self):
         SmartObject.__init__(self) 
+        self.defaultClass = 'SmartObject'
         # Use a smart object instance as a container for SmartObjects 
         # and create a Description resource for the RDF registry
-        self.description = self.create('description', Description)
+        self.description = self.create('Description')
         # TEST
         # create a SmeartObjectbject the top level for a rough test
         # add some example triples describing the object and it's properties
@@ -35,8 +36,11 @@ class ObjectService(SmartObject):
         self.description.set((URIRef('testObject/propertyTwo'), RDFS.Resource, Literal('temperature')))
         self.description.set((URIRef('testObject/propertyTwo'), RDF.type, Literal('sensor')))
         # create the object and it's properties using create
-        self.testObject = self.create('testObject', SmartObject)
-        self.testObject.propertyOne = self.testObject.create('propertyOne', ObservableProperty)
+
+        self.testObject = self.create('testObject')
+        self.testObject.description = self.testObject.create('Description')
+        self.testObject.propertyOne = self.testObject.create('propertyOne')
+        '''
         self.testObject.propertyOne.PropertyOfInterest = \
             self.testObject.propertyOne.create('PropertyOfInterest', PropertyOfInterest)
         self.testObject.propertyTwo = self.testObject.create('propertyTwo', ObservableProperty)
@@ -55,5 +59,6 @@ class ObjectService(SmartObject):
         self.testObject.propertyTwo.observers.set('http://localhost:8000/testObject/propertyThree')
         
         self.testObject.propertyTwo.set(99.7)
+        '''
         
     

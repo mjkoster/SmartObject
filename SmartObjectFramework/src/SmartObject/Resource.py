@@ -40,13 +40,16 @@ class Resource(object) :
     def set(self, newValue) :
         self.value=newValue
         return
+
+    def create(self, resourceName, resourceClass) :
+        return self._create(resourceName, resourceClass)
       
     # for adding resources inside this resource
-    def create(self, resourceName, className) :
+    def _create(self, resourceName, resourceClass) :
         # create new instance of the named class and add to resources directory, return the ref
-        self.resources.update({resourceName : className()}) 
+        self.resources.update({resourceName : resourceClass()}) 
         return self.resources[resourceName]
-
+    
     # for removing resources inside this resource
     def delete(self, resourceName) :
         del self.resources[resourceName] # remove dict entry FIXME remove reference to instance
