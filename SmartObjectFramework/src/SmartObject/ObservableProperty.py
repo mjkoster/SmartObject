@@ -53,7 +53,6 @@ class ObservableProperty(RESTfulResource):
                 className = self.defaultClass 
         # create new instance of the named class and add to resources directory, return the ref
         self.resources.update({resourceName : globals()[className]()}) 
-        print className
         return self.resources[resourceName] # returns a reference to the created instance
 
 

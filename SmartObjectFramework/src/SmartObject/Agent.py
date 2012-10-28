@@ -13,8 +13,31 @@ for debug.
 
 from RESTfulResource import RESTfulResource
 
-class Handler(RESTfulResource):
-    pass
+class SmartObjectHandler(RESTfulResource):
+    
+    def __init__(self):
+        RESTfulResource.__init__(self)
+        self._propertyLinks = []
+        self._codeModule = None
+
+    def codeModule(self):
+        return self._codeModule
+    
+    def propertyLinks(self):
+        return self._propertyLinks
+
+    def updateMethod(self):
+        return self._updateMethod
+    
+    def _updateMethod(self):
+        pass
+    
+    def get(self):
+        return self._codeModule
+    
+    def set(self,codeModule):
+        self._codeModule = codeModule
+
 
 class Agent(RESTfulResource):
     
@@ -22,27 +45,38 @@ class Agent(RESTfulResource):
         RESTfulResource.__init__(self)
         # reference to the code class to create an instance of 
         # can be passed in on the constructor, or default on init, or be changed later
-        self.__handlers = []
+        self.defaultClass = 'SmartObjectHandler'
+        self.__handlers = {}
         
-    def get(self, handler=None):
-        if handler == None:
-            return self.__handlers
+    def get(self, handlerName=None):
+        if handlerName == None:
+            return self._handlers.keys()
         else:
-            if self[handler] :
-                return self.__handlers[handler]
+            if self._handlers.has_key(handlerName) :
+                return self._handlers[handlerName]
         return None
     
-    def set(self, handler):
-        self.handler.set # what to do, what to do...
-        return
-    
-    def create(self, resourceName, className) :
+    '''    
+    def create(self, resourceName, className = 'Handler') :
         # create new instance of the named class and add to resources directory, return the ref
         self.resources.update({resourceName : className()}) 
         if className == 'Handler' :
-            handler = Handler() # where is code object
+            handler = SmartObjectHandler(resourceName) # name of code object
         return self.resources[resourceName]
-     
+    '''    
+    def create(self, resourceName, className=None ) : 
+        if className == None :
+            if resourceName in self.wellKnownClasses :
+                className = resourceName
+            else :
+                className = self.defaultClass 
+        # create new instance of the named class and add to resources directory, return the ref
+        self.resources.update({resourceName : globals()[className]()}) 
+        if className == self.defaultClass : # Handler class
+            self._handlers.update( {resourceName, self.resources[resourceName]} )
+        return self.resources[resourceName] # returns a reference to the created instance
+
+ 
     def delete(self, handlerName):
         RESTfulResource.delete(handlerName)    
         # and more...
