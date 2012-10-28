@@ -20,18 +20,6 @@ class Resource(object) :
         self.value = []
 
     # when this resource is deleted, recursively delete all internal resources
-    def __del__(self, instance):
-        for resource in self.resources.keys :
-            del self.resources[resource]
-            
-    """        
-    def __get__(self, instance, cls):
-        return self.get()
-    
-    def __set__(self, instance, newValue):
-        self.set(newValue)
-        return
-    """
     # return the default contents of this resource
     def get(self) :
         return self.value 

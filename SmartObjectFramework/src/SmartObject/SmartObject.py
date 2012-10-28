@@ -6,14 +6,7 @@ SmartObject class
 The SmartObject is the top level Resource pointed to by the URL
 
 The base resource is a description, which for linked data is the default
-resource returned by SmartObject.get() and is the object Descriptor 
-The following equivalent references return all 
-triples in the SmertObject.Description resource:
-
-SmartObject
-SmartObject.get()
-SmartObject.Description
-SmartObject.Description.get()
+resource returned by SmartObject.get() 
 
 Practical instances of SmartObject will have additional resources 
 such as ObservableProperty and Agent instances dynamically created
@@ -41,15 +34,6 @@ class SmartObject(RESTfulResource):
         # self.create('Description', Description)
         # Descriptor for SmartObject is the Description resource, 
         # to provide linked data compatibility
-        # This is also available via the property interface: SmartObject
-
-    def __get__(self, instance, cls):
-        return self.get()
-    
-    def __set__(self, instance, (s,p,o)):
-        self.set((s,p,o))
-        return
-    
     def get(self):
         if 'Description' in self.resources :
             return self.resources['Description'].get()
