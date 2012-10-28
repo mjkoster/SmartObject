@@ -23,8 +23,8 @@ class Request(restObject.Request):
         
 
 class RestObject(restObject.RestObject):
-    def __init__(self, objDict, users):
-        restObject.RestObject.__init__(self, objDict, users)
+    def __init__(self, rootObject, users):
+        restObject.RestObject.__init__(self, rootObject, users)
         
     def contentTypeNegotiate(self, accepts, providedTypes):
         accepts = accepts.split(',')
@@ -74,13 +74,13 @@ class RestObject(restObject.RestObject):
         restObject.RestObject._handleDELETE(self, currentResource) # default DELETE
 
 
-def bind(objDict, users=None):
+def bind(rootObject, users=None):
     '''The bind method to bind the returned wsgi application to the supplied data and users.
     @param data the original Python data structure which is used and updated as needed.
     @param users the optional users dictionary. If missing, it disables access control.
     @return:  the wsgi application that can be used with restlite.
     '''
-    restObject = RestObject(objDict, users)
+    restObject = RestObject(rootObject, users)
     def handler(env, start_response):
         return restObject.handler(env, start_response)
     return handler

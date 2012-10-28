@@ -24,7 +24,7 @@ class GatewayObjectService(object):
         from wsgiref.simple_server import make_server
         # HttpObjectService constructor method creates a Smart Object service and 
         # returns a constructor for a restlite router instance
-        self.httpObjectService = HttpObjectService(self.objectService.resources)
+        self.httpObjectService = HttpObjectService(self.objectService)
         self.httpd = make_server('', 8000, restlite.router(self.httpObjectService.routes))
         try: self.httpd.serve_forever()
         except KeyboardInterrupt: pass

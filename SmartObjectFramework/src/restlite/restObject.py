@@ -84,8 +84,8 @@ class Request(object):
     
             
 class RestObject(object):
-    def __init__(self, objDict, users):
-        self.objDict, self.users, self.realm = objDict, users, 'localhost'
+    def __init__(self, rootObject, users):
+        self.rootObject, self.users, self.realm = rootObject, users, 'localhost'
         
     #default GET does simple JSON and XML content negotiation, defaults to JSON   
     def _handleGET(self, currentItem): 
@@ -119,7 +119,8 @@ class RestObject(object):
         if not user or not reason.startswith('200'): 
             return self.request.unauthorized(self.realm, reason)
         # step through the path to the endpoint using the nextItem method, verify each resource
-        currentDict = self.objDict
+        currentResource = self.rootObject
+        currentDict = currentResource.resources
         while len(self.request.pathItems) > 1:
             item = self.request.nextItem()
             self.request.verifyAccess(user, 'x', currentDict) # Check "dir" permission for next
