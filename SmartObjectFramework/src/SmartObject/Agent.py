@@ -16,8 +16,6 @@ of the handler to it's input and output properties.
 
 from RESTfulResource import RESTfulResource
 
-# import AppHandlers # import a well known module
-
 
 class AppHandler(object): # template and convenience methods for raw app handlers. Python app handler should extend this class
     def __init__(self, linkBaseDict = None) :
@@ -34,12 +32,13 @@ class AppHandler(object): # template and convenience methods for raw app handler
                 
         self._propertyLinks = {} 
         self._linkCache = {}
-        
+  
         
     def linkToRef(self, linkPath ):
         '''
         takes a path string and walks the object tree from a base dictionary
         returns a ref to the resource at the path endpoint
+        store translations in a hash cache for fast lookup after the first walk
         '''
         self._linkPath = linkPath
         
@@ -55,41 +54,42 @@ class AppHandler(object): # template and convenience methods for raw app handler
         self._resource = self._currentDict[self._pathElements[-1] ]
         self._linkCache.update({ self._linkPath : self._resource })
         return self._resource
+       
         
     def getByLink(self, linkPath):
         return self.linkToRef(linkPath).get()
-    
+
     def setByLink(self, linkPath, newValue):
         self.linkToRef(linkPath).set(newValue)
-    
+
     def _updateHandler(self, updateRef = None ): # override this for handling state changes from an observer
         pass
 
 
-# an example Handler 
-class additionHandler(AppHandler):
+class additionHandler(AppHandler): # an example appHandler 
     def __init__(self):
         AppHandler.__init__(self)
+        # create the input and output link properties
         self._addend1Link = None
         self._addend2Link = None
         self._sumOutLink = None
+        # publish them with some names as an index
         self._propertyLinks = { 'addend1' : self._addend1Link,
                                'addend2' : self._addend2Link,
                                'sumOut' : self._sumOutLink
                                }
-               
+        
+        # define a method for handling state changes in observed resources       
         def _updateHandler(self, updateRef = None ):
                 '''
                 get the 2 addends, add them, and set the sum location
                 '''
                 self._addend1 = self.getByLink(self._addend1Link)
                 self._addend2 = self.getByLink(self._addend2Link)
-                self._sumOut = self.setByLink( self._sumOutLink, self._addend1 + self._addend2 )
+                self.setByLink( self._sumOutLink, self._addend1 + self._addend2 )
                 
-                self._sumOut.set( self._addend1.get + self._addend2.get )
             
-            
-class RESTfulEndpoint(object):
+class RESTfulEndpoint(object): # create a resource endpoint from a property reference
     def __init__(self, reference):
         self._resource = reference
         
