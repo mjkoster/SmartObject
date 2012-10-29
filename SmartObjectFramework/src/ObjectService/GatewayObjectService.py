@@ -15,11 +15,14 @@ from restlite import restlite
 import threading
 from time import sleep
 
+
 class GatewayObjectService(object):
     
     def __init__(self):
         self.objectService = ObjectService()
-    
+        import __builtin__
+        __builtin__.SmartObjectSevice = self.objectService # set global reference to the service
+        
     def _startHttpObjectService(self):
         from wsgiref.simple_server import make_server
         # HttpObjectService constructor method creates a Smart Object service and 
@@ -34,7 +37,7 @@ class GatewayObjectService(object):
         from wsgiref.simple_server import make_server
         # coapObjectServices = CoapObjectService(self.objectService)
         # self.coapd = make_server('', 61616, restlite.router(coapObjectService.routes))
-        self.coapObjectService = HttpObjectService(self.objectService.resources)
+        self.coapObjectService = HttpObjectService(self.objectService)
         self.coapd = make_server('', 8001, restlite.router(self.coapObjectService.routes))
         try: self.coapd.serve_forever()
         except KeyboardInterrupt: pass

@@ -4,9 +4,12 @@ Created on Sep 15, 2012
 Agent class. Contains reference to instance of class containing observer 
 handlers and code 
 
-Contains references to observer handlers which are expected to be used only
-by Agent code i.e. not exposed to service interfaces but may allow inspection 
-for debug. 
+First create an instance of the Agent Class, then create a named handler
+and set the desired appHandler code module to the named handler
+
+At this point, the appHandler class name, update handler callable method, and a dictionary
+of property link names to property link resources are published, to enable connection
+of the handler to it's input and output properties. 
 
 @author: mjkoster
 '''
@@ -17,31 +20,73 @@ from RESTfulResource import RESTfulResource
 
 
 class AppHandler(object): # template and convenience methods for raw app handlers. Python app handler should extend this class
-    def __init__(self) :
+    def __init__(self, linkBaseDict = None) :
+        if linkBaseDict is None :
+            
+            import __builtin__
+            try:
+                self.linkBaseDict = __builtin__.eval('SmartObjectServiceBaseDict')
+            except AttributeError:
+                print 'SmartObjectServiceBaseDict not found'
+            
+        else:
+            self.linkBaseDict = linkBaseDict
+                
         self._propertyLinks = {} 
+        self._linkCache = {}
+        
+        
+    def linkToRef(self, linkPath ):
+        '''
+        takes a path string and walks the object tree from a base dictionary
+        returns a ref to the resource at the path endpoint
+        '''
+        self._linkPath = linkPath
+        
+        if self._linkPath in self.linkCache.keys() :
+            return self._linkCache[self._linkPath]
+        # cache miss, walk path and update cache at end
+        self._currentDict = self._linkBaseDict
+        self._pathElements = linkPath.split('/')
+        
+        for pathElement in self._pathElements[0:-1] : # all but the last, which should be the endpoint
+            self._currentDict = self.currentDict[pathElement].resources
+            
+        self._resource = self._currentDict[self._pathElements[-1] ]
+        self._linkCache.update({ self._linkPath : self._resource })
+        return self._resource
+        
+    def getByLink(self, linkPath):
+        return self.linkToRef(linkPath).get()
     
-    def _updateHandler(self, updateRef = None ):
+    def setByLink(self, linkPath, newValue):
+        self.linkToRef(linkPath).set(newValue)
+    
+    def _updateHandler(self, updateRef = None ): # override this for handling state changes from an observer
         pass
+
 
 # an example Handler 
 class additionHandler(AppHandler):
     def __init__(self):
-        self._addend1Ref = None
-        self._addend2Ref = None
-        self._sumOutRef = None
-        self._propertyLinks = { 'addend1' : self._addend1Ref,
-                               'addend2' : self._addend2Ref,
-                               'sumOut' : self._sumOutRef
+        AppHandler.__init__(self)
+        self._addend1Link = None
+        self._addend2Link = None
+        self._sumOutLink = None
+        self._propertyLinks = { 'addend1' : self._addend1Link,
+                               'addend2' : self._addend2Link,
+                               'sumOut' : self._sumOutLink
                                }
-        # to test with simple property references 
-        
+               
         def _updateHandler(self, updateRef = None ):
-            if callable(self._addend1Ref) :
-                self.addend1 = self._addend1Ref.get()
-            if callable(self._addend2Ref) :
-                self.addend2 = self._addend2Ref.get()
-            if callable(self.sumOutRef) :
-                self.sumOut.set( self._addend1 + self._addend2 )
+                '''
+                get the 2 addends, add them, and set the sum location
+                '''
+                self._addend1 = self.getByLink(self._addend1Link)
+                self._addend2 = self.getByLink(self._addend2Link)
+                self._sumOut = self.setByLink( self._sumOutLink, self._addend1 + self._addend2 )
+                
+                self._sumOut.set( self._addend1.get + self._addend2.get )
             
             
 class RESTfulEndpoint(object):
@@ -119,14 +164,7 @@ class Agent(RESTfulResource):
                 return self._handlers[handlerName] # to get reference to handler resources by handler name
         return None
     
-    '''    
-    def create(self, resourceName, className = 'Handler') :
-        # create new instance of the named class and add to resources directory, return the ref
-        self.resources.update({resourceName : className()}) 
-        if className == 'Handler' :
-            handler = SmartObjectHandler(resourceName) # name of code object
-        return self.resources[resourceName]
-    '''    
+   
     def create(self, resourceName, className=None ) : 
         if className == None :
             if resourceName in self.wellKnownClasses :
