@@ -18,11 +18,11 @@ from RESTfulResource import RESTfulResource
 
 
 class AppHandler(object): # template and convenience methods for raw app handlers. Python app handler should extend this class
-    def __init__(self, linkBaseDict = None) :
+    def __init__(self, linkBaseDict = None) : # object base resource dict can be passed in
         if linkBaseDict is None :
             
-            import __builtin__
             try:
+                import __builtin__
                 self.linkBaseDict = __builtin__.eval('SmartObjectServiceBaseDict')
             except AttributeError:
                 print 'SmartObjectServiceBaseDict not found'
