@@ -19,9 +19,9 @@ from time import sleep
 
 if __name__ == '__main__' :
     
-    baseObject = SmartObject()
+    baseObject = SmartObject() # create a Smart Object to serve as the base container for other Smart Objects and resources
     
-    server = SmartObjectService(baseObject,8000) # make an instance of the service and start a thread for each service interface  
+    server = SmartObjectService(baseObject,8000) # make an instance of the service to listen on port 8000, baseObject is the object root
     print 'Service created'
        
     baseObject.defaultClass = 'SmartObject'
