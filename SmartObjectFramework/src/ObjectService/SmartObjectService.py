@@ -16,23 +16,24 @@ from time import sleep
 
 class SmartObjectService(object):
     
-    def __init__(self, baseObject=None):
-        if baseObject != None: 
-            self.baseObject = baseObject
-        else: 
-            self.baseObject = ObjectService()
-        
+    def __init__(self, baseObject=ObjectService(), port=8000): # if no service given, create a default service object
+        self._port = port  # default port 8000
+        self._baseObject = baseObject
         import __builtin__
-        __builtin__.SmartObjectSevice = self.baseObject # set global reference to the service
+        __builtin__.SmartObjectSevice = self._baseObject # create a global reference to this base object
     
         
-        
+    def start(self): 
+        httpThread = threading.Thread(target = self._startHttpObjectService)
+        httpThread.daemon = True
+        httpThread.start()
+       
     def _startHttpObjectService(self):
         from wsgiref.simple_server import make_server
         # HttpObjectService constructor method creates a Smart Object service and 
         # returns a constructor for a restlite router instance
-        self.httpObjectService = HttpObjectService(self.baseObject)
-        self.httpd = make_server('', 8000, restlite.router(self.httpObjectService.routes))
+        self.httpObjectService = HttpObjectService(self._baseObject)
+        self.httpd = make_server('', self._port, restlite.router(self.httpObjectService.routes))
         try: self.httpd.serve_forever()
         except KeyboardInterrupt: pass
     
@@ -41,27 +42,19 @@ class SmartObjectService(object):
         from wsgiref.simple_server import make_server
         # coapObjectServices = CoapObjectService(self.objectService)
         # self.coapd = make_server('', 61616, restlite.router(coapObjectService.routes))
-        self.coapObjectService = HttpObjectService(self.baseObject)
-        self.coapd = make_server('', 8001, restlite.router(self.coapObjectService.routes))
+        self.coapObjectService = HttpObjectService(self._baseObject)
+        self.coapd = make_server('', self._port, restlite.router(self.coapObjectService.routes))
         try: self.coapd.serve_forever()
         except KeyboardInterrupt: pass
         
             
 if __name__ == '__main__' :
     
-    server = SmartObjectService() # make an instance of the gateway and start a thread for each service interface  
-    print 'Gateway started'
-    
-    httpThread = threading.Thread(target = server._startHttpObjectService)
-    httpThread.daemon = True
-    httpThread.start()
+    server = SmartObjectService(ObjectService(),8000) # make an instance of the service and start a thread for each service interface  
+    print 'Service created'
+    server.start()
     print 'httpd started'
-    
-    coapThread = threading.Thread(target = server._startCoapObjectService)
-    coapThread.daemon = True
-    coapThread.start()
-    print 'coapd started'
-    
+
     # start agents here
     try:
         # register handlers etc.
