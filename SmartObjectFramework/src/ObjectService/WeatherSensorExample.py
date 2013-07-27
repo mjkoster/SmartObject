@@ -3,7 +3,7 @@ Created on July 26, 2013
 
 Example service created for a weather sensor. An Arduino POSTs simple JSON value-only updates to the
 REST endpoints defined by the Observable Property created for each sensor output. An example graph is 
-created to demonstrate how endpoints can be discoverd by reading the graph meta data
+created to demonstrate how endpoints can be discovered by reading the graph meta data
 
 @author: mjkoster
 '''
@@ -35,12 +35,12 @@ if __name__ == '__main__' :
     baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDF.type, Literal('WeatherSensor')))
     baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDFS.Resource, Literal('SmartObject')))
         
-    baseObject.sensors = baseObject.create('sensors') # top level object
+    baseObject.sensors = baseObject.create('sensors') # top level object container for sensors, default class is SmartObject
     sensors = baseObject.sensors
     sensors.description = baseObject.sensors.create('Description')
         
-    sensors.weather = sensors.create('rhvWeather-01', 'SmartObject')
-    sensors.weather.description = sensors.weather.create('Description')
+    sensors.weather = sensors.create('rhvWeather-01', 'SmartObject') # create a SmartObject for the weather sensor cluster
+    sensors.weather.description = sensors.weather.create('Description') # create a Description and build an example graph
 
     sensors.weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDFS.Resource, Literal('sensor')))
     sensors.weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDF.type, Literal('temperature')))
@@ -64,6 +64,8 @@ if __name__ == '__main__' :
     sensors.weather.description.set((URIRef('sensors/rhvWeather-01/hourly_rain'), RDF.type, Literal('depth')))
     sensors.weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDFS.Resource, Literal('sensor')))
     sensors.weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDF.type, Literal('depth')))
+    
+    # now create an Observable Property for each sensor output, each with a PropertyOfInterest class to hold the observation values
 
     sensors.weather.outdoor_temperature = sensors.weather.create('outdoor_temperature', 'ObservableProperty')
     sensors.weather.outdoor_temperature.create('PropertyOfInterest')
