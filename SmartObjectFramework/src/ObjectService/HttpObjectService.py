@@ -111,7 +111,7 @@ if __name__ == '__main__' :
     from wsgiref.simple_server import make_server
     # Create a Smart Object service,, return a reference to the top level resources dict
     objectService = ObjectService()
-    httpObjectService = HttpObjectService(objectService.resources)
+    httpObjectService = HttpObjectService(objectService)
     httpd = make_server('', 8000, restlite.router(httpObjectService.routes))
     print("Heres the server\n")
     try: httpd.serve_forever()

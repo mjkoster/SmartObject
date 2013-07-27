@@ -59,12 +59,18 @@ class Request(object):
     
     def getBody(self):
         try: 
+            # Instrument the header
+            #print self.env['CONTENT_LENGTH']
+            #print self.env['CONTENT_TYPE']
+            
             self.env['BODY'] = self.env['wsgi.input'].read(int(self.env['CONTENT_LENGTH']))
+            #print self.env['BODY']
+ 
         except (TypeError, ValueError): 
             raise restlite.Status, '400 Invalid Content-Length'
         if self.env['CONTENT_TYPE'].lower() == 'application/json' and self.env['BODY']: 
             try: 
-                self.env['BODY'] = json.loads(self.env['BODY'])
+                self.env['BODY'] = json.loads(self.env['BODY'])                
             except: 
                 raise restlite.Status, '400 Invalid JSON content'
         return self.env['BODY']
