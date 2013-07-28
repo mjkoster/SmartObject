@@ -80,6 +80,9 @@ if __name__ == '__main__' :
     sensors.weather.hourly_rain = sensors.weather.create('hourly_rain', 'ObservableProperty') 
     sensors.weather.daily_rain = sensors.weather.create('daily_rain', 'ObservableProperty')
         
+    pressure_observer = sensors.weather.pressure.create('Observers')
+    pressure_observer.create('http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature')
+    
     server.start()
     print 'httpd started'
 

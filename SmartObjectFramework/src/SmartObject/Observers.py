@@ -3,10 +3,50 @@ Created on Sep 15, 2012
 
 Observers class for observation of changes in a resource
 
+To use the observer, create a resource endpoint using http PUT, http POST or the Python API,
+consisting of a URL string in the Observers resource. For example:
+
+PUT /.../resource/Observer "http://<server>/<path>" 
+creates an http publisher that updates the endpoint at the specified URL with a JSON object 
+representing the value of the Observable Property whenever the Observable Property is updated
+
+It doesn't work if you try to directly update the Property Of Interest
+
+http PUT of JSON is all that is implemented for now
+
+
 @author: mjkoster
 '''
 from RESTfulResource import RESTfulResource
 from urlparse import urlparse
+import urllib2
+import json
+import httplib
+
+
+class httpHandler(object):
+    def __init__(self, targetURI=None):
+        self.targetURI = targetURI
+        self.uriObject = urlparse(targetURI)
+        self.httpServer = self.uriObject.netloc
+        self.httpPath = self.uriObject.path
+        
+    def notify(self,resource): # JSON only for now
+        self.jsonObject = json.dumps(resource.get())
+        self.httpHeader = {"Content-Type" : "application/json" }
+        self.httpConnection = httplib.HTTPConnection(self.httpServer)
+        self.httpConnection.request('PUT', self.httpPath, self.jsonObject, self.httpHeader)
+        return
+
+class coapHandler(object):
+    def __init__(self):
+        self.targetURI = None
+    pass
+
+class callbackHandler(object):
+    def __init__(self):
+        self.targetURI = None
+    pass
 
 class Observers(RESTfulResource):
     
@@ -14,42 +54,15 @@ class Observers(RESTfulResource):
         RESTfulResource.__init__(self)
         self.__schemes = ['http', 'coap', 'callback']
         self.__observers = []
+        self.__handlers = {}
                
     def onUpdate(self,resource):
         self.__onUpdate(resource)
         
     def __onUpdate(self, resource):
-        for self.__observer in self.__observers:
-            self.__notify(self.__observer, resource)
-    
-    def __notify(self, observer, resource):
-        if type(observer) is not callable : # FIX this
-            urlObject = urlparse(observer)
-            if urlObject.scheme == 'http' :
-                self.__httpNotify(observer, resource)
-            elif urlObject.scheme == 'coap' :
-                self.__coapNotify(observer, resource)
-            elif urlObject.scheme == 'callback' :
-                self.__callbackNotify(observer, resource)
-        else : 
-            observer(resource) # if it's a callable object
-            
-            
-    def __httpNotify(self, targetURI, resource):
-        # invoke method from http client interface
-        # self.__httpNotifyHandler(targetURI, resource)
-        print 'http notify stub'
-    
-    def __coapNotify(self, targetURI, resource):
-        # invoke method from CoAP server interface
-        # self.__coapNotifyHandler(targetURI, resource)
-        print 'coap notify stub'
-    
-    def __callbackNotify(self, observer, resource):
-        #call the function registered and pass the resource
-        #invoke the handler through the Agent resource
-        print 'callback notify stub'
-    
+        for observer in self.__observers:
+            self.__handlers[observer].notify(resource)
+
     # match returns the supplied URL, else none. Supplying None returns all Observers
     def get(self, targetURI=None):
         if targetURI != None:
@@ -64,11 +77,22 @@ class Observers(RESTfulResource):
     
     # create adds an observer to the list, echoes URI if created or exists
     def create(self, targetURI):
-        if urlparse(targetURI).scheme not in self.__schemes:
-            return None
+        self.uriObject = urlparse(targetURI)
+        if self.uriObject.scheme not in self.__schemes:
+            return None       
         if targetURI not in self.__observers :
             self.__observers.append(targetURI) # append to the list
-        return targetURI
+            
+        if self.uriObject.scheme == 'http' :
+            self.newHandler = httpHandler(targetURI)
+        elif self.uriObject.scheme == 'coap' :
+            self.newHandler = coapHandler(targetURI)
+        elif self.uriObject.scheme == 'callback' :
+            self.newHandler = callbackHandler(targetURI)
+                    
+        self.__handlers.update({targetURI : self.newHandler})
+        
+        return self.newHandler # return a handle to the handler object
 
     # delete removes an observer from the list, echoes None for failure
     def delete(self, targetURI):

@@ -35,7 +35,7 @@ class ObservableProperty(RESTfulResource):
         self.defaultClass = 'PropertyOfInterest'
         # default create property of interest
     def get(self):
-        if 'PropertyOfInterest' in self.resources :
+        if 'PropertyOfInterest' in self.resources : # allow creation of a custom object mapped to the observable property
             return self.resources['PropertyOfInterest'].get()
         else :
             return self._get()
@@ -47,7 +47,7 @@ class ObservableProperty(RESTfulResource):
             self._set(newValue) # if no POI is created, use the base class set method
             
         if 'Observers' in self.resources :
-            self.resources['Observers'].onUpdate() # invoke the callable 
+            self.resources['Observers'].onUpdate(self) # invoke the onUpdate routine 
                 
     def create(self, resourceName, className=None ) : 
         if className == None :
