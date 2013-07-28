@@ -50,9 +50,9 @@ class SmartObjectService(object):
             
 if __name__ == '__main__' :
     
-    server = SmartObjectService(ObjectService(),8000) # make an instance of the service and start a thread for each service interface  
+    server = SmartObjectService(ObjectService(),8000) # make an instance of the service
     print 'Service created'
-    server.start()
+    server.start() # and start the listener
     print 'httpd started'
 
     # start agents here

@@ -23,23 +23,24 @@ if __name__ == '__main__' :
     
     server = SmartObjectService(baseObject,8000) # make an instance of the service to listen on port 8000, baseObject is the object root
     print 'Service created'
-       
+    # set the default class for web API calls to create Smart Objects as named resources       
     baseObject.defaultClass = 'SmartObject'
-    # Use a smart object instance as a container for SmartObjects 
     # and create a Description resource for the RDF registry
     baseObject.description = baseObject.create('Description')
+    # this will create a resource of class Description rather than the default class because the name matches a well known class
         
     # create the weather station resource template
     # first the description 
-    baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDFS.Class, Literal('SensorSystem')))
+    baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDFS.Class, Literal('SmartObject')))
+    baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDFS.Resource, Literal('SensorSystem')))
     baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDF.type, Literal('WeatherSensor')))
-    baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDFS.Resource, Literal('SmartObject')))
         
     baseObject.sensors = baseObject.create('sensors') # top level object container for sensors, default class is SmartObject
     sensors = baseObject.sensors
-    sensors.description = baseObject.sensors.create('Description')
+    sensors.defaultClass = 'SmartObject'
+    sensors.description = sensors.create('Description')
         
-    sensors.weather = sensors.create('rhvWeather-01', 'SmartObject') # create a SmartObject for the weather sensor cluster
+    sensors.weather = sensors.create('rhvWeather-01') # create a default class SmartObject for the weather sensor cluster
     sensors.weather.description = sensors.weather.create('Description') # create a Description and build an example graph
 
     sensors.weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDFS.Resource, Literal('sensor')))
