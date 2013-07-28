@@ -66,40 +66,19 @@ if __name__ == '__main__' :
     sensors.weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDFS.Resource, Literal('sensor')))
     sensors.weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDF.type, Literal('depth')))
     
-    # now create an Observable Property for each sensor output, each with a PropertyOfInterest class to hold the observation values
+    # now create an Observable Property for each sensor output
 
-    sensors.weather.outdoor_temperature = sensors.weather.create('outdoor_temperature', 'ObservableProperty')
-    sensors.weather.outdoor_temperature.create('PropertyOfInterest')
-        
-    sensors.weather.outdoor_humidity = sensors.weather.create('outdoor_humidity', 'ObservableProperty')
-    sensors.weather.outdoor_humidity.create('PropertyOfInterest')
-        
-    sensors.weather.pressure = sensors.weather.create('sealevel_pressure', 'ObservableProperty')
-    sensors.weather.pressure.create('PropertyOfInterest')
-        
-    sensors.weather.indoor_temperature = sensors.weather.create('indoor_temperature', 'ObservableProperty')
-    sensors.weather.indoor_temperature.create('PropertyOfInterest')
-        
-    sensors.weather.indoor_humidity = sensors.weather.create('indoor_humidity', 'ObservableProperty')
-    sensors.weather.indoor_humidity.create('PropertyOfInterest')
-        
-    sensors.weather.wind_gust = sensors.weather.create('wind_gust', 'ObservableProperty')
-    sensors.weather.wind_gust.create('PropertyOfInterest')
-        
-    sensors.weather.wind_speed = sensors.weather.create('wind_speed', 'ObservableProperty')
-    sensors.weather.wind_speed.create('PropertyOfInterest')
-        
-    sensors.weather.wind_direction = sensors.weather.create('wind_direction', 'ObservableProperty')
-    sensors.weather.wind_direction.create('PropertyOfInterest')
-        
-    sensors.weather.current_rain = sensors.weather.create('current_rain', 'ObservableProperty')
-    sensors.weather.current_rain.create('PropertyOfInterest')
- 
-    sensors.weather.hourly_rain = sensors.weather.create('hourly_rain', 'ObservableProperty')
-    sensors.weather.hourly_rain.create('PropertyOfInterest')
- 
+    sensors.weather.outdoor_temperature = sensors.weather.create('outdoor_temperature', 'ObservableProperty')        
+    sensors.weather.outdoor_humidity = sensors.weather.create('outdoor_humidity', 'ObservableProperty')        
+    sensors.weather.pressure = sensors.weather.create('sealevel_pressure', 'ObservableProperty')        
+    sensors.weather.indoor_temperature = sensors.weather.create('indoor_temperature', 'ObservableProperty')        
+    sensors.weather.indoor_humidity = sensors.weather.create('indoor_humidity', 'ObservableProperty')        
+    sensors.weather.wind_gust = sensors.weather.create('wind_gust', 'ObservableProperty')        
+    sensors.weather.wind_speed = sensors.weather.create('wind_speed', 'ObservableProperty')        
+    sensors.weather.wind_direction = sensors.weather.create('wind_direction', 'ObservableProperty')        
+    sensors.weather.current_rain = sensors.weather.create('current_rain', 'ObservableProperty') 
+    sensors.weather.hourly_rain = sensors.weather.create('hourly_rain', 'ObservableProperty') 
     sensors.weather.daily_rain = sensors.weather.create('daily_rain', 'ObservableProperty')
-    sensors.weather.daily_rain.create('PropertyOfInterest')
         
     server.start()
     print 'httpd started'

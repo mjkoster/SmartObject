@@ -22,8 +22,11 @@ class Resource(object) :
     # when this resource is deleted, recursively delete all internal resources
     # return the default contents of this resource
     def get(self) :
+        return self._get() 
+    
+    def _get(self) :
         return self.value 
-
+    
     # update the default contents of this resource
     def set(self, newValue) :
         self._set(newValue)
