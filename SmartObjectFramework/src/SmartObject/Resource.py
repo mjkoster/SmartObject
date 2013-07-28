@@ -26,6 +26,10 @@ class Resource(object) :
 
     # update the default contents of this resource
     def set(self, newValue) :
+        self._set(newValue)
+        return
+
+    def _set(self, newValue) :
         self.value=newValue
         return
 

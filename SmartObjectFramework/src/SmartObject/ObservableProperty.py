@@ -42,8 +42,11 @@ class ObservableProperty(RESTfulResource):
     def set(self, newValue):
         if 'PropertyOfInterest' in self.resources :
             self.resources['PropertyOfInterest'].set(newValue)
-            if 'Observers' in self.resources :
-                self.resources['Observers'].onUpdate() # invoke the callable 
+        else :
+            self._set(newValue) # if no POI is created, use the base class set method
+            
+        if 'Observers' in self.resources :
+            self.resources['Observers'].onUpdate() # invoke the callable 
                 
     def create(self, resourceName, className=None ) : 
         if className == None :
