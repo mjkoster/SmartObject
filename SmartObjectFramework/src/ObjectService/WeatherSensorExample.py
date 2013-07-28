@@ -80,10 +80,14 @@ if __name__ == '__main__' :
     sensors.weather.hourly_rain = sensors.weather.create('hourly_rain', 'ObservableProperty') 
     sensors.weather.daily_rain = sensors.weather.create('daily_rain', 'ObservableProperty')
         
+    # test the simple http observer publisher
+    # first make an observer resource for the Observable Property to be monitored
     pressure_observer = sensors.weather.pressure.create('Observers')
+    # then create (or set) a URL endpoint to publish to, including the scheme
     pressure_observer.create('http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature')
+    # the publisher will use the scheme specified and update the URL endpoint whenever the OP is updated
     
-    server.start()
+    server.start() # forks a server thread
     print 'httpd started'
 
     try:
