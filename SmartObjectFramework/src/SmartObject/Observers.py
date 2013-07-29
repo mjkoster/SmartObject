@@ -3,10 +3,13 @@ Created on Sep 15, 2012
 
 Observers class for observation of changes in a resource
 
+Updated July 28, 2013 MJK - made a simple http ObserverPublisher prototype
+
 To use the observer, create a resource endpoint using http PUT, http POST or the Python API,
 consisting of a URL string in the Observers resource. For example:
 
 PUT /.../resource/Observer "http://<server>/<path>" 
+
 creates an http publisher that updates the endpoint at the specified URL with a JSON object 
 representing the value of the Observable Property whenever the Observable Property is updated
 
@@ -14,6 +17,8 @@ It doesn't work if you try to directly update the Property Of Interest
 
 http PUT of JSON is all that is implemented for now
 
+This should be replaced with a graph based observer endpoint to provide configurable protocols, 
+filters, and other scalable features
 
 @author: mjkoster
 '''
