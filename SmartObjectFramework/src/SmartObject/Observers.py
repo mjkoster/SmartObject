@@ -20,6 +20,9 @@ http PUT of JSON is all that is implemented for now
 This should be replaced with a graph based observer endpoint to provide configurable protocols, 
 filters, and other scalable features
 
+Handler observers are created using a URI of the form 'callback://local/<path_to_handler>
+this creates a callback object that has a reference to the handler
+
 @author: mjkoster
 '''
 from RESTfulResource import RESTfulResource
