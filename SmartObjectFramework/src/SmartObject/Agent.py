@@ -24,7 +24,7 @@ class AppHandler(object): # template and convenience methods for raw app handler
             try:
                 import __builtin__
                 self._linkBaseDict = __builtin__.eval('SmartObjectServiceBaseDict')
-            except AttributeError:
+            except :
                 print 'SmartObjectServiceBaseDict not found'
             
         else:
@@ -62,9 +62,9 @@ class AppHandler(object): # template and convenience methods for raw app handler
         pass
 
 
-class additionHandler(AppHandler): # an example appHandler 
-    def __init__(self):
-        AppHandler.__init__(self)
+class additionHandler(AppHandler): # an example appHandler that adds two values together and stores the result
+    def __init__(self, linkBaseDict=None):
+        AppHandler.__init__(self, linkBaseDict)
         # create the input and output link properties
         self._addend1Link = 'uninitialized'
         self._addend2Link = 'uninitialized'
@@ -81,11 +81,12 @@ class additionHandler(AppHandler): # an example appHandler
         self._addend1 = self.getByLink(self._propertyLinks['addend1'])
         self._addend2 = self.getByLink(self._propertyLinks['addend2'])
         self.setByLink( self._propertyLinks['sumOut'], self._addend1 + self._addend2 )
-                
-            
+        self.setByLink( self._propertyLinks['sumOut'], 99.9 )
+        
+        
 class RESTfulEndpoint(object): # create a resource endpoint from a property reference
     def __init__(self, reference):
-        self._resource = reference
+        self._resource = reference # this only happens on init of the RESTfulEndpoint
         self.resources = {}
         
     def get(self):
@@ -93,7 +94,7 @@ class RESTfulEndpoint(object): # create a resource endpoint from a property refe
     
     def set(self,newValue):
         self._resource = newValue
-        return
+        return 
     
     
 class Handler(RESTfulResource):
@@ -102,6 +103,7 @@ class Handler(RESTfulResource):
         RESTfulResource.__init__(self)
         self._propertyLinks = None 
         self._appHandlerName = None
+        self._baseDict = None
         #self._updateHandler = None # reference to _updateHandler method of AppHandler
 
     def importByName(self,classPath):
@@ -126,10 +128,10 @@ class Handler(RESTfulResource):
     def get(self):
         return self._appHandlerName
     
-    def set(self,appHandlerPath): # create an instance of a code object in this handler object, import module and make instance of class
+    def create(self,appHandlerPath): # create an instance of a code object in this handler object, import module and make instance of class
         self._appHandlerPath = appHandlerPath
         self._appHandlerName = self.importByName(self._appHandlerPath)
-        self._appHandler = globals()[self._appHandlerName]()
+        self._appHandler = globals()[self._appHandlerName](self._baseDict) # pass in the object path root
         # make a resource to read back the AppHandler class name
         self.resources.update( { 'AppHandler' : RESTfulEndpoint(self._appHandlerName)}) 
         # set up the property links resources
@@ -139,7 +141,8 @@ class Handler(RESTfulResource):
             for self._propertyLinkName in self._propertyLinks.keys() : 
                 self.resources.update({self._propertyLinkName : \
                                        RESTfulEndpoint(self._propertyLinks[self._propertyLinkName]) })
-                
+        # does this reference get stale when the propertyLinks are set?
+        
         # set up the callable property to be invoked on callbacks
         if hasattr( self._appHandler, '_updateHandler' ) :
             self._updateHandler = self._appHandler._updateHandler
@@ -148,9 +151,9 @@ class Handler(RESTfulResource):
 
 class Agent(RESTfulResource):
     
-    def __init__(self):
+    def __init__(self, SmartObjectBase=None):
         RESTfulResource.__init__(self)
-                
+        self._smartObjectBase = SmartObjectBase
         self.defaultClass = 'Handler'
         self._handlers = {}
         

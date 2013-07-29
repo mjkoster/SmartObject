@@ -16,11 +16,11 @@ from time import sleep
 
 class SmartObjectService(object):
     
-    def __init__(self, baseObject=ObjectService(), port=8000): # if no service given, create a default service object
+    def __init__(self, baseObject=None, port=8000): # if no service given, create a default service object
         self._port = port  # default port 8000
         self._baseObject = baseObject
         import __builtin__
-        __builtin__.SmartObjectSevice = self._baseObject # create a global reference to this base object
+        __builtin__.SmartObjectSeviceBaseDict = self._baseObject.resources # create a global reference to this base object
     
         
     def start(self): 

@@ -25,7 +25,7 @@ class ObjectService(SmartObject):
         SmartObject.__init__(self) # initialize the service as a Smart Object
         import __builtin__
         __builtin__.SmartObjectServiceBaseDict = self.resources # make this a global reference
-        
+        print 'making default objects'
         self.defaultClass = 'SmartObject'
         # Use a smart object instance as a container for SmartObjects 
         # and create a Description resource for the RDF registry

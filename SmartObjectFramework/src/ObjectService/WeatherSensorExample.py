@@ -90,7 +90,8 @@ if __name__ == '__main__' :
     # test the creation of agents and handlers
     weatherAgent = sensors.weather.create('Agent') # create the Agent resource
     testHandler = weatherAgent.create('testHandler') # create a handler
-    testHandler.set('SmartObject.Agent.additionHandler') # associate a handler subclass and make an instance
+    testHandler._baseDict = baseObject.resources # hack to get a reference for object root
+    testHandler.create('SmartObject.Agent.additionHandler') # associate a handler subclass and make an instance
     # hook up the property links to properties
     testHandler.propertyLinks()['addend1'] = 'sensors/rhvWeather-01/indoor_temperature'
     testHandler.propertyLinks()['addend2'] = 'sensors/rhvWeather-01/indoor_temperature'    
