@@ -21,7 +21,7 @@ class SmartObjectService(object):
         self._baseObject = baseObject
         import __builtin__
         __builtin__.SmartObjectSeviceBaseDict = self._baseObject.resources # create a global reference to this base object
-    
+        # this doesn't work 
         
     def start(self): 
         httpThread = threading.Thread(target = self._startHttpObjectService)

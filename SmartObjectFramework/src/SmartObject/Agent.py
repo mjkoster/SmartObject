@@ -11,6 +11,9 @@ At this point, the appHandler class name, update handler callable method, and a 
 of property link names to property link resources are published, to enable connection
 of the handler to it's input and output properties. 
 
+Global reference to base object dictionary is not working but hacked in an app level fix passing the 
+reference to a property of the handler resource to use starting up an appHandler instance inside
+
 @author: mjkoster
 '''
 
@@ -81,7 +84,6 @@ class additionHandler(AppHandler): # an example appHandler that adds two values 
         self._addend1 = self.getByLink(self._propertyLinks['addend1'])
         self._addend2 = self.getByLink(self._propertyLinks['addend2'])
         self.setByLink( self._propertyLinks['sumOut'], self._addend1 + self._addend2 )
-        self.setByLink( self._propertyLinks['sumOut'], 99.9 )
         
         
 class RESTfulEndpoint(object): # create a resource endpoint from a property reference
@@ -99,11 +101,11 @@ class RESTfulEndpoint(object): # create a resource endpoint from a property refe
     
 class Handler(RESTfulResource):
     
-    def __init__(self):
+    def __init__(self, baseDict=None):
         RESTfulResource.__init__(self)
         self._propertyLinks = None 
         self._appHandlerName = None
-        self._baseDict = None
+        self._objectPathBaseDict = baseDict
         #self._updateHandler = None # reference to _updateHandler method of AppHandler
 
     def importByName(self,classPath):
@@ -131,7 +133,7 @@ class Handler(RESTfulResource):
     def create(self,appHandlerPath): # create an instance of a code object in this handler object, import module and make instance of class
         self._appHandlerPath = appHandlerPath
         self._appHandlerName = self.importByName(self._appHandlerPath)
-        self._appHandler = globals()[self._appHandlerName](self._baseDict) # pass in the object path root
+        self._appHandler = globals()[self._appHandlerName](self._objectPathBaseDict) # pass in the object path root
         # make a resource to read back the AppHandler class name
         self.resources.update( { 'AppHandler' : RESTfulEndpoint(self._appHandlerName)}) 
         # set up the property links resources
@@ -151,9 +153,9 @@ class Handler(RESTfulResource):
 
 class Agent(RESTfulResource):
     
-    def __init__(self, SmartObjectBase=None):
+    def __init__(self, SmartObjectBaseDict=None):
         RESTfulResource.__init__(self)
-        self._smartObjectBase = SmartObjectBase
+        self._smartObjectBaseDict = SmartObjectBaseDict # should agent and handler each have a base object?
         self.defaultClass = 'Handler'
         self._handlers = {}
         
