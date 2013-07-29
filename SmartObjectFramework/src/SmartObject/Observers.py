@@ -24,7 +24,6 @@ filters, and other scalable features
 '''
 from RESTfulResource import RESTfulResource
 from urlparse import urlparse
-import urllib2
 import json
 import httplib
 
@@ -46,18 +45,46 @@ class httpHandler(object):
 class coapHandler(object):
     def __init__(self, targetURI = None):
         pass
-
-class callbackHandler(object):
+    
+class mqttHandler(object):
     def __init__(self, targetURI = None):
         pass
 
+class callbackHandler(object):
+    def __init__(self, targetURI = None, linkBaseDict = None ):
+        self.targetURI = targetURI
+        self._linkBaseDict = linkBaseDict
+        self.uriObject = urlparse(targetURI)
+        self._handlerService = self.uriObject.netloc
+        self._handlerPath = self.uriObject.path
+        self._appHandler = self.linkToRef(self._handlerPath)
+        
+    def notify(self,resource=None): # invoke the handler
+        self._appHandler._updateHandler(resource)
+        return
+    
+    def linkToRef(self, linkPath ):
+        '''
+        takes a path string and walks the object tree from a base dictionary
+        returns a ref to the resource at the path endpoint
+        '''
+        self._linkPath = linkPath
+        self._currentDict = self._linkBaseDict
+        self._pathElements = linkPath.split('/')
+        for pathElement in self._pathElements[:-1] : # all but the last, which should be the endpoint
+            if len(pathElement) > 0 : # first element is a zero length string for some reason
+                self._currentDict = self._currentDict[pathElement].resources
+        self._resource = self._currentDict[self._pathElements[-1] ]
+        return self._resource
+    
 class Observers(RESTfulResource):
     
-    def __init__(self):
+    def __init__(self, linkBaseDict=None):
         RESTfulResource.__init__(self)
-        self.__schemes = ['http', 'coap', 'callback']
+        self.__schemes = ['http', 'coap', 'mqtt', 'callback']
         self.__observers = []
         self.__handlers = {}
+        self._linkBaseDict = linkBaseDict
                
     def onUpdate(self,resource):
         self.__onUpdate(resource)
@@ -90,8 +117,10 @@ class Observers(RESTfulResource):
             self.newHandler = httpHandler(targetURI)
         elif self.uriObject.scheme == 'coap' :
             self.newHandler = coapHandler(targetURI)
+        elif self.uriObject.scheme == 'mqtt' :
+            self.newHandler = mqttHandler(targetURI)
         elif self.uriObject.scheme == 'callback' :
-            self.newHandler = callbackHandler(targetURI)
+            self.newHandler = callbackHandler(targetURI, self._linkBaseDict)
                     
         self.__handlers.update({targetURI : self.newHandler})
         

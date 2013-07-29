@@ -97,11 +97,10 @@ if __name__ == '__main__' :
     testHandler.propertyLinks()['addend2'] = 'sensors/rhvWeather-01/indoor_temperature'    
     testHandler.propertyLinks()['sumOut'] = 'sensors/rhvWeather-01/outdoor_humidity'
     
-    sensors.weather.indoor_temperature.set(101.1)
-    print sensors.weather.indoor_temperature.get()
-    testHandler._updateHandler() # manually run the handler
-    print sensors.weather.outdoor_humidity.get()
-    
+    tempObserver = sensors.weather.indoor_temperature.create('Observers')
+    tempObserver._linkBaseDict = baseObject.resources # hack base object in here too
+    tempObserver.create('callback://local/sensors/rhvWeather-01/Agent/testHandler')
+        
     server.start() # forks a server thread
     print 'httpd started'
 

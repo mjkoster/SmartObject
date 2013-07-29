@@ -149,7 +149,7 @@ class Handler(RESTfulResource):
         
         # set up the callable property to be invoked on callbacks
         if hasattr( self._appHandler, '_updateHandler' ) :
-            self._updateHandler = self._appHandler._updateHandler
+            self._updateHandler = self._appHandler._updateHandler # hack local property for now
                
 
 
