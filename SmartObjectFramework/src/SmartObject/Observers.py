@@ -44,14 +44,12 @@ class httpHandler(object):
         return
 
 class coapHandler(object):
-    def __init__(self):
-        self.targetURI = None
-    pass
+    def __init__(self, targetURI = None):
+        pass
 
 class callbackHandler(object):
-    def __init__(self):
-        self.targetURI = None
-    pass
+    def __init__(self, targetURI = None):
+        pass
 
 class Observers(RESTfulResource):
     

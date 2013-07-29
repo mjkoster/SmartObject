@@ -87,6 +87,20 @@ if __name__ == '__main__' :
     pressure_observer.create('http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature')
     # the publisher will use the scheme specified and update the URL endpoint whenever the OP is updated
     
+    # test the creation of agents and handlers
+    weatherAgent = sensors.weather.create('Agent') # create the Agent resource
+    testHandler = weatherAgent.create('testHandler') # create a handler
+    testHandler.set('SmartObject.Agent.additionHandler') # associate a handler subclass and make an instance
+    # hook up the property links to properties
+    testHandler.propertyLinks()['addend1'] = 'sensors/rhvWeather-01/indoor_temperature'
+    testHandler.propertyLinks()['addend2'] = 'sensors/rhvWeather-01/indoor_temperature'    
+    testHandler.propertyLinks()['sumOut'] = 'sensors/rhvWeather-01/outdoor_humidity'
+    
+    sensors.weather.indoor_temperature.set(101.1)
+    print sensors.weather.indoor_temperature.get()
+    testHandler._updateHandler() # manually run the handler
+    print sensors.weather.outdoor_humidity.get()
+    
     server.start() # forks a server thread
     print 'httpd started'
 

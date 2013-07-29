@@ -23,12 +23,12 @@ class AppHandler(object): # template and convenience methods for raw app handler
             
             try:
                 import __builtin__
-                self.linkBaseDict = __builtin__.eval('SmartObjectServiceBaseDict')
+                self._linkBaseDict = __builtin__.eval('SmartObjectServiceBaseDict')
             except AttributeError:
                 print 'SmartObjectServiceBaseDict not found'
             
         else:
-            self.linkBaseDict = linkBaseDict
+            self._linkBaseDict = linkBaseDict
                 
         self._propertyLinks = {} 
         self._linkCache = {}
@@ -41,20 +41,16 @@ class AppHandler(object): # template and convenience methods for raw app handler
         store translations in a hash cache for fast lookup after the first walk
         '''
         self._linkPath = linkPath
-        
-        if self._linkPath in self.linkCache.keys() :
+        if self._linkPath in self._linkCache.keys() :
             return self._linkCache[self._linkPath]
         # cache miss, walk path and update cache at end
         self._currentDict = self._linkBaseDict
         self._pathElements = linkPath.split('/')
-        
-        for pathElement in self._pathElements[0:-1] : # all but the last, which should be the endpoint
-            self._currentDict = self.currentDict[pathElement].resources
-            
+        for pathElement in self._pathElements[:-1] : # all but the last, which should be the endpoint
+            self._currentDict = self._currentDict[pathElement].resources
         self._resource = self._currentDict[self._pathElements[-1] ]
         self._linkCache.update({ self._linkPath : self._resource })
         return self._resource
-       
         
     def getByLink(self, linkPath):
         return self.linkToRef(linkPath).get()
@@ -70,28 +66,27 @@ class additionHandler(AppHandler): # an example appHandler
     def __init__(self):
         AppHandler.__init__(self)
         # create the input and output link properties
-        self._addend1Link = None
-        self._addend2Link = None
-        self._sumOutLink = None
+        self._addend1Link = 'uninitialized'
+        self._addend2Link = 'uninitialized'
+        self._sumOutLink = 'uninitialized'
         # publish them with some names as an index
-        self._propertyLinks = { 'addend1' : self._addend1Link,
+        self._propertyLinks = {'addend1' : self._addend1Link,
                                'addend2' : self._addend2Link,
                                'sumOut' : self._sumOutLink
                                }
         
-        # define a method for handling state changes in observed resources       
-        def _updateHandler(self, updateRef = None ):
-                '''
-                get the 2 addends, add them, and set the sum location
-                '''
-                self._addend1 = self.getByLink(self._addend1Link)
-                self._addend2 = self.getByLink(self._addend2Link)
-                self.setByLink( self._sumOutLink, self._addend1 + self._addend2 )
+    # define a method for handling state changes in observed resources       
+    def _updateHandler(self, updateRef = None ):
+        # get the 2 addends, add them, and set the sum location
+        self._addend1 = self.getByLink(self._propertyLinks['addend1'])
+        self._addend2 = self.getByLink(self._propertyLinks['addend2'])
+        self.setByLink( self._propertyLinks['sumOut'], self._addend1 + self._addend2 )
                 
             
 class RESTfulEndpoint(object): # create a resource endpoint from a property reference
     def __init__(self, reference):
         self._resource = reference
+        self.resources = {}
         
     def get(self):
         return self._resource
@@ -107,14 +102,14 @@ class Handler(RESTfulResource):
         RESTfulResource.__init__(self)
         self._propertyLinks = None 
         self._appHandlerName = None
-        self._updateHandler = None # reference to _updateHandler method of AppHandler
+        #self._updateHandler = None # reference to _updateHandler method of AppHandler
 
     def importByName(self,classPath):
-        module = __import__(classPath)
-        components = classPath.split('.')
-        for component in components[1:]:
-            module = getattr(module, component)
-            return module
+        # separate the module path from the class,import the module, and return the class name
+        self._components = classPath.split('.')
+        self._module = __import__( '.'.join(self._components[:-1]) )
+        self.appClass = self._components[-1]
+        return self.appClass
 
     def appHandlerName(self):
         return self._appHandlerName
@@ -125,13 +120,16 @@ class Handler(RESTfulResource):
     def updateHandler(self):
         return self._updateHandler
         
+    def _updateHandler(self): # internal method to override
+        pass
+    
     def get(self):
         return self._appHandlerName
     
-    def set(self,appHandlerName): # create an instance of a code object in this handler object
-        self._appHandlerName = appHandlerName
-        self._appHandlerClass = self.importByName(appHandlerName)
-        self._appHandler = self._appHandlerClass() # make instance of AppHandler by name
+    def set(self,appHandlerPath): # create an instance of a code object in this handler object, import module and make instance of class
+        self._appHandlerPath = appHandlerPath
+        self._appHandlerName = self.importByName(self._appHandlerPath)
+        self._appHandler = globals()[self._appHandlerName]()
         # make a resource to read back the AppHandler class name
         self.resources.update( { 'AppHandler' : RESTfulEndpoint(self._appHandlerName)}) 
         # set up the property links resources
@@ -143,7 +141,7 @@ class Handler(RESTfulResource):
                                        RESTfulEndpoint(self._propertyLinks[self._propertyLinkName]) })
                 
         # set up the callable property to be invoked on callbacks
-        if hasattr( self.appHandler, '_updateHandler' ) :
+        if hasattr( self._appHandler, '_updateHandler' ) :
             self._updateHandler = self._appHandler._updateHandler
                
 
@@ -174,7 +172,7 @@ class Agent(RESTfulResource):
         # create new instance of the named class and add to resources directory, return the ref
         self.resources.update({resourceName : globals()[className]()}) 
         if className == self.defaultClass : # Handler class assumed
-            self._handlers.update( {resourceName, self.resources[resourceName]} )
+            self._handlers.update( {resourceName : self.resources[resourceName]} )
         return self.resources[resourceName] # returns a reference to the created instance
 
         # need to destroy instance of code module
