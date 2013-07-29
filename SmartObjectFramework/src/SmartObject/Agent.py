@@ -70,16 +70,13 @@ class AppHandler(object): # template and convenience methods for raw app handler
 class additionHandler(AppHandler): # an example appHandler that adds two values together and stores the result
     def __init__(self, linkBaseDict=None):
         AppHandler.__init__(self, linkBaseDict)
-        # create the input and output link properties
-        self._addend1Link = 'uninitialized'
-        self._addend2Link = 'uninitialized'
-        self._sumOutLink = 'uninitialized'
-        # publish them with some names as an index
-        self._propertyLinks = {'addend1' : self._addend1Link,
-                               'addend2' : self._addend2Link,
-                               'sumOut' : self._sumOutLink
-                               }
-        
+        # create the input and output links 
+        self.propertyLinks = {}
+        # publish them with names as an index 
+        self.propertyLinks.update({'addend1' : None})
+        self.propertyLinks.update({'addend2' : None})
+        self.propertyLinks.update({'sumOut' : None})
+       
     # define a method for handling state changes in observed resources       
     def _updateHandler(self, updateRef = None ):
         # get the 2 addends, add them, and set the sum location
@@ -142,9 +139,10 @@ class Handler(RESTfulResource):
         if hasattr( self._appHandler, '_propertyLinks') :
             self._propertyLinks = self._appHandler._propertyLinks
             self.resources.update( { 'propertyLinks' : RESTfulEndpoint(self._propertyLinks)})
-            for self._propertyLinkName in self._propertyLinks.keys() : 
-                self.resources.update({self._propertyLinkName : \
-                                       RESTfulEndpoint(self._propertyLinks[self._propertyLinkName]) })
+            
+        #    for self._propertyLinkName in self._propertyLinks.keys() : 
+        #        self.resources.update({self._propertyLinkName : \
+        #                               RESTfulEndpoint(self._propertyLinks[self._propertyLinkName]) })
         # does this reference get stale when the propertyLinks are set?
         
         # set up the callable property to be invoked on callbacks
