@@ -14,6 +14,8 @@ of the handler to it's input and output properties.
 Global reference to base object dictionary is not working but hacked in an app level fix passing the 
 reference to a property of the handler resource to use starting up an appHandler instance inside
 
+RESTfulEndpoint doesn't create a reference or something preventing updating
+
 @author: mjkoster
 '''
 
