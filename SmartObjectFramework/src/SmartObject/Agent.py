@@ -139,12 +139,7 @@ class Handler(RESTfulResource):
         if hasattr( self._appHandler, '_propertyLinks') :
             self._propertyLinks = self._appHandler._propertyLinks
             self.resources.update( { 'propertyLinks' : RESTfulEndpoint(self._propertyLinks)})
-            
-        #    for self._propertyLinkName in self._propertyLinks.keys() : 
-        #        self.resources.update({self._propertyLinkName : \
-        #                               RESTfulEndpoint(self._propertyLinks[self._propertyLinkName]) })
-        # does this reference get stale when the propertyLinks are set?
-        
+                    
         # set up the callable property to be invoked on callbacks
         if hasattr( self._appHandler, '_updateHandler' ) :
             self._updateHandler = self._appHandler._updateHandler # hack local property for now
