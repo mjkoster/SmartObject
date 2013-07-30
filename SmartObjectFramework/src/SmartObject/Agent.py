@@ -71,11 +71,11 @@ class additionHandler(AppHandler): # an example appHandler that adds two values 
     def __init__(self, linkBaseDict=None):
         AppHandler.__init__(self, linkBaseDict)
         # create the input and output links 
-        self.propertyLinks = {}
+        self._propertyLinks = {}
         # publish them with names as an index 
-        self.propertyLinks.update({'addend1' : None})
-        self.propertyLinks.update({'addend2' : None})
-        self.propertyLinks.update({'sumOut' : None})
+        self._propertyLinks.update({'addend1' : None})
+        self._propertyLinks.update({'addend2' : None})
+        self._propertyLinks.update({'sumOut' : None})
        
     # define a method for handling state changes in observed resources       
     def _updateHandler(self, updateRef = None ):
