@@ -37,7 +37,7 @@ if __name__ == '__main__' :
         
     baseObject.sensors = baseObject.create('sensors') # top level object container for sensors, default class is SmartObject
     sensors = baseObject.sensors
-    sensors.defaultClass = 'SmartObject'
+    sensors.defaultClass = 'SmartObject' # defaultClass is class for creating named objects 
     sensors.description = sensors.create('Description')
         
     sensors.weather = sensors.create('rhvWeather-01') # create a default class SmartObject for the weather sensor cluster
@@ -96,7 +96,7 @@ if __name__ == '__main__' :
     testHandler.propertyLinks()['addend1'] = 'sensors/rhvWeather-01/indoor_temperature'
     testHandler.propertyLinks()['addend2'] = 'sensors/rhvWeather-01/indoor_temperature'    
     testHandler.propertyLinks()['sumOut'] = 'sensors/rhvWeather-01/outdoor_humidity'
-    
+    # now create an Observers resource and a callback observer to invoke the handler 
     tempObserver = sensors.weather.indoor_temperature.create('Observers')
     tempObserver._linkBaseDict = baseObject.resources # hack base object in here too
     tempObserver.create('callback://local/sensors/rhvWeather-01/Agent/testHandler')

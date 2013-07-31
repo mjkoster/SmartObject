@@ -14,7 +14,8 @@ of the handler to it's input and output properties.
 Global reference to base object dictionary is not working but hacked in an app level fix passing the 
 reference to a property of the handler resource to use starting up an appHandler instance inside
 
-RESTfulEndpoint doesn't create a reference or something preventing updating
+Provided RESTfulDictEndpoint to create a REST endpoint with a resources dictionary for each external property
+of a handler, such that the property can be updated using a web method.
 
 @author: mjkoster
 '''
@@ -66,6 +67,32 @@ class AppHandler(object): # template and convenience methods for raw app handler
     def _updateHandler(self, updateRef = None ): # override this for handling state changes from an observer
         pass
 
+        
+class RESTfulEndpoint(object): # create a resource endpoint from a property reference
+    def __init__(self, reference):
+        self.resources = {}
+        self._resource = reference # this only happens on init of the RESTfulEndpoint
+        
+    def get(self):
+        return self._resource
+    
+    def set(self,newValue):
+        self._resource = newValue
+        return 
+
+class RESTfulDictEndpoint(object):   
+    def __init__(self, resourceName, dict):
+        self.resources = {}
+        self._dict = dict
+        self._resourceName = resourceName
+            
+    def get(self):
+        return self._dict[self._resourceName]
+    
+    def set(self,newValue):
+        self._dict.update( [self._resourceName, newValue])
+        return 
+
 
 class additionHandler(AppHandler): # an example appHandler that adds two values together and stores the result
     def __init__(self, linkBaseDict=None):
@@ -84,20 +111,8 @@ class additionHandler(AppHandler): # an example appHandler that adds two values 
         self._addend2 = self.getByLink(self._propertyLinks['addend2'])
         self.setByLink( self._propertyLinks['sumOut'], self._addend1 + self._addend2 )
         
-        
-class RESTfulEndpoint(object): # create a resource endpoint from a property reference
-    def __init__(self, reference):
-        self._resource = reference # this only happens on init of the RESTfulEndpoint
-        self.resources = {}
-        
-    def get(self):
-        return self._resource
-    
-    def set(self,newValue):
-        self._resource = newValue
-        return 
-    
-    
+
+
 class Handler(RESTfulResource):
     
     def __init__(self, baseDict=None):
@@ -105,9 +120,8 @@ class Handler(RESTfulResource):
         self._propertyLinks = None 
         self._appHandlerName = None
         self._objectPathBaseDict = baseDict
-        #self._updateHandler = None # reference to _updateHandler method of AppHandler
 
-    def importByName(self,classPath):
+    def importByPath(self,classPath):
         # separate the module path from the class,import the module, and return the class name
         self._components = classPath.split('.')
         self._module = __import__( '.'.join(self._components[:-1]) )
@@ -129,9 +143,9 @@ class Handler(RESTfulResource):
     def get(self):
         return self._appHandlerName
     
-    def create(self,appHandlerPath): # create an instance of a code object in this handler object, import module and make instance of class
+    def create(self,appHandlerPath): # create an instance of a code object: import module and make instance of class
         self._appHandlerPath = appHandlerPath
-        self._appHandlerName = self.importByName(self._appHandlerPath)
+        self._appHandlerName = self.importByPath(self._appHandlerPath) # returns the class to make instance of...
         self._appHandler = globals()[self._appHandlerName](self._objectPathBaseDict) # pass in the object path root
         # make a resource to read back the AppHandler class name
         self.resources.update( { 'AppHandler' : RESTfulEndpoint(self._appHandlerName)}) 
@@ -139,7 +153,10 @@ class Handler(RESTfulResource):
         if hasattr( self._appHandler, '_propertyLinks') :
             self._propertyLinks = self._appHandler._propertyLinks
             self.resources.update( { 'propertyLinks' : RESTfulEndpoint(self._propertyLinks)})
-                    
+        
+        # set up a REST endpoint for each propertyLink entry; should it use fragments?
+        for propertyLink in self._propertyLinks.keys() :
+            self.resources.update( {propertyLink : RESTfulDictEndpoint(propertyLink, self._propertyLinks)} )           
         # set up the callable property to be invoked on callbacks
         if hasattr( self._appHandler, '_updateHandler' ) :
             self._updateHandler = self._appHandler._updateHandler # hack local property for now
