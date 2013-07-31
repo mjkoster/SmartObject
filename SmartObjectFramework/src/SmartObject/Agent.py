@@ -81,18 +81,27 @@ class RESTfulEndpoint(object): # create a resource endpoint from a property refe
         return 
 
 class RESTfulDictEndpoint(object):   
-    def __init__(self, resourceName, dict):
+    def __init__(self, resourceName, dict=None):
         self.resources = {}
-        self._dict = dict
+        if dict==None :
+            self._dict = self.resources
+        else:
+            self._dict = dict
+            
         self._resourceName = resourceName
             
     def get(self):
         return self._dict[self._resourceName]
     
     def set(self,newValue):
-        self._dict.update( [self._resourceName, newValue])
+        self._dict.update([self._resourceName, newValue])
         return 
 
+    def create(self, resourceName):
+        self.resources.update(resourceName, RESTfulDictEndpoint(resourceName)) # make an endpoint with internal dict
+        
+    def delete(self, resourceName):
+        del self.resources[resourceName]
 
 class additionHandler(AppHandler): # an example appHandler that adds two values together and stores the result
     def __init__(self, linkBaseDict=None):
@@ -153,10 +162,9 @@ class Handler(RESTfulResource):
         if hasattr( self._appHandler, '_propertyLinks') :
             self._propertyLinks = self._appHandler._propertyLinks
             self.resources.update( { 'propertyLinks' : RESTfulEndpoint(self._propertyLinks)})
-        
-        # set up a REST endpoint for each propertyLink entry; should it use fragments?
-        for propertyLink in self._propertyLinks.keys() :
-            self.resources.update( {propertyLink : RESTfulDictEndpoint(propertyLink, self._propertyLinks)} )           
+            # set up a REST endpoint for each propertyLink entry; should it use fragments?
+            for propertyLink in self._propertyLinks.keys() :
+                self.resources.update( {propertyLink : RESTfulDictEndpoint(propertyLink, self._propertyLinks)} )           
         # set up the callable property to be invoked on callbacks
         if hasattr( self._appHandler, '_updateHandler' ) :
             self._updateHandler = self._appHandler._updateHandler # hack local property for now
