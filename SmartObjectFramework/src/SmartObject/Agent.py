@@ -1,11 +1,11 @@
 '''
 Created on Sep 15, 2012
 
-Agent class. Contains reference to instance of class containing observer 
+Agent classes. Contains reference to instance of class containing observer 
 handlers and code 
 
-First create an instance of the Agent Class, then create a named handler
-and set the desired appHandler code module to the named handler
+First create an instance of the Agent Class, then create a named Handler class instance under the Agent, 
+then create an instance of the desired AppHandler code module under the named handler (using the module path)
 
 At this point, the appHandler class name, update handler callable method, and a dictionary
 of property link names to property link resources are published, to enable connection
@@ -90,7 +90,6 @@ class RESTfulDictEndpoint(object): # create a resource endpoint from a property 
         self._resource.update(newDict)
         return
 
-    
 class RESTfulDictElementEndpoint(object):   
     def __init__(self, resourceName, dict=None):
         self.resources = {}
