@@ -104,7 +104,6 @@ class RESTfulDictElementEndpoint(object):
         return self._dict[self._resourceName]
     
     def set(self,newValue):
-        print newValue
         self._dict.update( {self._resourceName : newValue} )
         return 
 
