@@ -81,7 +81,7 @@ if __name__ == '__main__' :
     sensors.weather.daily_rain = sensors.weather.create('daily_rain', 'ObservableProperty')
         
     # test the simple http observer publisher
-    # first make an observer resource for the Observable Property to be monitored
+    # first make an Observers resource for the Observable Property to be monitored
     pressure_observer = sensors.weather.pressure.create('Observers')
     # then create (or set) a URL endpoint to publish to, including the scheme
     pressure_observer.create('http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature')
@@ -89,14 +89,14 @@ if __name__ == '__main__' :
     
     # test the creation of agents and handlers
     weatherAgent = sensors.weather.create('Agent') # create the Agent resource
-    testHandler = weatherAgent.create('testHandler') # create a handler
+    testHandler = weatherAgent.create('testHandler') # create a handler (default class in Agent)
     testHandler._objectPathBaseDict = baseObject.resources # hack to get a reference for object root
     testHandler.create('SmartObject.Agent.additionHandler') # associate an AppHandler subclass and make a code instance
     # hook up the property links to properties
     testHandler.propertyLinks()['addend1'] = 'sensors/rhvWeather-01/indoor_temperature'
     testHandler.propertyLinks()['addend2'] = 'sensors/rhvWeather-01/indoor_temperature'    
     testHandler.propertyLinks()['sumOut'] = 'sensors/rhvWeather-01/outdoor_humidity'
-    # now create an Observers resource and a callback observer to invoke the handler 
+    # now create an Observers resource and a callback observer endpoint to invoke the handler on resource updates
     tempObserver = sensors.weather.indoor_temperature.create('Observers')
     tempObserver._linkBaseDict = baseObject.resources # hack base object in here too
     tempObserver.create('callback://local/sensors/rhvWeather-01/Agent/testHandler')
