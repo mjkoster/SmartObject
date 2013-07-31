@@ -81,10 +81,9 @@ class RESTfulDictEndpoint(object):
     def __init__(self, resourceName, dict=None):
         self.resources = {}
         if dict==None :
-            self._dict = self.resources
+            self._dict = self.resources # to create endpoints under endpoints
         else:
-            self._dict = dict
-            
+            self._dict = dict  
         self._resourceName = resourceName
             
     def get(self):
@@ -100,6 +99,7 @@ class RESTfulDictEndpoint(object):
         
     def delete(self, resourceName):
         del self.resources[resourceName]
+
 
 class additionHandler(AppHandler): # an example appHandler that adds two values together and stores the result
     def __init__(self, linkBaseDict=None):
@@ -156,11 +156,11 @@ class Handler(RESTfulResource):
         self._appHandler = globals()[self._appHandlerName](self._objectPathBaseDict) # pass in the object path root
         # make a resource to read back the AppHandler class name
         self.resources.update( { 'AppHandler' : RESTfulEndpoint(self._appHandlerName)}) 
-        # set up the property links resources
+        # set up the property links resources 
         if hasattr( self._appHandler, '_propertyLinks') :
             self._propertyLinks = self._appHandler._propertyLinks
             self.resources.update( { 'propertyLinks' : RESTfulEndpoint(self._propertyLinks)})
-            # set up a REST endpoint for each propertyLink entry; should it use fragments?
+            # set up a REST endpoint for each propertyLink entry
             for propertyLink in self._propertyLinks.keys() :
                 self.resources.update( {propertyLink : RESTfulDictEndpoint(propertyLink, self._propertyLinks)} )           
         # set up the callable property to be invoked on callbacks
