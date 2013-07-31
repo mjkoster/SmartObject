@@ -76,10 +76,7 @@ class RESTfulEndpoint(object): # create a resource endpoint from a property refe
     def get(self):
         return self._resource
     
-    def set(self,newValue):
-        self._resource = newValue
-        return 
-
+    
 class RESTfulDictEndpoint(object):   
     def __init__(self, resourceName, dict=None):
         self.resources = {}
