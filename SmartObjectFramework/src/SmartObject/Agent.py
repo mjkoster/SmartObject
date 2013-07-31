@@ -94,11 +94,12 @@ class RESTfulDictEndpoint(object):
         return self._dict[self._resourceName]
     
     def set(self,newValue):
-        self._dict.update([self._resourceName, newValue])
+        print newValue
+        self._dict.update( {self._resourceName : newValue} )
         return 
 
     def create(self, resourceName):
-        self.resources.update(resourceName, RESTfulDictEndpoint(resourceName)) # make an endpoint with internal dict
+        self.resources.update( {resourceName : RESTfulDictEndpoint(resourceName)} ) # make an endpoint with internal dict
         
     def delete(self, resourceName):
         del self.resources[resourceName]
