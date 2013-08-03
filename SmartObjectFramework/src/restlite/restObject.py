@@ -111,7 +111,7 @@ class RestObject(object):
         return
     
     def _handleDELETE(self, currentItem):
-        currentItem.delete()
+        currentItem.delete(self.request.getBody())
         return
     
     

@@ -115,7 +115,7 @@ class Observers(RESTfulResource):
             return None       
         if targetURI not in self.__observers :
             self.__observers.append(targetURI) # append to the list
-            
+                    
         if self.uriObject.scheme == 'http' :
             self.newHandler = httpHandler(targetURI)
         elif self.uriObject.scheme == 'coap' :
