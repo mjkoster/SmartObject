@@ -93,9 +93,9 @@ if __name__ == '__main__' :
     testHandler._objectPathBaseDict = baseObject.resources # hack to get a reference for object root
     testHandler.create('SmartObject.Agent.additionHandler') # associate an AppHandler subclass and make a code instance
     # hook up the property links to properties
-    testHandler.propertyLinks()['addend1'] = 'sensors/rhvWeather-01/indoor_temperature'
-    testHandler.propertyLinks()['addend2'] = 'sensors/rhvWeather-01/indoor_temperature'    
-    testHandler.propertyLinks()['sumOut'] = 'sensors/rhvWeather-01/outdoor_humidity'
+    testHandler.settings()['addendLink1'] = 'sensors/rhvWeather-01/indoor_temperature'
+    testHandler.settings()['addendLink2'] = 'sensors/rhvWeather-01/indoor_temperature'    
+    testHandler.settings()['sumOutLink'] = 'sensors/rhvWeather-01/outdoor_humidity'
     # now create an Observers resource and a callback observer endpoint to invoke the handler on resource updates
     tempObserver = sensors.weather.indoor_temperature.create('Observers')
     tempObserver._linkBaseDict = baseObject.resources # hack base object in here too

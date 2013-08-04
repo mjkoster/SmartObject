@@ -38,7 +38,7 @@ class AppHandler(object): # template and convenience methods for raw app handler
         else:
             self._linkBaseDict = linkBaseDict
                 
-        self._propertyLinks = {} 
+        self._settings = {} 
         self._linkCache = {}
   
         
@@ -91,12 +91,12 @@ class RESTfulDictEndpoint(object): # create a resource endpoint from a property 
         return
 
 class RESTfulDictElementEndpoint(object):   
-    def __init__(self, resourceName, dict=None):
+    def __init__(self, resourceName, newDict=None):
         self.resources = {}
-        if dict==None :
+        if newDict==None :
             self._dict = self.resources # to create endpoints under endpoints
         else:
-            self._dict = dict  
+            self._dict = newDict  
         self._resourceName = resourceName
             
     def get(self):
@@ -119,18 +119,18 @@ class additionHandler(AppHandler): # an example appHandler that adds two values 
     def __init__(self, linkBaseDict=None):
         AppHandler.__init__(self, linkBaseDict)
         # create the input and output links 
-        self._propertyLinks = {}
+        self._settings = {}
         # publish them with names as an index 
-        self._propertyLinks.update({'addend1' : None})
-        self._propertyLinks.update({'addend2' : None})
-        self._propertyLinks.update({'sumOut' : None})
+        self._settings.update({'addendLink1' : None})
+        self._settings.update({'addendLink2' : None})
+        self._settings.update({'sumOutLink' : None})
        
     # define a method for handling state changes in observed resources       
     def _updateHandler(self, updateRef = None ):
         # get the 2 addends, add them, and set the sum location
-        self._addend1 = self.getByLink(self._propertyLinks['addend1'])
-        self._addend2 = self.getByLink(self._propertyLinks['addend2'])
-        self.setByLink( self._propertyLinks['sumOut'], self._addend1 + self._addend2 )
+        self._addend1 = self.getByLink(self._settings['addendLink1'])
+        self._addend2 = self.getByLink(self._settings['addendLink2'])
+        self.setByLink( self._settings['sumOutLink'], self._addend1 + self._addend2 )
         
 
 
@@ -138,7 +138,7 @@ class Handler(RESTfulResource):
     
     def __init__(self, baseDict=None):
         RESTfulResource.__init__(self)
-        self._propertyLinks = None 
+        self._settings = None 
         self._appHandlerName = None
         self._objectPathBaseDict = baseDict
 
@@ -152,8 +152,13 @@ class Handler(RESTfulResource):
     def appHandlerName(self):
         return self._appHandlerName
     
-    def propertyLinks(self):
-        return self._propertyLinks
+    def settings(self):
+        return self._settings
+    
+        def get(self):
+            return self._settings
+        def set(self, newValue):
+            self._settings.update(newValue)
 
     def updateHandler(self):
         return self._updateHandler
@@ -170,13 +175,13 @@ class Handler(RESTfulResource):
         self._appHandler = globals()[self._appHandlerName](self._objectPathBaseDict) # pass in the object path root
         # make a resource to read back the AppHandler class name
         self.resources.update( { 'AppHandler' : RESTfulEndpoint(self._appHandlerName)}) 
-        # set up the property links resources 
-        if hasattr( self._appHandler, '_propertyLinks') :
-            self._propertyLinks = self._appHandler._propertyLinks
-            self.resources.update( { 'propertyLinks' : RESTfulDictEndpoint(self._propertyLinks)})
-            # set up a REST endpoint for each propertyLink entry
-            for propertyLink in self._propertyLinks.keys() :
-                self.resources.update( {propertyLink : RESTfulDictElementEndpoint(propertyLink, self._propertyLinks)} )           
+        # set up the settings resources 
+        if hasattr( self._appHandler, '_settings') :
+            self._settings = self._appHandler._settings
+            self.resources.update( { 'settings' : RESTfulDictEndpoint(self._settings)})
+            # set up a REST endpoint for each settings entry
+            for setting in self._settings.keys() :
+                self.resources.update( {setting : RESTfulDictElementEndpoint(setting, self._settings)} )           
         # set up the callable property to be invoked on callbacks
         if hasattr( self._appHandler, '_updateHandler' ) :
             self._updateHandler = self._appHandler._updateHandler # hack local property for now
