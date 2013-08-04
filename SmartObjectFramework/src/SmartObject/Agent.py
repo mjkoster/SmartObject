@@ -78,6 +78,10 @@ class RESTfulEndpoint(object): # create a resource endpoint from a property refe
     def get(self):
         return self._resource
     
+    def set(self, newValue):
+        self._resource = newValue
+        
+    
 class RESTfulDictEndpoint(object): # create a resource endpoint from a property reference
     def __init__(self, dictReference):
         self.resources = {}
@@ -89,6 +93,7 @@ class RESTfulDictEndpoint(object): # create a resource endpoint from a property 
     def set(self,newDict):
         self._resource.update(newDict)
         return
+
 
 class RESTfulDictElementEndpoint(object):   
     def __init__(self, resourceName, newDict=None):
@@ -155,11 +160,6 @@ class Handler(RESTfulResource):
     def settings(self):
         return self._settings
     
-        def get(self):
-            return self._settings
-        def set(self, newValue):
-            self._settings.update(newValue)
-
     def updateHandler(self):
         return self._updateHandler
         
@@ -175,6 +175,9 @@ class Handler(RESTfulResource):
         self._appHandler = globals()[self._appHandlerName](self._objectPathBaseDict) # pass in the object path root
         # make a resource to read back the AppHandler class name
         self.resources.update( { 'AppHandler' : RESTfulEndpoint(self._appHandlerName)}) 
+        # set up the callable property to be invoked on callbacks
+        if hasattr( self._appHandler, '_updateHandler' ) :
+            self._updateHandler = self._appHandler._updateHandler # hack local property for now
         # set up the settings resources 
         if hasattr( self._appHandler, '_settings') :
             self._settings = self._appHandler._settings
@@ -182,9 +185,6 @@ class Handler(RESTfulResource):
             # set up a REST endpoint for each settings entry
             for setting in self._settings.keys() :
                 self.resources.update( {setting : RESTfulDictElementEndpoint(setting, self._settings)} )           
-        # set up the callable property to be invoked on callbacks
-        if hasattr( self._appHandler, '_updateHandler' ) :
-            self._updateHandler = self._appHandler._updateHandler # hack local property for now
                
 
 
