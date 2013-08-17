@@ -36,39 +36,71 @@ class Observer(RESTfulResource):
         self._settings = {}
         self._observerClass = None
         self._observerInstance = None
-        self.updateHandler = None
         self._settings.update({'observerClass': None})
+        self._baseObject = parentObject
+        self._baseObjectDict = parentObject.resources['baseObject'].resources
 
+    def get(self, Key=None):
+        if Key != None :
+            return self._settings[Key]
+        else :
+            return self._settings
+        
+    def set(self, updateDict):
+        self._settings.update(updateDict)
+        if updateDict.has_key('observerClass'):
+            if updateDict['observerClass'] != self._observerClass: # create a new instance if observerClass is being set
+                self._observerClass = self._settings['observerClass']
+                self._observerInstance = self.newObserverInstance(self._settings)
+                self._notify = self._observerInstance.notify #reflect the handler back 
     
+    def newObserverInstance(self, settings): # make an instance, pass in the settings dict and return the handle
+        if settings['observerClass'] == 'httpObserver' :
+            return httpObserver(settings)
+        if settings['observerClass'] == 'coapObserver' :
+            return coapObserver(settings)
+        if settings['observerClass'] == 'mqttObserver' :
+            return mqttObserver(settings)
+        if settings['observerClass'] == 'callbackObserver' :
+            return callbackObserver(settings, self._baseObjectDict)
+        
+    def _notify(self, resource):
+        pass
+        
+    def notify(self, resource):
+        self._notify(resource)
+        
+        
 class httpObserver(object):
-    def __init__(self, targetURI=None):
-        self.targetURI = targetURI
-        self.uriObject = urlparse(targetURI)
-        self.httpServer = self.uriObject.netloc
-        self.httpPath = self.uriObject.path
+    def __init__(self, settings):
+        self._settings = settings
+        self._targetURI = self._settings['targetURI']
+        self._uriObject = urlparse(self._targetURI)
+        self._httpServer = self._uriObject.netloc
+        self._httpPath = self._uriObject.path
         
     def notify(self,resource): # JSON only for now
-        self.jsonObject = json.dumps(resource.get())
-        self.httpHeader = {"Content-Type" : "application/json" }
-        self.httpConnection = httplib.HTTPConnection(self.httpServer)
-        self.httpConnection.request('PUT', self.httpPath, self.jsonObject, self.httpHeader)
+        self._jsonObject = json.dumps(resource.get())
+        self._httpHeader = {"Content-Type" : "application/json" }
+        self._httpConnection = httplib.HTTPConnection(self._httpServer)
+        self._httpConnection.request('PUT', self._httpPath, self._jsonObject, self._httpHeader)
         return
 
 class coapObserver(object):
-    def __init__(self, targetURI = None):
+    def __init__(self, settings):
         pass
     
 class mqttObserver(object):
-    def __init__(self, targetURI = None):
+    def __init__(self, settings):
         pass
 
 class callbackObserver(object):
-    def __init__(self, targetURI = None, linkBaseDict = None ):
-        self.targetURI = targetURI
+    def __init__(self, settings, linkBaseDict):
+        self._handlerURI = settings['handlerURI']
         self._linkBaseDict = linkBaseDict
-        self.uriObject = urlparse(targetURI)
-        self._handlerService = self.uriObject.netloc
-        self._handlerPath = self.uriObject.path
+        self._uriObject = urlparse(self._handlerURI)
+        self._handlerService = self._uriObject.netloc
+        self._handlerPath = self._uriObject.path
         self._appHandler = self.linkToRef(self._handlerPath)
         
     def notify(self,resource=None): # invoke the handler
@@ -93,56 +125,37 @@ class Observers(RESTfulResource):
     
     def __init__(self, parentObject=None):
         RESTfulResource.__init__(self, parentObject)
-        self.__schemes = ['http', 'coap', 'mqtt', 'callback']
-        self.__observers = []
-        self.__handlers = {}
-        self._linkBaseDict = self.resources['baseObject'].resources
+        self._observers = {}
                
     def onUpdate(self,resource):
-        self.__onUpdate(resource)
+        self._onUpdate(resource)
         
-    def __onUpdate(self, resource):
-        for observer in self.__observers:
-            self.__handlers[observer].notify(resource)
+    def _onUpdate(self, resource):
+        for observer in self._observers.keys():
+            self._observers[observer].notify(resource)
 
-    # match returns the supplied URL, else none. Supplying None returns all Observers
-    def get(self, targetURI=None):
-        if targetURI != None:
-            if targetURI in self.__observers:
-                return targetURI
-            return None
-        return self.__observers # if no URI specified then return all observers
-        
+    def get(self, Key=None):
+        if Key == None :
+            return self._observers.keys() # if no URI specified then return all observers
+        return self._observer[Key] #return a handle to the observer object for python API
+    
     # map the set operation to the create operation
-    def set(self, targetURI):
-        self.create(targetURI)
+    def set(self, observerName):
+        self.create(observerName)
     
     # create adds an observer to the list, echoes URI if created or exists
-    def create(self, targetURI):
-        self.uriObject = urlparse(targetURI)
-        if self.uriObject.scheme not in self.__schemes:
-            return None       
-        if targetURI not in self.__observers :
-            self.__observers.append(targetURI) # append to the list
-                    
-        if self.uriObject.scheme == 'http' :
-            self.newObserver = httpObserver(targetURI)
-        elif self.uriObject.scheme == 'coap' :
-            self.newObserver = coapObserver(targetURI)
-        elif self.uriObject.scheme == 'mqtt' :
-            self.newObserver = mqttObserver(targetURI)
-        elif self.uriObject.scheme == 'callback' :
-            self.newObserver = callbackObserver(targetURI, self._linkBaseDict)
-                    
-        self.__handlers.update({targetURI : self.newObserver})
-        
-        return self.newObserver # return a handle to the handler object
+    def create(self, observerName):        
+        # create an Observer, add to resources directory, return the ref
+        self.resources.update({observerName : Observer(self)}) 
+        self._observers.update({observerName: self.resources[observerName]})        
+        return self.resources[observerName] # returns a reference to the created instance
 
     # delete removes an observer from the list, echoes None for failure
-    def delete(self, targetURI):
-        if targetURI in self.__observers :
-            self.__observers.remove(targetURI)
-            return targetURI
+    def delete(self, observerName):
+        if observerName in self._observers.keys() :
+            self._observers.remove(observerName)
+            self.resources.remove(observerName)
+            return observerName
         return None
     
     
