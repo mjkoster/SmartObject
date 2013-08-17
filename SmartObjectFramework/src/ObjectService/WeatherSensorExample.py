@@ -82,28 +82,28 @@ if __name__ == '__main__' :
     weather.daily_rain = weather.create('daily_rain')
         
     # test the simple http observer publisher
-    # first make an Observers resource for the Observable Property to be monitored by
+    # first make an Observers resource for the Observable Property to be monitored by,then create an Observer
     pressureObservers = weather.pressure.create('Observers')
-    # then create an Observer
     httpPressureObserver = pressureObservers.create('httpPressureObserver')
+    # configure the Observer to be an httpObserver and it's URI to PUT updates to
+    # the publisher will use the scheme specified and update the URL endpoint whenever the OP is updated
     httpPressureObserver.set({'observerClass': 'httpObserver', \
                               'targetURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature'})
-    # the publisher will use the scheme specified and update the URL endpoint whenever the OP is updated
     
     # test the creation of agents and handlers
     weatherAgent = weather.create('Agent') # create the Agent resource
-    testHandler = weatherAgent.create('testHandler') # create a handler (default class in Agent)
+    testHandler = weatherAgent.create('testHandler') # create a handler resource (default class in Agent)
     testHandler.create('SmartObject.Agent.additionHandler') # associate an AppHandler subclass and make a code instance
     # hook up the property links to properties
     testHandler.settings()['addendLink1'] = 'sensors/rhvWeather-01/indoor_temperature'
     testHandler.settings()['addendLink2'] = 'sensors/rhvWeather-01/indoor_temperature'    
     testHandler.settings()['sumOutLink'] = 'sensors/rhvWeather-01/outdoor_humidity'
     # now create an Observers resource and a callback observer endpoint 
-    tempObserver = weather.indoor_temperature.create('Observers')
-    callbackTempObserver = tempObserver.create('callbackTempObserver')
+    tempObservers = weather.indoor_temperature.create('Observers')
+    callbackTempObserver = tempObservers.create('callbackTempObserver')
     # configure the Observer to be a callback observer pointing to the testHandler
     callbackTempObserver.set({'observerClass': 'callbackObserver', \
-                              'handlerURI': 'callback://local/sensors/rhvWeather-01/Agent/testHandler'})
+                              'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/testHandler'})
         
     server.start() # forks a server thread
     print 'httpd started'
