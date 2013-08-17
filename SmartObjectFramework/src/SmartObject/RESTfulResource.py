@@ -26,10 +26,10 @@ class RESTfulResource(Resource) :
         Resource.__init__(self)
         
         self.resources.update({'thisObject': self})
-        self.resources.update({'baseObject': self})
-        self.resources.update({'parentObject': self})
-
-        if parentObject != None :
+        if parentObject == None :
+            self.resources.update({'baseObject': self})
+            self.resources.update({'parentObject': self})
+        else :
             self.resources.update({'parentObject' : parentObject.resources['thisObject']})
             self.resources.update({'baseObject': parentObject.resources['baseObject'] })
             
