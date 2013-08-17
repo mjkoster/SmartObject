@@ -66,7 +66,7 @@ class AppHandler(object): # template and convenience methods for raw app handler
     def setByLink(self, linkPath, newValue):
         self.linkToRef(linkPath).set(newValue)
 
-    def _updateHandler(self, updateRef = None ): # override this for handling state changes from an observer
+    def _handleNotify(self, updateRef = None ): # override this for handling state changes from an observer
         pass
 
         
@@ -131,7 +131,7 @@ class additionHandler(AppHandler): # an example appHandler that adds two values 
         self._settings.update({'sumOutLink' : None})
        
     # define a method for handling state changes in observed resources       
-    def _updateHandler(self, updateRef = None ):
+    def _handleNotify(self, updateRef = None ):
         # get the 2 addends, add them, and set the sum location
         self._addend1 = self.getByLink(self._settings['addendLink1'])
         self._addend2 = self.getByLink(self._settings['addendLink2'])
@@ -159,11 +159,8 @@ class Handler(RESTfulResource):
     
     def settings(self):
         return self._settings
-    
-    def updateHandler(self):
-        return self._updateHandler
-        
-    def _updateHandler(self): # internal method to override
+            
+    def handleNotify(self): # external method to override with method from appHandler
         pass
     
     def get(self):
@@ -176,8 +173,8 @@ class Handler(RESTfulResource):
         # make a resource to read back the AppHandler class name
         self.resources.update( { 'AppHandler' : RESTfulEndpoint(self._appHandlerName)}) 
         # set up the callable property to be invoked on callbacks
-        if hasattr( self._appHandler, '_updateHandler' ) :
-            self._updateHandler = self._appHandler._updateHandler # hack local property for now
+        if hasattr( self._appHandler, '_handleNotify' ) :
+            self.handleNotify = self._appHandler._handleNotify # reflect the appHandler handleNotify method 
         # set up the settings resources 
         if hasattr( self._appHandler, '_settings') :
             self._settings = self._appHandler._settings

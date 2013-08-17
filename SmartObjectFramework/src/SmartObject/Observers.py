@@ -4,6 +4,7 @@ Created on Sep 15, 2012
 Observers class for observation of changes in a resource
 
 Updated July 28, 2013 MJK - made a simple http ObserverPublisher prototype
+Updated Aug 17, 2013 MJK - implemented new Observers-Observer pattern using config settings from dict(JSON)
 
 To use the observer, create a resource endpoint using http PUT, http POST or the Python API,
 consisting of a URL string in the Observers resource. For example:
@@ -104,7 +105,7 @@ class callbackObserver(object):
         self._appHandler = self.linkToRef(self._handlerPath)
         
     def notify(self,resource=None): # invoke the handler
-        self._appHandler._updateHandler(resource)
+        self._appHandler.handleNotify(resource)
         return
     
     def linkToRef(self, linkPath ):
@@ -121,7 +122,7 @@ class callbackObserver(object):
         self._resource = self._currentDict[self._pathElements[-1] ]
         return self._resource
     
-class Observers(RESTfulResource):
+class Observers(RESTfulResource): # the Observers resource is a container for individual named Observer resources
     
     def __init__(self, parentObject=None):
         RESTfulResource.__init__(self, parentObject)
