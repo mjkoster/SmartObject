@@ -111,18 +111,6 @@ class RESTfulDictElementEndpoint(object):
 
 
 class additionHandler(AppHandler): # an example appHandler that adds two values together and stores the result
-    def __init__(self, settings, linkBaseDict):
-        AppHandler.__init__(self, settings, linkBaseDict)
-        # if link settings weren't supplied,
-        # create template for the input and output links 
-        # publish them with names as a prompt 
-        if 'addendLink1' not in self._settings.keys() :
-            self._settings.update({'addendLink1' : None})
-        if 'addendLink2' not in self._settings.keys() :
-            self._settings.update({'addendLink2' : None})
-        if 'sumOutLink' not in self._settings.keys() :
-            self._settings.update({'sumOutLink' : None})
-       
     # define a method for handling state changes in observed resources       
     def _handleNotify(self, updateRef = None ):
         # get the 2 addends, add them, and set the sum location
