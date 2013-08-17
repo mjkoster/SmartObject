@@ -20,7 +20,7 @@ from time import sleep
 if __name__ == '__main__' :
     
     baseObject = SmartObject() # create a Smart Object to serve as the base container for other Smart Objects and resources
-    
+
     server = SmartObjectService(baseObject,8000) # make an instance of the service to listen on port 8000, baseObject is the object root
     print 'Service created'
     # set the default class for web API calls to create Smart Objects as named resources       
@@ -37,6 +37,7 @@ if __name__ == '__main__' :
         
     baseObject.sensors = baseObject.create('sensors') # top level object container for sensors, default class is SmartObject
     sensors = baseObject.sensors
+    
     sensors.defaultClass = 'SmartObject' # defaultClass is class for creating named objects 
     sensors.description = sensors.create('Description')
         

@@ -30,7 +30,11 @@ from urlparse import urlparse
 import json
 import httplib
 
+class Observer(RESTfulResource):
+    def __init__(self, parentObject=None):
+        RESTfulResource.__init__(self, parentObject)
 
+    
 class httpHandler(object):
     def __init__(self, targetURI=None):
         self.targetURI = targetURI

@@ -22,8 +22,17 @@ from Resource import Resource
 class RESTfulResource(Resource) :
     
     # when this resource is created
-    def __init__(self):
+    def __init__(self, parentObject=None):
         Resource.__init__(self)
+        
+        self.resources.update({'thisObject': self})
+        self.resources.update({'baseObject': self})
+        self.resources.update({'parentObject': self})
+
+        if parentObject != None :
+            self.resources.update({'parentObject' : parentObject.resources['thisObject']})
+            self.resources.update({'baseObject': parentObject.resources['baseObject'] })
+            
         self._parseContentTypes = [] 
         self._serializeContentTypes = []
         self.defaultClass = 'RESTfulResource' # class name, override in derived classes
@@ -36,8 +45,9 @@ class RESTfulResource(Resource) :
                 className = resourceName
             else :
                 className = self.defaultClass 
-        # create new instance of the named class and add to resources directory, return the ref
-        self.resources.update({resourceName : globals()[className]()}) 
+        # create new instance of the named class, pass the resource dict to the constructor, 
+        # add to resources directory, return the ref
+        self.resources.update({resourceName : globals()[className](self)}) 
         print className
         return self.resources[resourceName] # returns a reference to the created instance
 

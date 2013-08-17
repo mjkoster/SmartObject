@@ -190,9 +190,9 @@ class Handler(RESTfulResource):
 
 class Agent(RESTfulResource):
     
-    def __init__(self, SmartObjectBaseDict=None):
-        RESTfulResource.__init__(self)
-        self._smartObjectBaseDict = SmartObjectBaseDict # should agent and handler each have a base object?
+    def __init__(self, parentObject=None):
+        RESTfulResource.__init__(self, parentObject)
+        self._smartObjectBaseDict = parentObject.resources['baseObject'].resources # should agent and handler each have a base object?
         self.defaultClass = 'Handler'
         self._handlers = {}
         

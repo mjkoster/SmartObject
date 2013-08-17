@@ -36,13 +36,13 @@ class Resource(object) :
         self.value=newValue
         return
 
-    def create(self, resourceName, resourceClass) :
-        return self._create(resourceName, resourceClass)
+    def create(self, resourceName, className) :
+        return self._create(resourceName, className)
       
     # for adding resources inside this resource
-    def _create(self, resourceName, resourceClass) :
+    def _create(self, resourceName, className) :
         # create new instance of the named class and add to resources directory, return the ref
-        self.resources.update({resourceName : resourceClass()}) 
+        self.resources.update({resourceName : globals()[className]()}) 
         return self.resources[resourceName]
     
     # for removing resources inside this resource

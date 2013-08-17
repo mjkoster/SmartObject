@@ -30,8 +30,8 @@ from Observers import Observers
 
 class ObservableProperty(RESTfulResource):
     
-    def __init__(self):
-        RESTfulResource.__init__(self) 
+    def __init__(self, parentObject=None):
+        RESTfulResource.__init__(self, parentObject) 
         self.defaultClass = 'PropertyOfInterest'
         # default create property of interest
     def get(self):

@@ -26,8 +26,8 @@ from PropertyOfInterest import PropertyOfInterest
 
 class SmartObject(RESTfulResource):
     
-    def __init__(self):
-        RESTfulResource.__init__(self)
+    def __init__(self, parentObject=None):
+        RESTfulResource.__init__(self, parentObject)
         self.defaultClass = 'ObservableProperty' # used when a new resource name is used in create
         self.wellKnownClasses = [ 'Description' , 'Observers' , 'PropertyOfInterest' , 'SmartObject' , 'RESTfulResource' , 'Agent' ]
         #Create a default instance of a Description resource for linked data
@@ -50,7 +50,7 @@ class SmartObject(RESTfulResource):
             else :
                 className = self.defaultClass 
         # create new instance of the named class and add to resources directory, return the ref
-        self.resources.update({resourceName : globals()[className]()}) 
+        self.resources.update({resourceName : globals()[className](self)}) 
 
         return self.resources[resourceName] # returns a reference to the created instance
 

@@ -10,6 +10,6 @@ from RESTfulResource import RESTfulResource
 
 class PropertyOfInterest(RESTfulResource):
     
-    def __init__(self):
-        RESTfulResource.__init__(self)
+    def __init__(self, parentObject=None):
+        RESTfulResource.__init__(self, parentObject)
         

@@ -19,8 +19,8 @@ class RespGraph(Graph):
  
 class Description (RESTfulResource):
     
-    def __init__(self):
-        RESTfulResource.__init__(self)
+    def __init__(self, parentObject=None):
+        RESTfulResource.__init__(self, parentObject)
         self.graph = Graph()
         self._parseContentTypes = [ 'text/plain' , 'application/rdf+xml' , 'text/rdf+n3' ]
         self._serializeContentTypes = [ 'text/xml' , 'text/plain', 'application/rdf+xml' , 'application/x-turtle' , 'text/rdf+n3' ]
