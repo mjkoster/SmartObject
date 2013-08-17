@@ -93,11 +93,14 @@ if __name__ == '__main__' :
     # test the creation of agents and handlers
     weatherAgent = weather.create('Agent') # create the Agent resource
     testHandler = weatherAgent.create('testHandler') # create a handler resource (default class in Agent)
-    testHandler.create('SmartObject.Agent.additionHandler') # associate an AppHandler subclass and make a code instance
+    
+    # associate an AppHandler subclass and make a code instance
     # hook up the property links to properties
-    testHandler.settings()['addendLink1'] = 'sensors/rhvWeather-01/indoor_temperature'
-    testHandler.settings()['addendLink2'] = 'sensors/rhvWeather-01/indoor_temperature'    
-    testHandler.settings()['sumOutLink'] = 'sensors/rhvWeather-01/outdoor_humidity'
+    testHandler.set({'handlerClass': 'SmartObject.Agent.additionHandler', \
+                     'addendLink1':'sensors/rhvWeather-01/indoor_temperature', \
+                     'addendLink2': 'sensors/rhvWeather-01/indoor_temperature', \
+                     'sumOutLink': 'sensors/rhvWeather-01/outdoor_humidity'}) 
+    
     # now create an Observers resource and a callback observer endpoint 
     tempObservers = weather.indoor_temperature.create('Observers')
     callbackTempObserver = tempObservers.create('callbackTempObserver')

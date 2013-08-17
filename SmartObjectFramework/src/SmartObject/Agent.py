@@ -26,23 +26,13 @@ from RESTfulResource import RESTfulResource
 
 
 class AppHandler(object): # template and convenience methods for raw app handlers. Python app handler should extend this class
-    def __init__(self, linkBaseDict = None) : # object base resource dict can be passed in
-        if linkBaseDict is None :
-            
-            try:
-                import __builtin__
-                self._linkBaseDict = __builtin__.eval('SmartObjectServiceBaseDict')
-            except :
-                print 'SmartObjectServiceBaseDict not found'
-            
-        else:
-            self._linkBaseDict = linkBaseDict
-                
-        self._settings = {} 
+    def __init__(self, settings, linkBaseDict) : # object base resource dict is be passed in with settings
         self._linkCache = {}
+        self._settings = settings # use the settings dictionary passed in            
+        self._linkBaseDict = linkBaseDict   
   
         
-    def linkToRef(self, linkPath ):
+    def linkToRef(self, linkPath):
         '''
         takes a path string and walks the object tree from a base dictionary
         returns a ref to the resource at the path endpoint
@@ -121,14 +111,17 @@ class RESTfulDictElementEndpoint(object):
 
 
 class additionHandler(AppHandler): # an example appHandler that adds two values together and stores the result
-    def __init__(self, linkBaseDict=None):
-        AppHandler.__init__(self, linkBaseDict)
-        # create the input and output links 
-        self._settings = {}
-        # publish them with names as an index 
-        self._settings.update({'addendLink1' : None})
-        self._settings.update({'addendLink2' : None})
-        self._settings.update({'sumOutLink' : None})
+    def __init__(self, settings, linkBaseDict):
+        AppHandler.__init__(self, settings, linkBaseDict)
+        # if link settings weren't supplied,
+        # create template for the input and output links 
+        # publish them with names as a prompt 
+        if 'addendLink1' not in self._settings.keys() :
+            self._settings.update({'addendLink1' : None})
+        if 'addendLink2' not in self._settings.keys() :
+            self._settings.update({'addendLink2' : None})
+        if 'sumOutLink' not in self._settings.keys() :
+            self._settings.update({'sumOutLink' : None})
        
     # define a method for handling state changes in observed resources       
     def _handleNotify(self, updateRef = None ):
@@ -143,9 +136,10 @@ class Handler(RESTfulResource):
     
     def __init__(self, parentObject=None):
         RESTfulResource.__init__(self, parentObject)
-        self._settings = None 
-        self._appHandlerName = None
-        self._objectPathBaseDict = self.resources['baseObject'].resources
+        self._settings = {} 
+        self._appHandlerClassPath = None
+        self._appHandlerClass = None
+        self._linkBaseDict = self.resources['baseObject'].resources
 
     def importByPath(self,classPath):
         # separate the module path from the class,import the module, and return the class name
@@ -154,8 +148,8 @@ class Handler(RESTfulResource):
         self.appClass = self._components[-1]
         return self.appClass
 
-    def appHandlerName(self):
-        return self._appHandlerName
+    def appHandlerClass(self):
+        return self._appHandlerClass
     
     def settings(self):
         return self._settings
@@ -163,26 +157,27 @@ class Handler(RESTfulResource):
     def handleNotify(self): # external method to override with method from appHandler
         pass
     
-    def get(self):
-        return self._appHandlerName
-    
-    def create(self,appHandlerPath): # create an instance of a code object: import module and make instance of class
-        self._appHandlerPath = appHandlerPath
-        self._appHandlerName = self.importByPath(self._appHandlerPath) # returns the class to make instance of...
-        self._appHandler = globals()[self._appHandlerName](self._objectPathBaseDict) # pass in the object path root
-        # make a resource to read back the AppHandler class name
-        self.resources.update( { 'AppHandler' : RESTfulEndpoint(self._appHandlerName)}) 
-        # set up the callable property to be invoked on callbacks
-        if hasattr( self._appHandler, '_handleNotify' ) :
-            self.handleNotify = self._appHandler._handleNotify # reflect the appHandler handleNotify method 
-        # set up the settings resources 
-        if hasattr( self._appHandler, '_settings') :
-            self._settings = self._appHandler._settings
-            self.resources.update( { 'settings' : RESTfulDictEndpoint(self._settings)})
-            # set up a REST endpoint for each settings entry
-            for setting in self._settings.keys() :
-                self.resources.update( {setting : RESTfulDictElementEndpoint(setting, self._settings)} )           
-               
+    def get(self, Key=None):
+        if Key != None :
+            return self.settings()[Key]
+        else :
+            return self.settings()
+     
+    def set(self, newSettings): # create an instance of a handler from settings dictionary
+        self._settings.update(newSettings)
+        if newSettings.has_key('handlerClass'):
+            if newSettings['handlerClass'] != self._appHandlerClass: # create a new instance if handlerClass is being changed
+                #note this requires handler class names be unique in the local environment
+                self._appHandlerClassPath = self._settings['handlerClass']
+                self._appHandlerClass = self.importByPath(self._appHandlerClassPath)
+                self._appHandler = globals()[self._appHandlerClass](self._settings, self._linkBaseDict) # pass settings to the constructor
+                
+                if hasattr( self._appHandler, '_handleNotify' ) :
+                    self.handleNotify = self._appHandler._handleNotify # reflect the appHandler handleNotify method 
+                    
+                # set up a REST endpoint for each settings entry
+                for setting in self._settings.keys() :
+                    self.resources.update( {setting : RESTfulDictElementEndpoint(setting, self._settings)} )                        
 
 
 class Agent(RESTfulResource):

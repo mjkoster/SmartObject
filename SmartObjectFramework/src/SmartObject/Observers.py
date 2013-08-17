@@ -47,10 +47,10 @@ class Observer(RESTfulResource):
         else :
             return self._settings
         
-    def set(self, updateDict):
-        self._settings.update(updateDict)
-        if updateDict.has_key('observerClass'):
-            if updateDict['observerClass'] != self._observerClass: # create a new instance if observerClass is being set
+    def set(self, newSettings):
+        self._settings.update(newSettings)
+        if newSettings.has_key('observerClass'):
+            if newSettings['observerClass'] != self._observerClass: # create a new instance if observerClass is being set
                 self._observerClass = self._settings['observerClass']
                 self._observerInstance = self.newObserverInstance(self._settings)
                 self._notify = self._observerInstance.notify #reflect the handler back 
