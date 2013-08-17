@@ -141,11 +141,11 @@ class additionHandler(AppHandler): # an example appHandler that adds two values 
 
 class Handler(RESTfulResource):
     
-    def __init__(self, baseDict=None):
-        RESTfulResource.__init__(self)
+    def __init__(self, parentObject=None):
+        RESTfulResource.__init__(self, parentObject)
         self._settings = None 
         self._appHandlerName = None
-        self._objectPathBaseDict = baseDict
+        self._objectPathBaseDict = self.resources['baseObject'].resources
 
     def importByPath(self,classPath):
         # separate the module path from the class,import the module, and return the class name
@@ -192,7 +192,7 @@ class Agent(RESTfulResource):
     
     def __init__(self, parentObject=None):
         RESTfulResource.__init__(self, parentObject)
-        self._smartObjectBaseDict = parentObject.resources['baseObject'].resources # should agent and handler each have a base object?
+        self._smartObjectBaseDict = self.resources['baseObject'].resources # should agent and handler each have a base object?
         self.defaultClass = 'Handler'
         self._handlers = {}
         
@@ -212,7 +212,7 @@ class Agent(RESTfulResource):
             else :
                 className = self.defaultClass 
         # create new instance of the named class and add to resources directory, return the ref
-        self.resources.update({resourceName : globals()[className]()}) 
+        self.resources.update({resourceName : globals()[className](self)}) 
         if className == self.defaultClass : # Handler class assumed
             self._handlers.update( {resourceName : self.resources[resourceName]} )
         return self.resources[resourceName] # returns a reference to the created instance

@@ -86,12 +86,12 @@ class callbackHandler(object):
     
 class Observers(RESTfulResource):
     
-    def __init__(self, linkBaseDict=None):
-        RESTfulResource.__init__(self)
+    def __init__(self, parentObject=None):
+        RESTfulResource.__init__(self, parentObject)
         self.__schemes = ['http', 'coap', 'mqtt', 'callback']
         self.__observers = []
         self.__handlers = {}
-        self._linkBaseDict = linkBaseDict
+        self._linkBaseDict = self.resources['baseObject'].resources
                
     def onUpdate(self,resource):
         self.__onUpdate(resource)

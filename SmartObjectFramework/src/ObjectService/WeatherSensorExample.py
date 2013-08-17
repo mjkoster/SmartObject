@@ -91,7 +91,6 @@ if __name__ == '__main__' :
     # test the creation of agents and handlers
     weatherAgent = sensors.weather.create('Agent') # create the Agent resource
     testHandler = weatherAgent.create('testHandler') # create a handler (default class in Agent)
-    testHandler._objectPathBaseDict = baseObject.resources # hack to get a reference for object root
     testHandler.create('SmartObject.Agent.additionHandler') # associate an AppHandler subclass and make a code instance
     # hook up the property links to properties
     testHandler.settings()['addendLink1'] = 'sensors/rhvWeather-01/indoor_temperature'
@@ -99,7 +98,6 @@ if __name__ == '__main__' :
     testHandler.settings()['sumOutLink'] = 'sensors/rhvWeather-01/outdoor_humidity'
     # now create an Observers resource and a callback observer endpoint to invoke the handler on resource updates
     tempObserver = sensors.weather.indoor_temperature.create('Observers')
-    tempObserver._linkBaseDict = baseObject.resources # hack base object in here too
     tempObserver.create('callback://local/sensors/rhvWeather-01/Agent/testHandler')
         
     server.start() # forks a server thread
