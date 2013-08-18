@@ -75,16 +75,13 @@ class Observer(RESTfulResource):
 class httpObserver(object):
     def __init__(self, settings):
         self._settings = settings
-        self._targetURI = self._settings['targetURI']
-        self._uriObject = urlparse(self._targetURI)
-        self._httpServer = self._uriObject.netloc
-        self._httpPath = self._uriObject.path
+        self._httpHeader = {"Content-Type" : "application/json" }
         
     def notify(self,resource): # JSON only for now
         self._jsonObject = json.dumps(resource.get())
-        self._httpHeader = {"Content-Type" : "application/json" }
-        self._httpConnection = httplib.HTTPConnection(self._httpServer)
-        self._httpConnection.request('PUT', self._httpPath, self._jsonObject, self._httpHeader)
+        self._uriObject = urlparse(self._settings['targetURI'])
+        self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
+        self._httpConnection.request('PUT', self._uriObject.path, self._jsonObject, self._httpHeader)
         return
 
 class coapObserver(object):
@@ -97,15 +94,11 @@ class mqttObserver(object):
 
 class callbackObserver(object):
     def __init__(self, settings, linkBaseDict):
-        self._handlerURI = settings['handlerURI']
+        self._settings = settings
         self._linkBaseDict = linkBaseDict
-        self._uriObject = urlparse(self._handlerURI)
-        self._handlerService = self._uriObject.netloc
-        self._handlerPath = self._uriObject.path
-        self._appHandler = self.linkToRef(self._handlerPath)
         
     def notify(self,resource=None): # invoke the handler
-        self._appHandler.handleNotify(resource)
+        self.linkToRef(urlparse(self._settings['handlerURI']).path).handleNotify(resource)
         return
     
     def linkToRef(self, linkPath ):
@@ -113,7 +106,6 @@ class callbackObserver(object):
         takes a path string and walks the object tree from a base dictionary
         returns a ref to the resource at the path endpoint
         '''
-        self._linkPath = linkPath
         self._currentDict = self._linkBaseDict
         self._pathElements = linkPath.split('/')
         for pathElement in self._pathElements[:-1] : # all but the last, which should be the endpoint
