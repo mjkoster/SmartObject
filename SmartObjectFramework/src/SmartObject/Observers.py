@@ -85,7 +85,6 @@ class httpObserver(object):
         self._uriObject = urlparse(self._settings['targetURI'])
         self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
         self._httpConnection.request('PUT', self._uriObject.path, self._jsonObject, self._httpHeader)
-        self._httpConnection.getresponse()
         return
 
 class coapObserver(object):
