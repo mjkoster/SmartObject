@@ -33,8 +33,8 @@ class RESTfulResource(Resource) :
             self.resources.update({'parentObject' : parentObject.resources['thisObject']})
             self.resources.update({'baseObject': parentObject.resources['baseObject'] })
             
-        self._parseContentTypes = [] 
-        self._serializeContentTypes = []
+        self._parseContentTypes = ['*/*'] 
+        self._serializeContentTypes = ['*/*']
         self.defaultClass = 'RESTfulResource' # class name, override in derived classes
         self.wellKnownClasses = [ 'Description' , 'Observers' , 'PropertyOfInterest' , 'SmartObject' , 'RESTfulResource' , 'Agent' ]
 
