@@ -16,13 +16,8 @@ representing the value of the Observable Property whenever the Observable Proper
 
 It doesn't work if you try to directly update the Property Of Interest
 
-http PUT of JSON is all that is implemented for now
-
-This should be replaced with a graph based observer endpoint to provide configurable protocols, 
-filters, and other scalable features
-
-Callback observer instances are created using a URI of the form 'callback://local/<path_to_handler>
-this creates a callback object that has a reference to the observer
+An Observer is created subordinate to the Observers resource, and configured with a particular observer 
+class using a PUT (set) of a JSON (dictionary) settings object
 
 @author: mjkoster
 '''

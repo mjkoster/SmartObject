@@ -6,13 +6,9 @@ handlers and code
 
 First create an instance of the Agent Class, then create a named Handler class instance under the Agent, 
 then create an instance of the desired AppHandler code module under the named handler (using the module path)
+by PUT (set) of a JSON object containing a dictionary of settings
 
-At this point, the appHandler class name, update handler callable method, and a dictionary
-of property link names to property link resources are published, to enable connection
-of the handler to it's input and output properties. 
-
-Global reference to base object dictionary is not working but hacked in an app level fix passing the 
-reference to a property of the handler resource to use starting up an appHandler instance inside
+for example myObserver.set({'handlerClass': 'SmartObject.Agent.additionHandler'})
 
 @author: mjkoster
 '''
