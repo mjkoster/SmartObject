@@ -20,9 +20,11 @@ from time import sleep
 if __name__ == '__main__' :
     
     baseObject = SmartObject() # create a Smart Object to serve as the base container for other Smart Objects and resources
-
     server = SmartObjectService(baseObject,8000) # make an instance of the service to listen on port 8000, baseObject is the object root
     print 'Service created'
+    server.start() # forks a server thread
+    print 'httpd started'
+
     # set the default class for web API calls to create Smart Objects as named resources       
     baseObject.defaultClass = 'SmartObject'
     # and create a Description resource for the RDF registry
@@ -89,7 +91,16 @@ if __name__ == '__main__' :
     # the publisher will use the scheme specified and update the URL endpoint whenever the OP is updated
     httpPressureObserver.set({'observerClass': 'httpObserver', \
                               'targetURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature'})
-    
+
+    # test the http Subscriber, which creates a remote observer at the location observerURI
+    humidityObservers = weather.outdoor_humidity.create('Observers')
+    humiditySubscriber = humidityObservers.create('humiditySubscriber')
+    # configure the subscriber to 
+    humiditySubscriber.set({'observerClass': 'httpSubscriber', \
+                          'subscriberURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_humidity', \
+                          'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/sealevel_pressure', \
+                          'observerName': 'humiditySubObserver' })
+
     # test the creation of agents and handlers
     weatherAgent = weather.create('Agent') # create the Agent resource
     testHandler = weatherAgent.create('testHandler') # create a handler resource (default class in Agent)
@@ -108,9 +119,6 @@ if __name__ == '__main__' :
     callbackTempObserver.set({'observerClass': 'callbackObserver', \
                               'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/testHandler'})
         
-    server.start() # forks a server thread
-    print 'httpd started'
-
     try:
     # register handlers etc.
         while 1: sleep(1)

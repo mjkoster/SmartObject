@@ -40,15 +40,14 @@ class RESTfulResource(Resource) :
 
 
     def create(self, resourceName, className=None ) : 
-        if className == None :
-            if resourceName in self.wellKnownClasses :
-                className = resourceName
-            else :
-                className = self.defaultClass 
-        # create new instance of the named class, pass the resource dict to the constructor, 
-        # add to resources directory, return the ref
-        self.resources.update({resourceName : globals()[className](self)}) 
-        print className
+        if resourceName not in self.resources :
+            if className == None :
+                if resourceName in self.wellKnownClasses :
+                    className = resourceName
+                else :
+                    className = self.defaultClass 
+                    # create new instance of the named class and add to resources directory, return the ref
+            self.resources.update({resourceName : globals()[className](self)}) 
         return self.resources[resourceName] # returns a reference to the created instance
 
 

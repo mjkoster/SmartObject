@@ -64,6 +64,9 @@ class Observer(RESTfulResource):
             return mqttObserver(settings)
         if settings['observerClass'] == 'callbackObserver' :
             return callbackObserver(settings, self._baseObjectDict)
+        if settings['observerClass'] == 'httpSubscriber' :
+            return httpSubscriber(settings)
+        
         
     def _notify(self, resource):
         pass
@@ -96,7 +99,7 @@ class callbackObserver(object):
     def __init__(self, settings, linkBaseDict):
         self._settings = settings
         self._linkBaseDict = linkBaseDict
-        
+    
     def notify(self,resource=None): # invoke the handler
         self.linkToRef(urlparse(self._settings['handlerURI']).path).handleNotify(resource)
         return
@@ -113,6 +116,31 @@ class callbackObserver(object):
                 self._currentDict = self._currentDict[pathElement].resources
         self._resource = self._currentDict[self._pathElements[-1] ]
         return self._resource
+
+class httpSubscriber(object):
+    def __init__(self, settings):
+        self._settings = settings
+        self._subscriberURI = self._settings['subscriberURI']
+        self._observerURI = self._settings['observerURI']
+        self._observerName = self._settings['observerName']
+        self._observerSettings = {'observerClass': 'httpObserver'}
+        self._observerSettings.update({'targetURI': self._settings['subscriberURI']})
+
+        self._httpHeader = {} 
+        self._jsonHeader = {"Content-Type" : "application/json" }        
+        self._uriObject = urlparse(self._observerURI)
+        self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
+        # create the named resource for the Observer
+        self._httpConnection.request('POST', self._uriObject.path + '/Observers', self._observerName, self._httpHeader)
+        # configure the Observer
+        self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
+        self._httpConnection.request('PUT', self._uriObject.path + '/Observers' + '/' + self._observerName, \
+                                     json.dumps(self._observerSettings), self._jsonHeader)
+        return
+
+    def notify(self, resource):
+        pass
+    
     
 class Observers(RESTfulResource): # the Observers resource is a container for individual named Observer resources
     

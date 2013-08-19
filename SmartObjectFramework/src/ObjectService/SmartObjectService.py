@@ -12,6 +12,7 @@ from ObjectService import ObjectService
 from restlite import restlite
 import threading
 from time import sleep
+from os import system
 
 
 class SmartObjectService(object):
@@ -19,9 +20,6 @@ class SmartObjectService(object):
     def __init__(self, baseObject=None, port=8000): # if no service given, create a default service object
         self._port = port  # default port 8000
         self._baseObject = baseObject
-        import __builtin__
-        __builtin__.SmartObjectSeviceBaseDict = self._baseObject.resources # create a global reference to this base object
-        # this doesn't work 
         
     def start(self): 
         httpThread = threading.Thread(target = self._startHttpObjectService)
