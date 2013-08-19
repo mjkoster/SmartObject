@@ -14,11 +14,6 @@ of the handler to it's input and output properties.
 Global reference to base object dictionary is not working but hacked in an app level fix passing the 
 reference to a property of the handler resource to use starting up an appHandler instance inside
 
-Provided RESTfulDictElementEndpoint to create a REST endpoint with a resources dictionary for each external property
-of a handler, such that the property can be updated using a web method.
-
-Added RESTfulDictEndpoint to allow PUT of JSON to update dictionary
-
 @author: mjkoster
 '''
 
@@ -59,56 +54,6 @@ class AppHandler(object): # template and convenience methods for raw app handler
     def _handleNotify(self, updateRef = None ): # override this for handling state changes from an observer
         pass
 
-        
-class RESTfulEndpoint(object): # create a resource endpoint from a property reference
-    def __init__(self, reference):
-        self.resources = {}
-        self._resource = reference # this only happens on init of the RESTfulEndpoint
-        
-    def get(self):
-        return self._resource
-    
-    def set(self, newValue):
-        self._resource = newValue
-        
-    
-class RESTfulDictEndpoint(object): # create a resource endpoint from a property reference
-    def __init__(self, dictReference):
-        self.resources = {}
-        self._resource = dictReference # this only happens on init of the RESTfulEndpoint
-        
-    def get(self):
-        return self._resource
-    
-    def set(self,newDict):
-        self._resource.update(newDict)
-        return
-
-
-class RESTfulDictElementEndpoint(object):   
-    def __init__(self, resourceName, newDict=None):
-        self.resources = {}
-        if newDict==None :
-            self._dict = self.resources # to create endpoints under endpoints
-        else:
-            self._dict = newDict  
-        self._resourceName = resourceName
-            
-    def get(self):
-        return self._dict[self._resourceName]
-    
-    def set(self,newValue):
-        self._dict.update( {self._resourceName : newValue} )
-        return 
-
-    def create(self, resourceName):
-        self.resources.update( {resourceName : RESTfulDictElementEndpoint(resourceName)} ) # make an endpoint with internal dict
-        return
-    
-    def delete(self, resourceName):
-        del self.resources[resourceName]
-        return
-
 
 class additionHandler(AppHandler): # an example appHandler that adds two values together and stores the result
     # define a method for handling state changes in observed resources       
@@ -118,7 +63,6 @@ class additionHandler(AppHandler): # an example appHandler that adds two values 
         self._addend2 = self.getByLink(self._settings['addendLink2'])
         self.setByLink( self._settings['sumOutLink'], self._addend1 + self._addend2 )
         
-
 
 class Handler(RESTfulResource):
     
@@ -156,6 +100,7 @@ class Handler(RESTfulResource):
         if newSettings.has_key('handlerClass'):
             if newSettings['handlerClass'] != self._appHandlerClass: # create a new instance if handlerClass is being changed
                 #note this requires handler class names be unique in the local environment
+                #FIXME need to clean up old handler before creating new one
                 self._appHandlerClassPath = self._settings['handlerClass']
                 self._appHandlerClass = self.importByPath(self._appHandlerClassPath)
                 self._appHandler = globals()[self._appHandlerClass](self._settings, self._linkBaseDict) # pass settings to the constructor
@@ -163,10 +108,6 @@ class Handler(RESTfulResource):
                 if hasattr( self._appHandler, '_handleNotify' ) :
                     self.handleNotify = self._appHandler._handleNotify # reflect the appHandler handleNotify method 
                     
-                # set up a REST endpoint for each settings entry
-                for setting in self._settings.keys() :
-                    self.resources.update( {setting : RESTfulDictElementEndpoint(setting, self._settings)} )                        
-
 
 class Agent(RESTfulResource):
     
