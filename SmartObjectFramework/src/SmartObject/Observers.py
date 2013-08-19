@@ -85,6 +85,7 @@ class httpObserver(object):
         self._uriObject = urlparse(self._settings['targetURI'])
         self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
         self._httpConnection.request('PUT', self._uriObject.path, self._jsonObject, self._httpHeader)
+        self._httpConnection.getresponse()
         return
 
 class coapObserver(object):
@@ -132,10 +133,12 @@ class httpSubscriber(object):
         self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
         # create the named resource for the Observer
         self._httpConnection.request('POST', self._uriObject.path + '/Observers', self._observerName, self._httpHeader)
+        self._httpConnection.getresponse()
         # configure the Observer
-        self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
+        #self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
         self._httpConnection.request('PUT', self._uriObject.path + '/Observers' + '/' + self._observerName, \
                                      json.dumps(self._observerSettings), self._jsonHeader)
+        self._httpConnection.getresponse()
         return
 
     def notify(self, resource):
