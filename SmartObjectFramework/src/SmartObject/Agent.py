@@ -115,7 +115,7 @@ class Agent(RESTfulResource):
     
     def __init__(self, parentObject=None):
         RESTfulResource.__init__(self, parentObject)
-        self._smartObjectBaseDict = self.resources['baseObject'].resources # should agent and handler each have a base object?
+        self._smartObjectBaseDict = self.resources['baseObject'].resources 
         self.defaultClass = 'Handler'
         self._handlers = {}
         
@@ -138,6 +138,7 @@ class Agent(RESTfulResource):
                     # create new instance of the named class and add to resources directory, return the ref
             self.resources.update({resourceName : globals()[className](self)}) 
             self.resources[resourceName].resources.update({'resourceName': resourceName})
+            self._handlers.update({resourceName: self.resources['resourceName']})
         return self.resources[resourceName] # returns a reference to the created instance
 
         # need to destroy instance of code module
