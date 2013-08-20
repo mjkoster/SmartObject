@@ -44,15 +44,17 @@ class SmartObject(RESTfulResource):
             self.resources['Description'].set((s,p,o))
             
     def create(self, resourceName, className=None ) : 
-        if className == None :
-            if resourceName in self.wellKnownClasses :
-                className = resourceName
-            else :
-                className = self.defaultClass 
-        # create new instance of the named class and add to resources directory, return the ref
-        self.resources.update({resourceName : globals()[className](self)}) 
-
+        if resourceName not in self.resources :
+            if className == None :
+                if resourceName in self.wellKnownClasses :
+                    className = resourceName
+                else :
+                    className = self.defaultClass 
+                    # create new instance of the named class and add to resources directory, return the ref
+            self.resources.update({resourceName : globals()[className](self)}) 
+            self.resources[resourceName].resources.update({'resourceName': resourceName})
         return self.resources[resourceName] # returns a reference to the created instance
+
 
     def serialize(self, graph, cType) : 
         if 'Description' in self.resources :

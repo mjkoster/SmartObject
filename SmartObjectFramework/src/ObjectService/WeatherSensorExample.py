@@ -17,6 +17,8 @@ from rdflib.term import Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD, OWL
 from SmartObjectService import SmartObjectService
 from time import sleep
+import sys
+
 
 # simple print handler that echoes the value each time an observed resource is updated
 class printHandler(AppHandler):
@@ -25,7 +27,7 @@ class printHandler(AppHandler):
 
 
 if __name__ == '__main__' :
-    
+    print sys.path
     baseObject = SmartObject() # create a Smart Object to serve as the base container for other Smart Objects and resources
     server = SmartObjectService(baseObject,8000) # make an instance of the service to listen on port 8000, baseObject is the object root
     print 'Service created'
@@ -128,7 +130,8 @@ if __name__ == '__main__' :
 
     # test the use of the class defined in this file for a handler instance
     printHandler = weatherAgent.create('printHandler')    
-    printHandler.set({'handlerClass': 'SmartObject.Agent.printHandler'})
+    printHandler.set({'handlerClass': 'WeatherSensorExample.printHandler'})
+    #printHandler.set({'handlerClass': 'SmartObject.Agent.printHandler'})
     tempPrintObserver = tempObservers.create('tempPrintObserver')
     tempPrintObserver.set({'observerClass': 'callbackObserver', \
                           'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/printHandler'})

@@ -165,6 +165,7 @@ class Observers(RESTfulResource): # the Observers resource is a container for in
     def create(self, observerName):        
         # create an Observer, add to resources directory, return the ref
         self.resources.update({observerName : Observer(self)}) 
+        self.resources[observerName].resources.update({'resourceName': observerName})
         self._observers.update({observerName: self.resources[observerName]})        
         return self.resources[observerName] # returns a reference to the created instance
 
