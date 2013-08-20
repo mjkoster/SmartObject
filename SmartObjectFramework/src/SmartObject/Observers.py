@@ -161,7 +161,7 @@ class Observers(RESTfulResource): # the Observers resource is a container for in
     def set(self, observerName):
         self.create(observerName)
     
-    # create adds an observer to the list, echoes URI if created or exists
+    # create adds an observer to the list FIXME use RESTfulResource create method
     def create(self, observerName):        
         # create an Observer, add to resources directory, return the ref
         self.resources.update({observerName : Observer(self)}) 

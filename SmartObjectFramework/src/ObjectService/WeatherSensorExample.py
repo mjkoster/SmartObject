@@ -23,8 +23,8 @@ import sys
 # simple print handler that echoes the value each time an observed resource is updated
 class printHandler(AppHandler):
     def _handleNotify(self, resource) :
-        print resource.get()
-
+        print resource.resources['resourceName'], ' = ', resource.get()
+        
 
 if __name__ == '__main__' :
     print sys.path
@@ -92,6 +92,7 @@ if __name__ == '__main__' :
     weather.hourly_rain = weather.create('hourly_rain') 
     weather.daily_rain = weather.create('daily_rain')
         
+        
     # test the simple http observer publisher
     # first make an Observers resource for the Observable Property to be monitored by,then create an Observer
     pressureObservers = weather.pressure.create('Observers')
@@ -100,6 +101,7 @@ if __name__ == '__main__' :
     # the publisher will use the scheme specified and update the URL endpoint whenever the OP is updated
     httpPressureObserver.set({'observerClass': 'httpObserver', \
                               'targetURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature'})
+
 
     # test the http Subscriber, which creates a remote observer at the location observerURI
     humidityObservers = weather.outdoor_humidity.create('Observers')
@@ -110,23 +112,23 @@ if __name__ == '__main__' :
                           'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/sealevel_pressure', \
                           'observerName': 'humiditySubObserver' })
 
+
     # test the creation of agents and handlers
     weatherAgent = weather.create('Agent') # create the Agent resource
     testHandler = weatherAgent.create('testHandler') # create a handler resource (default class in Agent)
-    
     # associate an AppHandler subclass and make a code instance
     # hook up the property links to properties
     testHandler.set({'handlerClass': 'SmartObject.Agent.additionHandler', \
                      'addendLink1':'sensors/rhvWeather-01/indoor_temperature', \
                      'addendLink2': 'sensors/rhvWeather-01/indoor_temperature', \
-                     'sumOutLink': 'sensors/rhvWeather-01/outdoor_humidity'}) 
-    
+                     'sumOutLink': 'sensors/rhvWeather-01/outdoor_humidity'})     
     # now create an Observers resource and a callback observer endpoint 
     tempObservers = weather.indoor_temperature.create('Observers')
     callbackTempObserver = tempObservers.create('callbackTempObserver')
     # configure the Observer to be a callback observer pointing to the testHandler
     callbackTempObserver.set({'observerClass': 'callbackObserver', \
                               'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/testHandler'})
+
 
     # test the use of the class defined in this file for a handler instance
     printHandler = weatherAgent.create('printHandler')    

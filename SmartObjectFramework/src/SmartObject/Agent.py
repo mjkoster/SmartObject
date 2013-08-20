@@ -59,11 +59,12 @@ class additionHandler(AppHandler): # an example appHandler that adds two values 
         self._addend2 = self.getByLink(self._settings['addendLink2'])
         self.setByLink( self._settings['sumOutLink'], self._addend1 + self._addend2 )
 
+
 # simple print handler that echoes the value each time an observed resource is updated
 class printHandler(AppHandler):
     def _handleNotify(self, resource) :
-        print resource.get()
-        
+        print resource.resources['resourceName'], ' = ', resource.get()
+ 
 
 class Handler(RESTfulResource):
     
