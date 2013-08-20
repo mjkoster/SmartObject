@@ -150,7 +150,7 @@ class Observers(RESTfulResource): # the Observers resource is a container for in
         self._onUpdate(resource)
         
     def _onUpdate(self, resource):
-        for observer in self._observers.keys():
+        for observer in self._observers :
             self._observers[observer].notify(resource)
 
     def get(self, Key=None):
@@ -173,7 +173,7 @@ class Observers(RESTfulResource): # the Observers resource is a container for in
                     # create new instance of the named class and add to resources directory, return the ref
             self.resources.update({resourceName : globals()[className](self)}) 
             self.resources[resourceName].resources.update({'resourceName': resourceName})
-            self._observers.update({resourceName: self.resources['resourceName']})
+            self._observers.update({resourceName: self.resources[resourceName]})
         return self.resources[resourceName] # returns a reference to the created instance
 
 

@@ -28,11 +28,13 @@ class SmartObject(RESTfulResource):
     
     def __init__(self, parentObject=None):
         RESTfulResource.__init__(self, parentObject)
+        self.defaultResources = ['Description', 'Agent']
         self.defaultClass = 'ObservableProperty' # used when a new resource name is used in create
         self.wellKnownClasses = [ 'Description' , 'Observers' , 'PropertyOfInterest' , 'SmartObject' , 'RESTfulResource' , 'Agent' ]
-        #Create a default instance of a Description resource for linked data
-        # self.create('Description', Description)
-        # Descriptor for SmartObject is the Description resource, 
+        # make the defaultResources
+        for resourceName in self.defaultResources :
+            self.create(resourceName, resourceName)
+        # Default get for SmartObject is the Description resource, 
         # to provide linked data compatibility
     def get(self):
         if 'Description' in self.resources :

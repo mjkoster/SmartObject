@@ -32,8 +32,11 @@ class ObservableProperty(RESTfulResource):
     
     def __init__(self, parentObject=None):
         RESTfulResource.__init__(self, parentObject) 
-        self.defaultClass = 'PropertyOfInterest'
-        # default create property of interest
+        self.defaultResources = ['Description', 'Observers']
+        self.defaultClass = 'PropertyOfInterest' # default create property of interest for named resources
+        for resourceName in self.defaultResources :
+            self.create(resourceName, resourceName)
+        
     def get(self):
         if 'PropertyOfInterest' in self.resources : # allow creation of a custom object mapped to the observable property
             return self.resources['PropertyOfInterest'].get()

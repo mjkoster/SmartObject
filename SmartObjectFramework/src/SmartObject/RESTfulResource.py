@@ -36,6 +36,7 @@ class RESTfulResource(Resource) :
             
         self._parseContentTypes = ['*/*'] 
         self._serializeContentTypes = ['*/*']
+        self.defaultResources = None
         self.defaultClass = 'RESTfulResource' # class name, override in derived classes
         self.wellKnownClasses = [ 'Description' , 'Observers' , 'PropertyOfInterest' , 'SmartObject' , 'RESTfulResource' , 'Agent' ]
 
