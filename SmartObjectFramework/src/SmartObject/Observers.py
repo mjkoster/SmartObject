@@ -27,14 +27,18 @@ import json
 import httplib
 
 class Observer(RESTfulResource):
-    def __init__(self, parentObject=None):
-        RESTfulResource.__init__(self, parentObject)
+    def __init__(self, parentObject=None, resourceName=''):
+        RESTfulResource.__init__(self, parentObject, resourceName)
         self._settings = {}
         self._observerClass = None
         self._observerInstance = None
         self._settings.update({'observerClass': None})
-        self._baseObject = parentObject
-        self._baseObjectDict = parentObject.resources['baseObject'].resources
+        self._baseObject = self.resources['baseObject']
+        self._baseObjectDict = self.resources['baseObject'].resources
+        self._thisURI =  self.resources['baseObject'].resources['httpService'] \
+                    + self.resources['parentObject'].resources['parentObject'].resources['pathFromBase']
+        self._settings.update({'thisURI': self._thisURI})
+
 
     def get(self, Key=None):
         if Key != None :
@@ -115,11 +119,11 @@ class callbackObserver(object):
 class httpSubscriber(object):
     def __init__(self, settings):
         self._settings = settings
-        self._subscriberURI = self._settings['subscriberURI']
+        self._thisURI = self._settings['thisURI']
         self._observerURI = self._settings['observerURI']
         self._observerName = self._settings['observerName']
         self._observerSettings = {'observerClass': 'httpObserver'}
-        self._observerSettings.update({'targetURI': self._settings['subscriberURI']})
+        self._observerSettings.update({'targetURI': self._thisURI})
 
         self._httpHeader = {} 
         self._jsonHeader = {"Content-Type" : "application/json" }        
@@ -129,7 +133,6 @@ class httpSubscriber(object):
         self._httpConnection.request('POST', self._uriObject.path + '/Observers', self._observerName, self._httpHeader)
         self._httpConnection.getresponse()
         # configure the Observer
-        #self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
         self._httpConnection.request('PUT', self._uriObject.path + '/Observers' + '/' + self._observerName, \
                                      json.dumps(self._observerSettings), self._jsonHeader)
         self._httpConnection.getresponse()
@@ -141,8 +144,8 @@ class httpSubscriber(object):
     
 class Observers(RESTfulResource): # the Observers resource is a container for individual named Observer resources
     
-    def __init__(self, parentObject=None):
-        RESTfulResource.__init__(self, parentObject)
+    def __init__(self, parentObject=None, resourceName=''):
+        RESTfulResource.__init__(self, parentObject, resourceName)
         self.defaultClass = 'Observer'
         self._observers = {}
                
@@ -171,8 +174,7 @@ class Observers(RESTfulResource): # the Observers resource is a container for in
                 else :
                     className = self.defaultClass 
                     # create new instance of the named class and add to resources directory, return the ref
-            self.resources.update({resourceName : globals()[className](self)}) 
-            self.resources[resourceName].resources.update({'resourceName': resourceName})
+            self.resources.update({resourceName : globals()[className](self, resourceName)}) 
             self._observers.update({resourceName: self.resources[resourceName]})
         return self.resources[resourceName] # returns a reference to the created instance
 

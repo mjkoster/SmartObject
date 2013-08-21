@@ -22,17 +22,21 @@ from Resource import Resource
 class RESTfulResource(Resource) :
     
     # when this resource is created
-    def __init__(self, parentObject=None):
+    def __init__(self, parentObject=None, resourceName=''):
         Resource.__init__(self)
         
         self.resources.update({'thisObject': self})
-        if parentObject == None :
+        self.resources.update({'resourceName': resourceName}) 
+
+        if parentObject == None : #no parent means this is a base object
             self.resources.update({'baseObject': self})
             self.resources.update({'parentObject': self})
-            self.resources.update({'resourceName': 'baseObject'})
+            self.resources.update({'pathFromBase': ''})
         else :
             self.resources.update({'parentObject' : parentObject.resources['thisObject']})
             self.resources.update({'baseObject': parentObject.resources['baseObject'] })
+            self.resources.update({'pathFromBase': self.resources['parentObject'].resources['pathFromBase'] \
+                                   + '/' + self.resources['resourceName']})
             
         self._parseContentTypes = ['*/*'] 
         self._serializeContentTypes = ['*/*']
@@ -49,8 +53,8 @@ class RESTfulResource(Resource) :
                 else :
                     className = self.defaultClass 
                     # create new instance of the named class and add to resources directory, return the ref
-            self.resources.update({resourceName : globals()[className](self)}) 
-            self.resources[resourceName].resources.update({'resourceName': resourceName})
+            self.resources.update({resourceName : globals()[className](self, resourceName)}) 
+            #self.resources[resourceName].resources.update({'resourceName': resourceName})
         return self.resources[resourceName] # returns a reference to the created instance
 
 

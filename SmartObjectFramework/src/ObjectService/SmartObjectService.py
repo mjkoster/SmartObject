@@ -13,6 +13,7 @@ from restlite import restlite
 import threading
 from time import sleep
 from os import system
+from socket import gethostname, getfqdn
 
 
 class SmartObjectService(object):
@@ -20,11 +21,13 @@ class SmartObjectService(object):
     def __init__(self, baseObject=None, port=8000): # if no service given, create a default service object
         self._port = port  # default port 8000
         self._baseObject = baseObject
+        self.resources = self._baseObject.resources
         
     def start(self): 
         httpThread = threading.Thread(target = self._startHttpObjectService)
         httpThread.daemon = True
         httpThread.start()
+        self._baseObject.resources.update({'httpService': 'http://' + gethostname() + ':' + repr(self._port)})
        
     def _startHttpObjectService(self):
         from wsgiref.simple_server import make_server

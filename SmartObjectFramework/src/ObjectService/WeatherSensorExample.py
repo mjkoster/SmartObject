@@ -27,19 +27,16 @@ class printHandler(AppHandler):
         
 
 if __name__ == '__main__' :
-    print sys.path
+    print 'path = ', sys.path
     baseObject = SmartObject() # create a Smart Object to serve as the base container for other Smart Objects and resources
     server = SmartObjectService(baseObject,8000) # make an instance of the service to listen on port 8000, baseObject is the object root
-    print 'Service created'
     server.start() # forks a server thread
-    print 'httpd started'
+    print 'httpd started at', server.resources['httpService']
 
     # set the default class for web API calls to create Smart Objects as named resources       
     baseObject.defaultClass = 'SmartObject'
     # and create a Description resource for the RDF registry
-    baseObject.description = baseObject.resources['Description']
-    # this will create a resource of class Description rather than the default class because the name matches a well known class
-        
+    baseObject.description = baseObject.resources['Description']        
     # create the weather station resource template
     # first the description 
     baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDFS.Class, Literal('SmartObject')))
@@ -47,8 +44,7 @@ if __name__ == '__main__' :
     baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDF.type, Literal('WeatherSensor')))
         
     baseObject.sensors = baseObject.create('sensors') # top level object container for sensors, default class is SmartObject
-    sensors = baseObject.sensors
-    
+    sensors = baseObject.sensors    
     sensors.defaultClass = 'SmartObject' # defaultClass is class for creating named objects 
     sensors.description = sensors.create('Description')
         
@@ -107,7 +103,6 @@ if __name__ == '__main__' :
     humiditySubscriber = weather.outdoor_humidity.resources['Observers'].create('humiditySubscriber')
     # configure the subscriber to create a remote Observer
     humiditySubscriber.set({'observerClass': 'httpSubscriber', \
-                          'subscriberURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_humidity', \
                           'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/sealevel_pressure', \
                           'observerName': 'humiditySubObserver' })
 

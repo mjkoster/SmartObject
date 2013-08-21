@@ -30,12 +30,12 @@ from Observers import Observers
 
 class ObservableProperty(RESTfulResource):
     
-    def __init__(self, parentObject=None):
-        RESTfulResource.__init__(self, parentObject) 
+    def __init__(self, parentObject=None, resourceName=''):
+        RESTfulResource.__init__(self, parentObject, resourceName) 
         self.defaultResources = ['Description', 'Observers']
         self.defaultClass = 'PropertyOfInterest' # default create property of interest for named resources
-        for resourceName in self.defaultResources :
-            self.create(resourceName, resourceName)
+        for defaultResource in self.defaultResources :
+            self.create(defaultResource, defaultResource)
         
     def get(self):
         if 'PropertyOfInterest' in self.resources : # allow creation of a custom object mapped to the observable property
@@ -60,7 +60,6 @@ class ObservableProperty(RESTfulResource):
                 else :
                     className = self.defaultClass 
                     # create new instance of the named class and add to resources directory, return the ref
-            self.resources.update({resourceName : globals()[className](self)}) 
-            self.resources[resourceName].resources.update({'resourceName': resourceName})
+            self.resources.update({resourceName : globals()[className](self, resourceName)}) 
         return self.resources[resourceName] # returns a reference to the created instance
 
