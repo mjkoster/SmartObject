@@ -19,12 +19,63 @@ to content types
 '''
 from Resource import Resource
 
+class RESTfulEndpoint(object): # create a resource endpoint from a property reference
+    def __init__(self, reference):
+        self.resources = {}
+        self._resource = reference # this only happens on init of the RESTfulEndpoint
+        
+    def get(self):
+        return self._resource
+    
+    def set(self, newValue):
+        self._resource = newValue
+        
+    
+class RESTfulDictEndpoint(object): # create a resource endpoint from a property reference
+    def __init__(self, dictReference):
+        self.resources = {}
+        self._resource = dictReference # this only happens on init of the RESTfulEndpoint
+        
+    def get(self):
+        return self._resource
+    
+    def set(self,newDict):
+        self._resource.update(newDict)
+        return
+
+
+class RESTfulDictElementEndpoint(object):   
+    def __init__(self, resourceName, newDict=None):
+        self.resources = {}
+        if newDict==None :
+            self._dict = self.resources # to create endpoints under endpoints
+        else:
+            self._dict = newDict  
+        self._resourceName = resourceName
+            
+    def get(self):
+        return self._dict[self._resourceName]
+    
+    def set(self,newValue):
+        self._dict.update( {self._resourceName : newValue} )
+        return 
+
+    def create(self, resourceName):
+        self.resources.update( {resourceName : RESTfulDictElementEndpoint(resourceName)} ) # make an endpoint with internal dict
+        return
+    
+    def delete(self, resourceName):
+        del self.resources[resourceName]
+        return
+
+
 class RESTfulResource(Resource) :
     
     # when this resource is created
     def __init__(self, parentObject=None, resourceName=''):
-        self._properties = {}
         Resource.__init__(self)
+        self._properties = {}
+        self.resources.update({'Properties': RESTfulDictEndpoint(self._properties)})
         
         self.resources.update({'thisObject': self})
         self.resources.update({'resourceName': resourceName}) 
@@ -58,7 +109,7 @@ class RESTfulResource(Resource) :
             #self.resources[resourceName].resources.update({'resourceName': resourceName})
         return self.resources[resourceName] # returns a reference to the created instance
 
-
+      
 """ Default representation is JSON, XML also supported
     Add parse and serialize for RDF graph, etc. for richer 
     representation than JSON
