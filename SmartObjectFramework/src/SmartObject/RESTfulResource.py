@@ -35,15 +35,22 @@ class RESTfulDictEndpoint(object): # create a resource endpoint from a property 
     def __init__(self, dictReference):
         self.resources = {}
         self._resource = dictReference # this only happens on init of the RESTfulEndpoint
-        
-    def get(self, key=None):
+    
+    def getList(self, key=None):
         if key == None:
             return self._resource.keys()
         else:
             return self._resource[key]
+        
     def dict(self):
         return self._resource
     
+    def get(self, key=None):
+        if key == None:
+            return self._resource
+        else:
+            return self._resource[key]
+        
     def set(self,dictUpdate):
         self._resource.update(dictUpdate)
         return
