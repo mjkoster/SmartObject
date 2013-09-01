@@ -31,7 +31,7 @@ if __name__ == '__main__' :
     baseObject = SmartObject() # create a Smart Object to serve as the base container for other Smart Objects and resources
     server = SmartObjectService(baseObject,8000) # make an instance of the service to listen on port 8000, baseObject is the object root
     server.start() # forks a server thread
-    print 'httpd started at', server.resources['httpService']
+    print 'httpd started at', baseObject.Properties.get('httpService')
 
     # set the default class for web API calls to create Smart Objects as named resources       
     baseObject.defaultClass = 'SmartObject'

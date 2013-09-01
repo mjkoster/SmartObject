@@ -35,7 +35,7 @@ class Observer(RESTfulResource):
         self._settings.update({'observerClass': None})
         self._baseObject = self.resources['baseObject']
         self._baseObjectDict = self.resources['baseObject'].resources
-        self._thisURI =  self.resources['baseObject'].resources['httpService'] \
+        self._thisURI =  self.resources['baseObject'].Properties.get('httpService') \
                     + self.resources['parentObject'].resources['parentObject'].Properties.get('pathFromBase')
         self._settings.update({'thisURI': self._thisURI})
 

@@ -27,7 +27,7 @@ class SmartObjectService(object):
         httpThread = threading.Thread(target = self._startHttpObjectService)
         httpThread.daemon = True
         httpThread.start()
-        self._baseObject.resources.update({'httpService': 'http://' + gethostname() + ':' + repr(self._port)})
+        self._baseObject.Properties.update({'httpService': 'http://' + gethostname() + ':' + repr(self._port)})
        
     def _startHttpObjectService(self):
         from wsgiref.simple_server import make_server

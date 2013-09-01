@@ -63,7 +63,7 @@ class additionHandler(AppHandler): # an example appHandler that adds two values 
 # simple print handler that echoes the value each time an observed resource is updated
 class printHandler(AppHandler):
     def _handleNotify(self, resource) :
-        print resource.resources['resourceName'], ' = ', resource.get()
+        print resource.Properties.get('resourceName'), ' = ', resource.get()
  
 
 class Handler(RESTfulResource):
