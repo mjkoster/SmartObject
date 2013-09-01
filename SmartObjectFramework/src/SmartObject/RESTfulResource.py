@@ -36,18 +36,18 @@ class RESTfulDictEndpoint(object): # create a resource endpoint from a property 
         self.resources = {}
         self._resource = dictReference # this only happens on init of the RESTfulEndpoint
     
-    def getList(self, key=None):
-        if key == None:
-            return self._resource.keys()
-        else:
-            return self._resource[key]
-        
     def dict(self):
         return self._resource
     
     def get(self, key=None):
         if key == None:
             return self._resource
+        else:
+            return self._resource[key]
+        
+    def getList(self, key=None):
+        if key == None:
+            return self._resource.keys()
         else:
             return self._resource[key]
         
@@ -98,21 +98,21 @@ class RESTfulResource(Resource) :
         # make an entry in resources to point to properties
         self.Resources.update({'Properties': self.Properties})
         
-        self.resources.update({'thisObject': self})
-        self.resources.update({'resourceName': resourceName}) 
+        self.Resources.update({'thisObject': self})
+        self.Properties.update({'resourceName': resourceName}) 
 
         if parentObject == None : #no parent means this is a base object
-            self.resources.update({'baseObject': self})
-            self.resources.update({'parentObject': self})
-            self.resources.update({'pathFromBase': ''})
+            self.Resources.update({'baseObject': self})
+            self.Resources.update({'parentObject': self})
+            self.Properties.update({'pathFromBase': ''})
         else :
-            self.resources.update({'parentObject' : parentObject.resources['thisObject']})
-            self.resources.update({'baseObject': parentObject.resources['baseObject'] })
-            self.resources.update({'pathFromBase': self.resources['parentObject'].resources['pathFromBase'] \
-                                   + '/' + self.resources['resourceName']})
+            self.Resources.update({'parentObject' : parentObject.resources['thisObject']})
+            self.Resources.update({'baseObject': parentObject.resources['baseObject'] })
+            self.Properties.update({'pathFromBase': self.resources['parentObject'].Properties.get('pathFromBase') \
+                                   + '/' + self.Properties.get('resourceName')})
 
-        self.Properties.update({'resourceName': resourceName}) 
-        self.Properties.update({'pathFromBase': self.resources['pathFromBase']})
+        #self.Properties.update({'resourceName': resourceName}) 
+        #self.Properties.update({'pathFromBase': self.resources['pathFromBase']})
             
         self._parseContentTypes = ['*/*'] 
         self._serializeContentTypes = ['*/*']
