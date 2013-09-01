@@ -29,8 +29,8 @@ class printHandler(AppHandler):
 if __name__ == '__main__' :
     print 'path = ', sys.path
     baseObject = SmartObject() # create a Smart Object to serve as the base container for other Smart Objects and resources
-    server = SmartObjectService(baseObject,8000) # make an instance of the service to listen on port 8000, baseObject is the object root
-    server.start() # forks a server thread
+    server = SmartObjectService(baseObject) # make an instance of the service, baseObject is the object root
+    server.start(8000) # forks a server thread to listen on port 8000
     print 'httpd started at', baseObject.Properties.get('httpService')
 
     # set the default class for web API calls to create Smart Objects as named resources       

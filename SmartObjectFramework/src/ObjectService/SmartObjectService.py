@@ -23,7 +23,9 @@ class SmartObjectService(object):
         self._baseObject = baseObject
         self.resources = self._baseObject.resources
         
-    def start(self): 
+    def start(self, port=None): 
+        if port!=None:
+            self._port=port
         httpThread = threading.Thread(target = self._startHttpObjectService)
         httpThread.daemon = True
         httpThread.start()
