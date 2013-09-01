@@ -97,7 +97,6 @@ class RESTfulResource(Resource) :
         self.Properties = RESTfulDictEndpoint(self._properties)
         # make an entry in resources to point to properties
         self.Resources.update({'Properties': self.Properties})
-        self.Resources.update({'Resources': self.Resources})
         
         self.resources.update({'thisObject': self})
         self.resources.update({'resourceName': resourceName}) 
