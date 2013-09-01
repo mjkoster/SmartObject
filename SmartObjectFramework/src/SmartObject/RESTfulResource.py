@@ -23,6 +23,7 @@ class RESTfulResource(Resource) :
     
     # when this resource is created
     def __init__(self, parentObject=None, resourceName=''):
+        self._properties = {}
         Resource.__init__(self)
         
         self.resources.update({'thisObject': self})
