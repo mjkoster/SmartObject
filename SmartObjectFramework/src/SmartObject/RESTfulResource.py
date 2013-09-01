@@ -35,18 +35,19 @@ class RESTfulDictEndpoint(object): # create a resource endpoint from a property 
     def __init__(self, dictReference):
         self.resources = {}
         self._resource = dictReference # this only happens on init of the RESTfulEndpoint
-    
+    #try the Property interface to expose the dictionary with getter and setter properties
+    @property
     def dict(self):
         return self._resource
+    @dict.setter
+    def dict(self, dictUpdate):
+        self._resource.update(dictUpdate)
 
     def get(self, key=None):
         if key == None:
             return self._resource
         else:
             return self._resource[key]
-        
-    def __get__(self, instance, owner):
-        return self._resource
     
     def getList(self, key=None):
         if key == None:
@@ -61,8 +62,16 @@ class RESTfulDictEndpoint(object): # create a resource endpoint from a property 
     def update(self,dictUpdate):
         self._resource.update(dictUpdate)
         return
-
-
+    
+    #try the decsriptor interface to allow use of the attribute as a reference
+    def __get__(self, instance, owner):
+        return self._resource
+    
+    def __set__(self, instance, dictUpdate):
+        self._resource.update(dictUpdate)
+        return
+    
+        
 class RESTfulDictElementEndpoint(object):   
     def __init__(self, resourceName, newDict=None):
         self.resources = {}
@@ -110,7 +119,6 @@ class RESTfulResource(Resource) :
             self.Resources.update({'parentObject': self})
             self.Properties.update({'pathFromBase': ''})
         else :
-            #self.Resources.update({'parentObject' : parentObject.Resources.get()['thisObject']})
             self.Resources.update({'parentObject' : parentObject.Resources.get('thisObject')})
             self.Resources.update({'baseObject': parentObject.Resources.get('baseObject') })
             self.Properties.update({'pathFromBase': self.Resources.get('parentObject').Properties.get('pathFromBase') \
