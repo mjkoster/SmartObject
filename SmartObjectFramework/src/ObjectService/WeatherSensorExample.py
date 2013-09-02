@@ -12,19 +12,12 @@ from SmartObject.Description import Description
 from SmartObject.ObservableProperty import ObservableProperty
 from SmartObject.Observers import Observers
 from SmartObject.PropertyOfInterest import PropertyOfInterest
-from SmartObject.Agent import AppHandler
 from rdflib.term import Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD, OWL
 from SmartObjectService import SmartObjectService
 from time import sleep
 import sys
 
-
-# simple print handler that echoes the value each time an observed resource is updated
-class printHandler(AppHandler):
-    def _handleNotify(self, resource) :
-        print resource.Properties.get('resourceName'), ' = ', resource.get()
-        
 
 if __name__ == '__main__' :
     # print 'path = ', sys.path
@@ -126,40 +119,32 @@ if __name__ == '__main__' :
                           'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/sealevel_pressure', \
                           'observerName': 'humiditySubObserver' })
 
-    # test the creation of agents and handlers
+    # test the creation of handlers and invocation by Observers
     weatherAgent = weather.Resources.get('Agent') # get a handle to the Agent resource
-    testHandler = weatherAgent.create({'resourceName': 'testHandler',\
-                                       'resourceClass': 'Handler'}) # create a handler resource (default class in Agent)
-    #  make a code instance and configure the settings
-    testHandler.set({'handlerClass': 'SmartObject.Agent.additionHandler', \
-                     'addendLink1':'sensors/rhvWeather-01/indoor_temperature', \
+   
+    logPrintHandler = weatherAgent.create({'resourceName': 'logPrintHandler',\
+                                           'resourceClass': 'logPrintHandler'})
+    
+    tempPrintObserver = indoor_temperature.Resources.get('Observers').create({'resourceName': 'tempPrintObserver',\
+                                                                                 'resourceClass': 'Observer'})
+    tempPrintObserver.set({'observerClass': 'callbackObserver', \
+                          'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/logPrintHandler'}) 
+
+    addHandler = weatherAgent.create({'resourceName': 'addHandler',\
+                                           'resourceClass': 'addHandler'})
+    
+    addHandler.set({'addendLink1':'sensors/rhvWeather-01/indoor_temperature', \
                      'addendLink2': 'sensors/rhvWeather-01/indoor_temperature', \
                      'sumOutLink': 'sensors/rhvWeather-01/outdoor_humidity'})     
-
+    
     # now create an Observers resource and a callback observer endpoint 
     callbackTempObserver = indoor_temperature.Resources.get('Observers').create({'resourceName': 'callbackTempObserver',\
                                                                                     'resourceClass': 'Observer'})
     # configure the Observer to be a callback observer pointing to the testHandler
     callbackTempObserver.set({'observerClass': 'callbackObserver', \
-                              'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/testHandler'})
+                              'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/addHandler'})
 
-    # test the use of the class defined in this file for a handler instance
-    printHandler = weatherAgent.create({'resourceName': 'printHandler',\
-                                       'resourceClass': 'Handler'})    
-
-    printHandler.set({'handlerClass': 'WeatherSensorExample.printHandler'})
-    #printHandler.set({'handlerClass': 'SmartObject.Agent.printHandler'})
-
-    tempPrintObserver = indoor_temperature.Resources.get('Observers').create({'resourceName': 'tempPrintObserver',\
-                                                                                 'resourceClass': 'Observer'})
-    
-    tempPrintObserver.set({'observerClass': 'callbackObserver', \
-                          'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/logPrintHandler'})
-
-    logPrintHandler = weatherAgent.create({'resourceName': 'logPrintHandler',\
-                                           'resourceClass': 'logPrintHandler'})
-    
-    
+     
     try:
     # register handlers etc.
         while 1: sleep(1)
