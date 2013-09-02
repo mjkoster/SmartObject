@@ -20,8 +20,8 @@ class AppHandler(object): # template and convenience methods for raw app handler
     def __init__(self, settings, linkBaseDict) : # object base resource dict is be passed in with settings
         self._linkCache = {}
         self._settings = settings # use the settings dictionary passed in            
-        self._linkBaseDict = linkBaseDict   
-  
+        self._linkBaseDict = linkBaseDict  
+          
         
     def linkToRef(self, linkPath):
         '''
@@ -68,8 +68,8 @@ class printHandler(AppHandler):
 
 class Handler(RESTfulResource):
     
-    def __init__(self, parentObject=None, resourceName=''):
-        RESTfulResource.__init__(self, parentObject, resourceName)
+    def __init__(self, parentObject=None, resourceDescriptor = {}):
+        RESTfulResource.__init__(self, parentObject, resourceDescriptor)
         self._settings = {} 
         self._appHandlerClassPath = None
         self._appHandlerClass = None
@@ -109,17 +109,80 @@ class Handler(RESTfulResource):
                 
                 if hasattr( self._appHandler, '_handleNotify' ) :
                     self.handleNotify = self._appHandler._handleNotify # reflect the appHandler handleNotify method 
-                    
+
+
+class HandlerBase(RESTfulResource):   # single base class for handlers to extend directly, 
+    def __init__(self, parentObject=None, resourceDescriptor = {}):
+        RESTfulResource.__init__(self, parentObject, resourceDescriptor)
+        self._settings = {} 
+        self._defaultSettings = {}
+        self._appHandlerClassPath = None
+        self._appHandlerClass = None
+        self._linkBaseDict = self.resources['baseObject'].resources
+        self._linkCache = {}
+          
+    def get(self, Key=None):
+        if Key != None :
+            return self._settings[Key]
+        else :
+            return self._settings
+     
+    def set(self, newSettings): # create an instance of a handler from settings dictionary
+        self._settings.update(newSettings)
+
+    def handleNotify(self, updateRef=None): # external method to call from Observer-Notifier
+        self._handleNotify(updateRef)
+    
+    def _handleNotify(self, updateRef=None ): # override this for handling state changes from an observer
+        pass
+
+    def linkToRef(self, linkPath):
+        '''
+        takes a path string and walks the object tree from a base dictionary
+        returns a ref to the resource at the path endpoint
+        store translations in a hash cache for fast lookup after the first walk
+        '''
+        self._linkPath = linkPath
+        if self._linkPath in self._linkCache.keys() :
+            return self._linkCache[self._linkPath]
+        # cache miss, walk path and update cache at end
+        self._currentDict = self._linkBaseDict
+        self._pathElements = linkPath.split('/')
+        for pathElement in self._pathElements[:-1] : # all but the last, which should be the endpoint
+            self._currentDict = self._currentDict[pathElement].resources
+        self._resource = self._currentDict[self._pathElements[-1] ]
+        self._linkCache.update({ self._linkPath : self._resource })
+        return self._resource
+        
+    def getByLink(self, linkPath):
+        return self.linkToRef(linkPath).get()
+
+    def setByLink(self, linkPath, newValue):
+        self.linkToRef(linkPath).set(newValue)
+
+class addHandler(HandlerBase): # an example appHandler that adds two values together and stores the result
+    # define a method for handling state changes in observed resources       
+    def _handleNotify(self, updateRef = None ):
+        # get the 2 addends, add them, and set the sum location
+        self._addend1 = self.getByLink(self._settings['addendLink1'])
+        self._addend2 = self.getByLink(self._settings['addendLink2'])
+        self.setByLink( self._settings['sumOutLink'], self._addend1 + self._addend2 )
+
+# simple print handler that echoes the value each time an observed resource is updated
+class logPrintHandler(HandlerBase):
+    def _handleNotify(self, resource) :
+        print resource.Properties.get('resourceName'), ' = ', resource.get()
+ 
 
 class Agent(RESTfulResource):
-    
-    def __init__(self, parentObject=None, resourceName=''):
-        RESTfulResource.__init__(self, parentObject, resourceName)
+    # Agent is a container for Handlers and daemons, instantiated as a resource of a SmartObject 
+    def __init__(self, parentObject=None, resourceDescriptor = {}):
+        RESTfulResource.__init__(self, parentObject, resourceDescriptor)
         self._handlers = {}
         
     def get(self, handlerName=None):
         if handlerName == None:
-            return self._handlers.keys() # to get the list of names
+            return self._handlers # to get the list of names
         else:
             if self._handlers.has_key(handlerName) :
                 return self._handlers[handlerName] # to get reference to handler resources by handler name
@@ -129,11 +192,24 @@ class Agent(RESTfulResource):
     def create(self, resourceDescriptor):
         resourceName = resourceDescriptor['resourceName']
         resourceClass = resourceDescriptor['resourceClass']
+        # import the module if it's specified in the descriptor
+        if resourceDescriptor.has_key('resourceClassPath') : 
+            resourceClassPath = resourceDescriptor['resourceClassPath'] 
+            self.importByPath(resourceClassPath)
+        
         if resourceName not in self.resources:
             # create new instance of the named class and add to resources directory, return the ref
-            self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
-            self._handlers.update({resourceName: self.Properties.get('resourceName')})
+            self.resources.update({resourceName : globals()[resourceClass](self, resourceDescriptor)}) 
+            #pass the constructor the entire descriptor for creating the properties object
+            #self.resources.update({resourceName : globals()[resourceClass](self, resourceDescriptor)}) 
+            self._handlers.update({resourceName: resourceClass})
         return self.resources[resourceName] # returns a reference to the created instance
                  
         # need to destroy instance of code module
+    def importByPath(self,classPath):
+        # separate the module path from the class,import the module, and return the class name
+        self._components = classPath.split('.')
+        self._module = __import__( '.'.join(self._components[:-1]) )
+        return self._module
+            
         

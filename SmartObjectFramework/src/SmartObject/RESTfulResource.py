@@ -63,7 +63,7 @@ class RESTfulDictEndpoint(object): # create a resource endpoint from a property 
 
 class RESTfulResource(Resource) :    
     # when this resource is created
-    def __init__(self, parentObject=None, resourceName=''):
+    def __init__(self, parentObject=None, resourceDescriptor = {}):
         Resource.__init__(self)
         # The resources dictionary is for subclasses of RESTfulResource, routable as http endpoints
         # The Properties dictionary is for serializable objects and strings, get/put but not routable
@@ -75,7 +75,7 @@ class RESTfulResource(Resource) :
         self.Resources.update({'Properties': self.Properties}) # put Properties into the resource dict
         
         self.Resources.update({'thisObject': self}) #self-identity
-        self.Properties.update({'resourceName': resourceName}) 
+        self.Properties.update(resourceDescriptor) # Start by putting in the constructor properties
 
         if parentObject == None : #no parent means this is a base object
             self.Resources.update({'baseObject': self})
@@ -97,7 +97,7 @@ class RESTfulResource(Resource) :
         resourceClass = resourceDescriptor['resourceClass']
         if resourceName not in self.resources:
             # create new instance of the named class and add to resources directory, return the ref
-            self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
+            self.resources.update({resourceName : globals()[resourceClass](self, resourceDescriptor)}) 
         return self.resources[resourceName] # returns a reference to the created instance
                         
      

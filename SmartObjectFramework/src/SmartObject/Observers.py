@@ -27,8 +27,8 @@ import json
 import httplib
 
 class Observer(RESTfulResource):
-    def __init__(self, parentObject=None, resourceName=''):
-        RESTfulResource.__init__(self, parentObject, resourceName)
+    def __init__(self, parentObject=None, resourceDescriptor = {}):
+        RESTfulResource.__init__(self, parentObject, resourceDescriptor)
         self._settings = {}
         self._observerClass = None
         self._observerInstance = None
@@ -126,13 +126,12 @@ class httpSubscriber(object):
                                     'resourceClass': 'Observer' }
         self._observerSettings = {'observerClass': 'httpObserver', \
                                   'targetURI': self._thisURI}
-
-        self._httpHeader = {} 
         self._jsonHeader = {"Content-Type" : "application/json" }        
         self._uriObject = urlparse(self._observerURI)
         self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
         # create the named resource for the Observer
-        self._httpConnection.request('POST', self._uriObject.path + '/Observers', json.dumps(self._observerDescriptor), self._jsonHeader)
+        self._httpConnection.request('POST', self._uriObject.path + '/Observers', \
+                                     json.dumps(self._observerDescriptor), self._jsonHeader)
         self._httpConnection.getresponse()
         # configure the Observer
         self._httpConnection.request('PUT', self._uriObject.path + '/Observers' + '/' + self._observerName, \
@@ -146,8 +145,8 @@ class httpSubscriber(object):
     
 class Observers(RESTfulResource): # the Observers resource is a container for individual named Observer resources
     
-    def __init__(self, parentObject=None, resourceName=''):
-        RESTfulResource.__init__(self, parentObject, resourceName)
+    def __init__(self, parentObject=None, resourceDescriptor = {}):
+        RESTfulResource.__init__(self, parentObject, resourceDescriptor)
         self._observers = {}
                
     def onUpdate(self,resource):
@@ -172,7 +171,7 @@ class Observers(RESTfulResource): # the Observers resource is a container for in
         resourceClass = resourceDescriptor['resourceClass']
         if resourceName not in self.resources:
             # create new instance of the named class and add to resources directory, return the ref
-            self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
+            self.resources.update({resourceName : globals()[resourceClass](self, resourceDescriptor)}) 
             self._observers.update({resourceName: self.resources[resourceName]})            
         return self.resources[resourceName] # returns a reference to the created instance
 

@@ -30,8 +30,8 @@ from Observers import Observers
 
 class ObservableProperty(RESTfulResource):
     
-    def __init__(self, parentObject=None, resourceName=''):
-        RESTfulResource.__init__(self, parentObject, resourceName) 
+    def __init__(self, parentObject=None, resourceDescriptor = {}):
+        RESTfulResource.__init__(self, parentObject, resourceDescriptor) 
         self.defaultResources = ['Description', 'Observers']
 
         for defaultResource in self.defaultResources :
@@ -59,6 +59,6 @@ class ObservableProperty(RESTfulResource):
         resourceClass = resourceDescriptor['resourceClass']
         if resourceName not in self.resources:
             # create new instance of the named class and add to resources directory, return the ref
-            self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
+            self.resources.update({resourceName : globals()[resourceClass](self, resourceDescriptor)}) 
         return self.resources[resourceName] # returns a reference to the created instance
 
