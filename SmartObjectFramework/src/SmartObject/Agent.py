@@ -111,13 +111,12 @@ class Handler(RESTfulResource):
                     self.handleNotify = self._appHandler._handleNotify # reflect the appHandler handleNotify method 
 
 
-class HandlerBase(RESTfulResource):   # single base class for handlers to extend directly, 
+class HandlerBase(RESTfulResource):   # single base class for handlers to extend directly, contains convenience methods for linking resources
     def __init__(self, parentObject=None, resourceDescriptor = {}):
         RESTfulResource.__init__(self, parentObject, resourceDescriptor)
-        self._settings = {} 
         self._defaultSettings = {}
-        self._appHandlerClassPath = None
-        self._appHandlerClass = None
+        self._settings = {} # use the constructor descriptor for the initial settings
+        # link cache keeps endpoints hashed by pathFromBase string, only need to walk the path one time
         self._linkBaseDict = self.resources['baseObject'].resources
         self._linkCache = {}
           
@@ -160,6 +159,7 @@ class HandlerBase(RESTfulResource):   # single base class for handlers to extend
     def setByLink(self, linkPath, newValue):
         self.linkToRef(linkPath).set(newValue)
 
+
 class addHandler(HandlerBase): # an example appHandler that adds two values together and stores the result
     # define a method for handling state changes in observed resources       
     def _handleNotify(self, updateRef = None ):
@@ -167,6 +167,7 @@ class addHandler(HandlerBase): # an example appHandler that adds two values toge
         self._addend1 = self.getByLink(self._settings['addendLink1'])
         self._addend2 = self.getByLink(self._settings['addendLink2'])
         self.setByLink( self._settings['sumOutLink'], self._addend1 + self._addend2 )
+
 
 # simple print handler that echoes the value each time an observed resource is updated
 class logPrintHandler(HandlerBase):

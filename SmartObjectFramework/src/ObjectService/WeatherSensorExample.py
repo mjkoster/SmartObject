@@ -154,8 +154,12 @@ if __name__ == '__main__' :
                                                                                  'resourceClass': 'Observer'})
     
     tempPrintObserver.set({'observerClass': 'callbackObserver', \
-                          'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/printHandler'})
+                          'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/logPrintHandler'})
 
+    logPrintHandler = weatherAgent.create({'resourceName': 'logPrintHandler',\
+                                           'resourceClass': 'logPrintHandler'})
+    
+    
     try:
     # register handlers etc.
         while 1: sleep(1)
