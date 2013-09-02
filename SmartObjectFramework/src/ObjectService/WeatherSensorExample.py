@@ -27,7 +27,7 @@ class printHandler(AppHandler):
         
 
 if __name__ == '__main__' :
-    print 'path = ', sys.path
+    # print 'path = ', sys.path
     baseObject = SmartObject() # create a Smart Object to serve as the base container for other Smart Objects and resources
     server = SmartObjectService(baseObject) # make an instance of the service, baseObject is the object root
     server.start(8000) # forks a server thread to listen on port 8000
