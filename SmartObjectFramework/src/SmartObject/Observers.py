@@ -116,6 +116,64 @@ class callbackObserver(object):
         self._resource = self._currentDict[self._pathElements[-1] ]
         return self._resource
 
+class ObserverBase(RESTfulResource):
+    def __init__(self, parentObject=None, resourceDescriptor = {}):
+        RESTfulResource.__init__(self, parentObject, resourceDescriptor)
+        self._settings = {}
+        self._baseObject = self.resources['baseObject']
+        self._linkBaseDict = self.resources['baseObject'].resources
+        self._thisURI =  self.resources['baseObject'].Properties.get('httpService') \
+                    + self.resources['parentObject'].resources['parentObject'].Properties.get('pathFromBase')
+        self._settings.update({'thisURI': self._thisURI})
+        self._init() # to initialize instance of subclass that already has resources, Properties, and settings
+
+    def _init(self):
+        pass
+
+    def get(self, Key=None):
+        if Key != None :
+            return self._settings[Key]
+        else :
+            return self._settings
+        
+    def set(self, newSettings):
+        self._settings.update(newSettings)        
+        
+    def notify(self, resource):
+        self._notify(resource)
+        
+    def _notify(self, resource):
+        pass
+
+    def linkToRef(self, linkPath ):
+        '''
+        takes a path string and walks the object tree from a base dictionary
+        returns a ref to the resource at the path endpoint
+        '''
+        self._currentDict = self._linkBaseDict
+        self._pathElements = linkPath.split('/')
+        for pathElement in self._pathElements[:-1] : # all but the last, which should be the endpoint
+            if len(pathElement) > 0 : # first element is a zero length string for some reason
+                self._currentDict = self._currentDict[pathElement].resources
+        self._resource = self._currentDict[self._pathElements[-1] ]
+        return self._resource        
+
+
+class httpPublisher(ObserverBase):
+    def _notify(self,resource): # JSON only for now
+        self._jsonObject = json.dumps(resource.get())
+        self._uriObject = urlparse(self._settings['targetURI'])
+        self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
+        self._httpConnection.request('PUT', self._uriObject.path, self._jsonObject, {"Content-Type" : "application/json" })
+        return
+
+
+class callbackNotifier(ObserverBase):    
+    def _notify(self,resource=None): # invoke the handler
+        self.linkToRef(urlparse(self._settings['handlerURI']).path).handleNotify(resource)
+        return
+    
+
 class httpSubscriber(object):
     def __init__(self, settings):
         self._settings = settings
@@ -162,9 +220,9 @@ class Observers(RESTfulResource): # the Observers resource is a container for in
         return self._observer[Key] #return a handle to the observer object for python API
     
     # map the set operation to the create operation
-    def set(self, observerName):
-        self.create(observerName)
-
+    def set(self):
+        pass
+    
     # new create takes dictionary built from JSON object POSTed to parent resource
     def create(self, resourceDescriptor):
         resourceName = resourceDescriptor['resourceName']

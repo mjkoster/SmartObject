@@ -126,9 +126,8 @@ if __name__ == '__main__' :
                                            'resourceClass': 'logPrintHandler'})
     
     tempPrintObserver = indoor_temperature.Resources.get('Observers').create({'resourceName': 'tempPrintObserver',\
-                                                                                 'resourceClass': 'Observer'})
-    tempPrintObserver.set({'observerClass': 'callbackObserver', \
-                          'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/logPrintHandler'}) 
+                                                                                 'resourceClass': 'callbackNotifier'})
+    tempPrintObserver.set({'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/logPrintHandler'}) 
 
     addHandler = weatherAgent.create({'resourceName': 'addHandler',\
                                            'resourceClass': 'addHandler'})
@@ -139,10 +138,9 @@ if __name__ == '__main__' :
     
     # now create an Observers resource and a callback observer endpoint 
     callbackTempObserver = indoor_temperature.Resources.get('Observers').create({'resourceName': 'callbackTempObserver',\
-                                                                                    'resourceClass': 'Observer'})
+                                                                                    'resourceClass': 'callbackNotifier'})
     # configure the Observer to be a callback observer pointing to the testHandler
-    callbackTempObserver.set({'observerClass': 'callbackObserver', \
-                              'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/addHandler'})
+    callbackTempObserver.set({'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/addHandler'})
 
      
     try:
