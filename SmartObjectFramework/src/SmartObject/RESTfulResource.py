@@ -64,7 +64,7 @@ class RESTfulDictEndpoint(object): # create a resource endpoint from a property 
         return
     
     #try the decsriptor interface to allow use of the attribute as a reference
-    def __get__(self, instance, owner):
+    def __get__(self, instance, owner=None):
         return self._resource
     
     def __set__(self, instance, dictUpdate):
@@ -111,14 +111,14 @@ class RESTfulResource(Resource) :
         # make an entry in resources to point to properties
         self.Resources.update({'Properties': self.Properties}) # put Properties into the resource dict
         
-        self.Resources.update({'thisObject': self})
+        self.Resources.update({'thisObject': self}) #self-identity
         self.Properties.update({'resourceName': resourceName}) 
 
         if parentObject == None : #no parent means this is a base object
             self.Resources.update({'baseObject': self})
             self.Resources.update({'parentObject': self})
             self.Properties.update({'pathFromBase': ''})
-        else :
+        else : # identity of parent, base, and path to base
             self.Resources.update({'parentObject' : parentObject.Resources.get('thisObject')})
             self.Resources.update({'baseObject': parentObject.Resources.get('baseObject') })
             self.Properties.update({'pathFromBase': self.Resources.get('parentObject').Properties.get('pathFromBase') \
@@ -130,8 +130,17 @@ class RESTfulResource(Resource) :
         self.defaultClass = 'RESTfulResource' # class name, override in derived classes
         self.wellKnownClasses = [ 'Description' , 'Observers' , 'PropertyOfInterest' , 'SmartObject' , 'RESTfulResource' , 'Agent' ]
 
-
-    def create(self, resourceName, className=None ) : 
+    # new create takes dictionary built from JSON object POSTed to parent resource
+    def create(self, resourceDescriptor):
+        resourceName = resourceDescriptor['resourceName']
+        resourceClass = resourceDescriptor['resourceClass']
+        if resourceName not in self.resources:
+            # create new instance of the named class and add to resources directory, return the ref
+            self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
+        return self.resources[resourceName] # returns a reference to the created instance
+                        
+        
+    def _create(self, resourceName, className=None ) : 
         if resourceName not in self.resources :
             if className == None :
                 if resourceName in self.wellKnownClasses :

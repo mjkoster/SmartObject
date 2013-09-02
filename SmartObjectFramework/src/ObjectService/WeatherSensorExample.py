@@ -33,24 +33,23 @@ if __name__ == '__main__' :
     server.start(8000) # forks a server thread to listen on port 8000
     print 'httpd started at', baseObject.Properties.get('httpService')
 
-    # set the default class for web API calls to create Smart Objects as named resources       
-    baseObject.defaultClass = 'SmartObject'
-    # and create a Description resource for the RDF registry
+    # make a reference to thhe baseObject Description resource
     baseObject.description = baseObject.resources['Description']        
     # create the weather station resource template
     # first the description 
     baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDFS.Class, Literal('SmartObject')))
     baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDFS.Resource, Literal('SensorSystem')))
     baseObject.description.set((URIRef('sensors/rhvWeather-01'), RDF.type, Literal('WeatherSensor')))
-        
-    baseObject.sensors = baseObject.create('sensors') # top level object container for sensors, default class is SmartObject
-    sensors = baseObject.sensors    
-    sensors.defaultClass = 'SmartObject' # defaultClass is class for creating named objects 
-    sensors.description = sensors.create('Description')
-        
-    weather = sensors.create('rhvWeather-01') # create a default class SmartObject for the weather sensor cluster
-    weather.description = weather.resources['Description'] # create a Description and build an example graph
-
+    
+    # sensors resource under the baseObject for all sensors    
+    sensors = baseObject.create({'resourceName': 'sensors',\
+                                 'resourceClass': 'SmartObject'}) # top level object container for sensors, default class is SmartObject
+    #weather resource under sensors for the weather sensor    
+    weather = sensors.create({'resourceName': 'rhvWeather-01', \
+                             'resourceClass': 'SmartObject'}) # create a default class SmartObject for the weather sensor cluster
+    # make a reference to the weather sensor object Description and build an example graph
+    weather.description = weather.resources['Description'] 
+    
     weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDFS.Resource, Literal('sensor')))
     weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDF.type, Literal('temperature')))
     weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_humidity'), RDFS.Resource, Literal('sensor')))
@@ -76,22 +75,44 @@ if __name__ == '__main__' :
     
     # now create an Observable Property for each sensor output
 
-    weather.outdoor_temperature = weather.create('outdoor_temperature')        
-    weather.outdoor_humidity = weather.create('outdoor_humidity')        
-    weather.pressure = weather.create('sealevel_pressure')        
-    weather.indoor_temperature = weather.create('indoor_temperature')        
-    weather.indoor_humidity = weather.create('indoor_humidity')        
-    weather.wind_gust = weather.create('wind_gust')        
-    weather.wind_speed = weather.create('wind_speed')        
-    weather.wind_direction = weather.create('wind_direction')        
-    weather.current_rain = weather.create('current_rain') 
-    weather.hourly_rain = weather.create('hourly_rain') 
-    weather.daily_rain = weather.create('daily_rain')
-        
+    outdoor_temperature = weather.create({'resourceName': 'outdoor_temperature',\
+                                          'resourceClass': 'ObservableProperty'})
+    
+    outdoor_humidity = weather.create({'resourceName': 'outdoor_humidity',\
+                                        'resourceClass': 'ObservableProperty'})
+    
+    pressure = weather.create({'resourceName': 'sealevel_pressure',\
+                                'resourceClass': 'ObservableProperty'})
+    
+    indoor_temperature = weather.create({'resourceName': 'indoor_temperature',\
+                                          'resourceClass': 'ObservableProperty'})
+    
+    indoor_humidity = weather.create({'resourceName': 'indoor_humidity',\
+                                        'resourceClass': 'ObservableProperty'})
+    
+    wind_gust = weather.create({'resourceName': 'wind_gust',\
+                                'resourceClass': 'ObservableProperty'})
+    
+    wind_speed = weather.create({'resourceName': 'wind_speed',\
+                                  'resourceClass': 'ObservableProperty'})
+    
+    wind_direction = weather.create({'resourceName': 'wind_direction',\
+                                    'resourceClass': 'ObservableProperty'})
+    
+    current_rain = weather.create({'resourceName': 'current_rain',\
+                                    'resourceClass': 'ObservableProperty'})
+    
+    hourly_rain = weather.create({'resourceName': 'hourly_rain',\
+                                  'resourceClass': 'ObservableProperty'})
+    
+    daily_rain = weather.create({'resourceName': 'daily_rain',\
+                                 'resourceClass': 'ObservableProperty'})
+ 
         
     # test the simple http observer publisher 
     # make a named observer resource
-    httpPressureObserver = weather.pressure.resources['Observers'].create('httpPressureObserver')
+    httpPressureObserver = pressure.resources['Observers'].create({'resourceName': 'httpPressureObserver',\
+                                                                  'resourceClass': 'Observer'})   
     # configure the Observer to be an httpObserver and it's URI to PUT updates to
     # the publisher will use the scheme specified and update the URL endpoint whenever the OP is updated
     httpPressureObserver.set({'observerClass': 'httpObserver', \
@@ -100,7 +121,8 @@ if __name__ == '__main__' :
 
     # test the http Subscriber, which creates a remote observer at the location observerURI
     # make a named subscriber resource
-    humiditySubscriber = weather.outdoor_humidity.resources['Observers'].create('humiditySubscriber')
+    humiditySubscriber = outdoor_humidity.resources['Observers'].create({'resourceName': 'humiditySubscriber',\
+                                                                         'resourceClass': 'Observer'})
     # configure the subscriber to create a remote Observer
     humiditySubscriber.set({'observerClass': 'httpSubscriber', \
                           'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/sealevel_pressure', \
@@ -109,24 +131,32 @@ if __name__ == '__main__' :
 
     # test the creation of agents and handlers
     weatherAgent = weather.resources['Agent'] # get a handle to the Agent resource
-    testHandler = weatherAgent.create('testHandler') # create a handler resource (default class in Agent)
+    testHandler = weatherAgent.create({'resourceName': 'testHandler',\
+                                       'resourceClass': 'Handler'}) # create a handler resource (default class in Agent)
     #  make a code instance and configure the settings
     testHandler.set({'handlerClass': 'SmartObject.Agent.additionHandler', \
                      'addendLink1':'sensors/rhvWeather-01/indoor_temperature', \
                      'addendLink2': 'sensors/rhvWeather-01/indoor_temperature', \
                      'sumOutLink': 'sensors/rhvWeather-01/outdoor_humidity'})     
+
     # now create an Observers resource and a callback observer endpoint 
-    callbackTempObserver = weather.indoor_temperature.resources['Observers'].create('callbackTempObserver')
+    callbackTempObserver = indoor_temperature.resources['Observers'].create({'resourceName': 'callbackTempObserver',\
+                                                                                    'resourceClass': 'Observer'})
     # configure the Observer to be a callback observer pointing to the testHandler
     callbackTempObserver.set({'observerClass': 'callbackObserver', \
                               'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/testHandler'})
 
 
     # test the use of the class defined in this file for a handler instance
-    printHandler = weatherAgent.create('printHandler')    
+    printHandler = weatherAgent.create({'resourceName': 'printHandler',\
+                                       'resourceClass': 'Handler'})    
+
     printHandler.set({'handlerClass': 'WeatherSensorExample.printHandler'})
     #printHandler.set({'handlerClass': 'SmartObject.Agent.printHandler'})
-    tempPrintObserver = weather.indoor_temperature.resources['Observers'].create('tempPrintObserver')
+
+    tempPrintObserver = indoor_temperature.resources['Observers'].create({'resourceName': 'tempPrintObserver',\
+                                                                                 'resourceClass': 'Observer'})
+    
     tempPrintObserver.set({'observerClass': 'callbackObserver', \
                           'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/printHandler'})
 

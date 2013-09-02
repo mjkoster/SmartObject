@@ -122,15 +122,17 @@ class httpSubscriber(object):
         self._thisURI = self._settings['thisURI']
         self._observerURI = self._settings['observerURI']
         self._observerName = self._settings['observerName']
-        self._observerSettings = {'observerClass': 'httpObserver'}
-        self._observerSettings.update({'targetURI': self._thisURI})
+        self._observerDescriptor = {'resourceName': self._observerName,\
+                                    'resourceClass': 'Observer' }
+        self._observerSettings = {'observerClass': 'httpObserver', \
+                                  'targetURI': self._thisURI}
 
         self._httpHeader = {} 
         self._jsonHeader = {"Content-Type" : "application/json" }        
         self._uriObject = urlparse(self._observerURI)
         self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
         # create the named resource for the Observer
-        self._httpConnection.request('POST', self._uriObject.path + '/Observers', self._observerName, self._httpHeader)
+        self._httpConnection.request('POST', self._uriObject.path + '/Observers', json.dumps(self._observerDescriptor), self._jsonHeader)
         self._httpConnection.getresponse()
         # configure the Observer
         self._httpConnection.request('PUT', self._uriObject.path + '/Observers' + '/' + self._observerName, \
@@ -164,9 +166,19 @@ class Observers(RESTfulResource): # the Observers resource is a container for in
     # map the set operation to the create operation
     def set(self, observerName):
         self.create(observerName)
+
+    # new create takes dictionary built from JSON object POSTed to parent resource
+    def create(self, resourceDescriptor):
+        resourceName = resourceDescriptor['resourceName']
+        resourceClass = resourceDescriptor['resourceClass']
+        if resourceName not in self.resources:
+            # create new instance of the named class and add to resources directory, return the ref
+            self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
+        return self.resources[resourceName] # returns a reference to the created instance
+                 
     
     # create adds an observer to the list FIXME use RESTfulResource create method
-    def create(self, resourceName, className=None ) : 
+    def _create(self, resourceName, className=None ) : 
         if resourceName not in self.resources :
             if className == None :
                 if resourceName in self.wellKnownClasses :

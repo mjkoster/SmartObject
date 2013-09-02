@@ -33,9 +33,10 @@ class SmartObject(RESTfulResource):
         self.wellKnownClasses = [ 'Description' , 'Observers' , 'PropertyOfInterest' , 'SmartObject' , 'RESTfulResource' , 'Agent' ]
         # make the defaultResources
         for defaultResource in self.defaultResources :
-            self.create(defaultResource, defaultResource)
-        # Default get for SmartObject is the Description resource, 
-        # to provide linked data compatibility
+            self.create({'resourceName': defaultResource,\
+                         'resourceClass' : defaultResource})
+            
+
     def get(self):
         if 'Description' in self.resources :
             return self.resources['Description'].get()
@@ -45,7 +46,15 @@ class SmartObject(RESTfulResource):
         if 'Description' in self.resources :
             self.resources['Description'].set((s,p,o))
             
-    def create(self, resourceName, className=None ) : 
+    def create(self, resourceDescriptor):
+        resourceName = resourceDescriptor['resourceName']
+        resourceClass = resourceDescriptor['resourceClass']
+        if resourceName not in self.resources:
+            # create new instance of the named class and add to resources directory, return the ref
+            self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
+        return self.resources[resourceName] # returns a reference to the created instance
+             
+    def _create(self, resourceName, className=None ) : 
         if resourceName not in self.resources :
             if className == None :
                 if resourceName in self.wellKnownClasses :

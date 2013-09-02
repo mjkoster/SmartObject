@@ -127,8 +127,17 @@ class Agent(RESTfulResource):
                 return self._handlers[handlerName] # to get reference to handler resources by handler name
         return None
     
+    # new create takes dictionary built from JSON object POSTed to parent resource
+    def create(self, resourceDescriptor):
+        resourceName = resourceDescriptor['resourceName']
+        resourceClass = resourceDescriptor['resourceClass']
+        if resourceName not in self.resources:
+            # create new instance of the named class and add to resources directory, return the ref
+            self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
+        return self.resources[resourceName] # returns a reference to the created instance
+                 
    
-    def create(self, resourceName, className=None ) : 
+    def _create(self, resourceName, className=None ) : 
         if resourceName not in self.resources :
             if className == None :
                 if resourceName in self.wellKnownClasses :
