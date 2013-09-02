@@ -6,13 +6,13 @@ Observers class for observation of changes in a resource
 Updated July 28, 2013 MJK - made a simple http ObserverPublisher prototype
 Updated Aug 17, 2013 MJK - implemented new Observers-Observer pattern using config settings from dict(JSON)
 
-To use the observer, create a resource endpoint using http PUT, http POST or the Python API,
-consisting of a URL string in the Observers resource. For example:
+To use the observer, create an observer subclass resource endpoint using http POST or the Python API
 
-PUT /.../resource/Observer "http://<server>/<path>" 
-
-creates an http publisher that updates the endpoint at the specified URL with a JSON object 
+the observer subclass httpPublisher updates the endpoint at the specified URL with a JSON object 
 representing the value of the Observable Property whenever the Observable Property is updated
+
+other observer subclasses are httpSubscriber, which creates a remote httpPublisher, 
+and handlerNotifier, which invokes the handleNotify method of handler
 
 It doesn't work if you try to directly update the Property Of Interest
 
@@ -30,104 +30,13 @@ class Observer(RESTfulResource):
     def __init__(self, parentObject=None, resourceDescriptor = {}):
         RESTfulResource.__init__(self, parentObject, resourceDescriptor)
         self._settings = {}
-        self._observerClass = None
-        self._observerInstance = None
-        self._settings.update({'observerClass': None})
-        self._baseObject = self.resources['baseObject']
-        self._baseObjectDict = self.resources['baseObject'].resources
-        self._thisURI =  self.resources['baseObject'].Properties.get('httpService') \
-                    + self.resources['parentObject'].resources['parentObject'].Properties.get('pathFromBase')
-        self._settings.update({'thisURI': self._thisURI})
-
-
-    def get(self, Key=None):
-        if Key != None :
-            return self._settings[Key]
-        else :
-            return self._settings
-        
-    def set(self, newSettings):
-        self._settings.update(newSettings)
-        if newSettings.has_key('observerClass'):
-            if newSettings['observerClass'] != self._observerClass: # create a new instance if observerClass is being set
-                self._observerClass = self._settings['observerClass']
-                self._observerInstance = self.newObserverInstance(self._settings)
-                self._notify = self._observerInstance.notify #reflect the handler back 
-    
-    def newObserverInstance(self, settings): # make an instance, pass in the settings dict and return the handle
-        if settings['observerClass'] == 'httpObserver' :
-            return httpObserver(settings)
-        if settings['observerClass'] == 'coapObserver' :
-            return coapObserver(settings)
-        if settings['observerClass'] == 'mqttObserver' :
-            return mqttObserver(settings)
-        if settings['observerClass'] == 'callbackObserver' :
-            return callbackObserver(settings, self._baseObjectDict)
-        if settings['observerClass'] == 'httpSubscriber' :
-            return httpSubscriber(settings)
-        
-        
-    def _notify(self, resource):
-        pass
-        
-    def notify(self, resource):
-        self._notify(resource)
-        
-        
-class httpObserver(object):
-    def __init__(self, settings):
-        self._settings = settings
-        self._httpHeader = {"Content-Type" : "application/json" }
-        
-    def notify(self,resource): # JSON only for now
-        self._jsonObject = json.dumps(resource.get())
-        self._uriObject = urlparse(self._settings['targetURI'])
-        self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
-        self._httpConnection.request('PUT', self._uriObject.path, self._jsonObject, self._httpHeader)
-        return
-
-class coapObserver(object):
-    def __init__(self, settings):
-        pass
-    
-class mqttObserver(object):
-    def __init__(self, settings):
-        pass
-
-class callbackObserver(object):
-    def __init__(self, settings, linkBaseDict):
-        self._settings = settings
-        self._linkBaseDict = linkBaseDict
-    
-    def notify(self,resource=None): # invoke the handler
-        self.linkToRef(urlparse(self._settings['handlerURI']).path).handleNotify(resource)
-        return
-    
-    def linkToRef(self, linkPath ):
-        '''
-        takes a path string and walks the object tree from a base dictionary
-        returns a ref to the resource at the path endpoint
-        '''
-        self._currentDict = self._linkBaseDict
-        self._pathElements = linkPath.split('/')
-        for pathElement in self._pathElements[:-1] : # all but the last, which should be the endpoint
-            if len(pathElement) > 0 : # first element is a zero length string for some reason
-                self._currentDict = self._currentDict[pathElement].resources
-        self._resource = self._currentDict[self._pathElements[-1] ]
-        return self._resource
-
-class ObserverBase(RESTfulResource):
-    def __init__(self, parentObject=None, resourceDescriptor = {}):
-        RESTfulResource.__init__(self, parentObject, resourceDescriptor)
-        self._settings = {}
         self._baseObject = self.resources['baseObject']
         self._linkBaseDict = self.resources['baseObject'].resources
         self._thisURI =  self.resources['baseObject'].Properties.get('httpService') \
                     + self.resources['parentObject'].resources['parentObject'].Properties.get('pathFromBase')
         self._settings.update({'thisURI': self._thisURI})
-        self._init() # to initialize instance of subclass that already has resources, Properties, and settings
 
-    def _init(self):
+    def _updateSettings(self):
         pass
 
     def get(self, Key=None):
@@ -137,7 +46,8 @@ class ObserverBase(RESTfulResource):
             return self._settings
         
     def set(self, newSettings):
-        self._settings.update(newSettings)        
+        self._settings.update(newSettings) 
+        self._updateSettings()       
         
     def notify(self, resource):
         self._notify(resource)
@@ -159,7 +69,7 @@ class ObserverBase(RESTfulResource):
         return self._resource        
 
 
-class httpPublisher(ObserverBase):
+class httpPublisher(Observer):
     def _notify(self,resource): # JSON only for now
         self._jsonObject = json.dumps(resource.get())
         self._uriObject = urlparse(self._settings['targetURI'])
@@ -168,22 +78,20 @@ class httpPublisher(ObserverBase):
         return
 
 
-class callbackNotifier(ObserverBase):    
+class callbackNotifier(Observer):    
     def _notify(self,resource=None): # invoke the handler
         self.linkToRef(urlparse(self._settings['handlerURI']).path).handleNotify(resource)
         return
     
 
-class httpSubscriber(object):
-    def __init__(self, settings):
-        self._settings = settings
+class httpSubscriber(Observer):
+    def _updateSettings(self):
         self._thisURI = self._settings['thisURI']
         self._observerURI = self._settings['observerURI']
         self._observerName = self._settings['observerName']
         self._observerDescriptor = {'resourceName': self._observerName,\
-                                    'resourceClass': 'Observer' }
-        self._observerSettings = {'observerClass': 'httpObserver', \
-                                  'targetURI': self._thisURI}
+                                    'resourceClass': 'httpPublisher' }
+        self._observerSettings = {'targetURI': self._thisURI}
         self._jsonHeader = {"Content-Type" : "application/json" }        
         self._uriObject = urlparse(self._observerURI)
         self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
@@ -196,9 +104,6 @@ class httpSubscriber(object):
                                      json.dumps(self._observerSettings), self._jsonHeader)
         self._httpConnection.getresponse()
         return
-
-    def notify(self, resource):
-        pass
     
     
 class Observers(RESTfulResource): # the Observers resource is a container for individual named Observer resources
