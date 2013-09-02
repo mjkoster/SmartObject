@@ -28,12 +28,11 @@ class SmartObject(RESTfulResource):
     
     def __init__(self, parentObject=None, resourceDescriptor = {}):
         RESTfulResource.__init__(self, parentObject, resourceDescriptor)
-        self.defaultResources = ['Description', 'Agent']
         # make the defaultResources
-        for defaultResource in self.defaultResources :
-            self.create({'resourceName': defaultResource,\
-                         'resourceClass' : defaultResource})
-            
+        self.Description = self.create({'resourceName':'Description',\
+                                        'resourceClass': 'Description'})
+        self.Agent = self.create({'resourceName':'Agent',\
+                                  'resourceClass':'Agent'})            
 
     def get(self):
         if 'Description' in self.resources :
