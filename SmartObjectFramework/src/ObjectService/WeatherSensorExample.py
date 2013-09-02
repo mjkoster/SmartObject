@@ -112,7 +112,7 @@ if __name__ == '__main__' :
     # test the simple http observer publisher 
     # make a named observer resource
     httpPressureObserver = pressure.resources['Observers'].create({'resourceName': 'httpPressureObserver',\
-                                                                  'resourceClass': 'Observer'})   
+                                                                  'resourceClass': 'Observer'})  
     # configure the Observer to be an httpObserver and it's URI to PUT updates to
     # the publisher will use the scheme specified and update the URL endpoint whenever the OP is updated
     httpPressureObserver.set({'observerClass': 'httpObserver', \

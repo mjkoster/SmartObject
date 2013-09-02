@@ -134,6 +134,7 @@ class Agent(RESTfulResource):
         if resourceName not in self.resources:
             # create new instance of the named class and add to resources directory, return the ref
             self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
+            self._handlers.update({resourceName: self.Properties.get('resourceName')})
         return self.resources[resourceName] # returns a reference to the created instance
                  
    

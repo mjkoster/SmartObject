@@ -174,6 +174,7 @@ class Observers(RESTfulResource): # the Observers resource is a container for in
         if resourceName not in self.resources:
             # create new instance of the named class and add to resources directory, return the ref
             self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
+            self._observers.update({resourceName: self.resources[resourceName]})            
         return self.resources[resourceName] # returns a reference to the created instance
                  
     
