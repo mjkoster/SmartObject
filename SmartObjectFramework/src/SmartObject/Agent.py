@@ -19,11 +19,14 @@ from RESTfulResource import RESTfulResource
 class Handler(RESTfulResource):   # single base class for handlers to extend directly, contains convenience methods for linking resources
     def __init__(self, parentObject=None, resourceDescriptor = {}):
         RESTfulResource.__init__(self, parentObject, resourceDescriptor)
-        self._defaultSettings = {}
-        self._settings = {} # use the constructor descriptor for the initial settings
+        self._settings = self.Properties.get() # use the constructor descriptor for the initial settings
         # link cache keeps endpoints hashed by pathFromBase string, only need to walk the path one time
-        self._linkBaseDict = self.resources['baseObject'].resources
+        self._linkBaseDict = self.Resources.get('baseObject').resources
         self._linkCache = {}
+        self._init()
+        
+    def _init(self):
+        pass
           
     def get(self, Key=None):
         if Key != None :

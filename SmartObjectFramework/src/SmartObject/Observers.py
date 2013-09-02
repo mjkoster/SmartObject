@@ -29,7 +29,7 @@ import httplib
 class Observer(RESTfulResource):
     def __init__(self, parentObject=None, resourceDescriptor = {}):
         RESTfulResource.__init__(self, parentObject, resourceDescriptor)
-        self._settings = {}
+        self._settings = self.Properties.get()
         self._baseObject = self.resources['baseObject']
         self._linkBaseDict = self.resources['baseObject'].resources
         self._thisURI =  self.resources['baseObject'].Properties.get('httpService') \
@@ -51,7 +51,7 @@ class Observer(RESTfulResource):
         
     def set(self, newSettings):
         self._settings.update(newSettings) 
-        self._updateSettings() # to synchronize the state of other resources       
+        self._updateSettings() # to synchronize the state of other resources in derived classes     
         
     def notify(self, resource):
         self._notify(resource)
@@ -90,14 +90,21 @@ class callbackNotifier(Observer):
 
 class httpSubscriber(Observer):
     # wait until settings are updated using the SET operation 
+    def _init(self):
+        if self._settings.has_key('observerURI'): #means settings were passed in on constructor
+            self._updateSettings()
+            
     def _updateSettings(self):
         # this creates the remote observer instance. 
         self._thisURI = self._settings['thisURI']
+        
         self._observerURI = self._settings['observerURI']
         self._observerName = self._settings['observerName']
+        
         self._observerDescriptor = {'resourceName': self._observerName,\
                                     'resourceClass': 'httpPublisher' }
         self._observerSettings = {'targetURI': self._thisURI}
+        # build and send the requests to create the remore Observer
         self._jsonHeader = {"Content-Type" : "application/json" }        
         self._uriObject = urlparse(self._observerURI)
         self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
