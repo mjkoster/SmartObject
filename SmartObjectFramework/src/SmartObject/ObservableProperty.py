@@ -33,7 +33,6 @@ class ObservableProperty(RESTfulResource):
     def __init__(self, parentObject=None, resourceName=''):
         RESTfulResource.__init__(self, parentObject, resourceName) 
         self.defaultResources = ['Description', 'Observers']
-        self.defaultClass = 'PropertyOfInterest' # default create property of interest for named resources
 
         for defaultResource in self.defaultResources :
             self.create({'resourceName': defaultResource,\
@@ -61,16 +60,5 @@ class ObservableProperty(RESTfulResource):
         if resourceName not in self.resources:
             # create new instance of the named class and add to resources directory, return the ref
             self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
-        return self.resources[resourceName] # returns a reference to the created instance
-                 
-    def _create(self, resourceName, className=None ) : 
-        if resourceName not in self.resources :
-            if className == None :
-                if resourceName in self.wellKnownClasses :
-                    className = resourceName
-                else :
-                    className = self.defaultClass 
-                    # create new instance of the named class and add to resources directory, return the ref
-            self.resources.update({resourceName : globals()[className](self, resourceName)}) 
         return self.resources[resourceName] # returns a reference to the created instance
 

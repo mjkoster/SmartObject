@@ -148,7 +148,6 @@ class Observers(RESTfulResource): # the Observers resource is a container for in
     
     def __init__(self, parentObject=None, resourceName=''):
         RESTfulResource.__init__(self, parentObject, resourceName)
-        self.defaultClass = 'Observer'
         self._observers = {}
                
     def onUpdate(self,resource):
@@ -176,21 +175,6 @@ class Observers(RESTfulResource): # the Observers resource is a container for in
             self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
             self._observers.update({resourceName: self.resources[resourceName]})            
         return self.resources[resourceName] # returns a reference to the created instance
-                 
-    
-    # create adds an observer to the list FIXME use RESTfulResource create method
-    def _create(self, resourceName, className=None ) : 
-        if resourceName not in self.resources :
-            if className == None :
-                if resourceName in self.wellKnownClasses :
-                    className = resourceName
-                else :
-                    className = self.defaultClass 
-                    # create new instance of the named class and add to resources directory, return the ref
-            self.resources.update({resourceName : globals()[className](self, resourceName)}) 
-            self._observers.update({resourceName: self.resources[resourceName]})
-        return self.resources[resourceName] # returns a reference to the created instance
-
 
     # delete removes an observer from the list, echoes None for failure
     def delete(self, observerName):

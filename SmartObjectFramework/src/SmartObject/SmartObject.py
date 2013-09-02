@@ -29,8 +29,6 @@ class SmartObject(RESTfulResource):
     def __init__(self, parentObject=None, resourceName=''):
         RESTfulResource.__init__(self, parentObject, resourceName)
         self.defaultResources = ['Description', 'Agent']
-        self.defaultClass = 'ObservableProperty' # used when a new resource name is used in create
-        self.wellKnownClasses = [ 'Description' , 'Observers' , 'PropertyOfInterest' , 'SmartObject' , 'RESTfulResource' , 'Agent' ]
         # make the defaultResources
         for defaultResource in self.defaultResources :
             self.create({'resourceName': defaultResource,\
@@ -53,18 +51,6 @@ class SmartObject(RESTfulResource):
             # create new instance of the named class and add to resources directory, return the ref
             self.resources.update({resourceName : globals()[resourceClass](self, resourceName)}) 
         return self.resources[resourceName] # returns a reference to the created instance
-             
-    def _create(self, resourceName, className=None ) : 
-        if resourceName not in self.resources :
-            if className == None :
-                if resourceName in self.wellKnownClasses :
-                    className = resourceName
-                else :
-                    className = self.defaultClass 
-                    # create new instance of the named class and add to resources directory, return the ref
-            self.resources.update({resourceName : globals()[className](self, resourceName)}) 
-        return self.resources[resourceName] # returns a reference to the created instance
-
 
     def serialize(self, graph, cType) : 
         if 'Description' in self.resources :
