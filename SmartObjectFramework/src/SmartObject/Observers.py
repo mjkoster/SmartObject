@@ -35,6 +35,10 @@ class Observer(RESTfulResource):
         self._thisURI =  self.resources['baseObject'].Properties.get('httpService') \
                     + self.resources['parentObject'].resources['parentObject'].Properties.get('pathFromBase')
         self._settings.update({'thisURI': self._thisURI})
+        self._init()
+        
+    def _init(self):
+        pass
 
     def _updateSettings(self):
         pass
@@ -47,7 +51,7 @@ class Observer(RESTfulResource):
         
     def set(self, newSettings):
         self._settings.update(newSettings) 
-        self._updateSettings()       
+        self._updateSettings() # to synchronize the state of other resources       
         
     def notify(self, resource):
         self._notify(resource)
@@ -85,7 +89,9 @@ class callbackNotifier(Observer):
     
 
 class httpSubscriber(Observer):
+    # wait until settings are updated using the SET operation 
     def _updateSettings(self):
+        # this creates the remote observer instance. 
         self._thisURI = self._settings['thisURI']
         self._observerURI = self._settings['observerURI']
         self._observerName = self._settings['observerName']
@@ -106,8 +112,8 @@ class httpSubscriber(Observer):
         return
     
     
-class Observers(RESTfulResource): # the Observers resource is a container for individual named Observer resources
-    
+class Observers(RESTfulResource): 
+    # the Observers resource is a container for individual named Observer resources, created for each Observable Property resource
     def __init__(self, parentObject=None, resourceDescriptor = {}):
         RESTfulResource.__init__(self, parentObject, resourceDescriptor)
         self._observers = {}
