@@ -19,17 +19,6 @@ to content types
 '''
 from Resource import Resource
 
-class RESTfulEndpoint(object): # create a resource endpoint from a property reference
-    def __init__(self, reference):
-        self.resources = {}
-        self._resource = reference # this only happens on init of the RESTfulEndpoint
-        
-    def get(self):
-        return self._resource
-    
-    def set(self, newValue):
-        self._resource = newValue
-        
     
 class RESTfulDictEndpoint(object): # create a resource endpoint from a property reference
     def __init__(self, dictReference):
@@ -71,32 +60,6 @@ class RESTfulDictEndpoint(object): # create a resource endpoint from a property 
         self._resource.update(dictUpdate)
         return
     
-        
-class RESTfulDictElementEndpoint(object):   
-    def __init__(self, resourceName, newDict=None):
-        self.resources = {}
-        self._resourceName = resourceName
-        if newDict==None :
-            self._dict = self.resources # to create endpoints under endpoints
-        else:
-            self._dict = newDict  
-        self._resourceName = resourceName
-            
-    def get(self):
-        return self._dict[self._resourceName]
-    
-    def set(self,newValue):
-        self._dict.update( {self._resourceName : newValue} )
-        return 
-
-    def create(self, resourceName):
-        self.resources.update( {resourceName : RESTfulDictElementEndpoint(resourceName)} ) # make an endpoint with internal dict
-        return
-    
-    def delete(self, resourceName):
-        del self.resources[resourceName]
-        return
- 
 
 class RESTfulResource(Resource) :    
     # when this resource is created
