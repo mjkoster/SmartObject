@@ -19,7 +19,7 @@ from RESTfulResource import RESTfulResource
 class Handler(RESTfulResource):   # single base class for handlers to extend directly, contains convenience methods for linking resources
     def __init__(self, parentObject=None, resourceDescriptor = {}):
         RESTfulResource.__init__(self, parentObject, resourceDescriptor)
-        self._settings = self.Properties.get() # use the constructor descriptor for the initial settings
+        self._settings = self._resourceDescriptor # use the constructor descriptor for the initial settings
         # link cache keeps endpoints hashed by pathFromBase string, only need to walk the path one time
         self._linkBaseDict = self.Resources.get('baseObject').resources
         self._linkCache = {}
@@ -88,6 +88,9 @@ class Agent(RESTfulResource):
     def __init__(self, parentObject=None, resourceDescriptor = {}):
         RESTfulResource.__init__(self, parentObject, resourceDescriptor)
         self._handlers = {}
+
+    def __init(self):
+        print 'Agent __init'
         
     def get(self, handlerName=None):
         if handlerName == None:

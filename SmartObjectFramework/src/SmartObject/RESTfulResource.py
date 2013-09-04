@@ -73,15 +73,20 @@ class RESTfulResource(Resource) :
         self.Properties = RESTfulDictEndpoint(self._properties) #make Properties endpoint from its dict
         # make an entry in resources to point to properties
         self.Resources.update({'Properties': self.Properties}) # put Properties into the resource dict
-        
         self.Resources.update({'thisObject': self}) #self-identity
-        self.Properties.update(resourceDescriptor) # Start by putting in the constructor properties
+        # initialize Properties by putting in the constructor properties
+        
+        self._resourceDescriptor = resourceDescriptor # for settings and properties update
 
-        if parentObject == None : #no parent means this is a base object
+        if parentObject == None : #no parent means this is a base object, fill in base settings
             self.Resources.update({'baseObject': self})
             self.Resources.update({'parentObject': self})
             self.Properties.update({'pathFromBase': ''})
-        else : # identity of parent, base, and path to base
+            self.Properties.update({'resourceName': 'baseObject'})
+            self.Properties.update({'resourceClass': 'SmartObject'})
+        else : # fill in properties and identity of parent, base, and path to base
+            self.Properties.update({'resourceName': resourceDescriptor['resourceName']}) 
+            self.Properties.update({'resourceClass': resourceDescriptor['resourceClass']})
             self.Resources.update({'parentObject' : parentObject.Resources.get('thisObject')})
             self.Resources.update({'baseObject': parentObject.Resources.get('baseObject') })
             self.Properties.update({'pathFromBase': self.Resources.get('parentObject').Properties.get('pathFromBase') \
@@ -90,6 +95,11 @@ class RESTfulResource(Resource) :
         self._parseContentTypes = ['*/*'] 
         self._serializeContentTypes = ['*/*']
         self.defaultResources = None
+        self.__init()
+        
+    def __init(self): # for post-initialization of derived classes
+        #print '__init', self.Properties.get('resourceName')
+        pass
 
     # new create takes dictionary built from JSON object POSTed to parent resource
     def create(self, resourceDescriptor):

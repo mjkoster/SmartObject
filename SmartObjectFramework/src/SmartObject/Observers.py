@@ -29,13 +29,13 @@ import httplib
 class Observer(RESTfulResource):
     def __init__(self, parentObject=None, resourceDescriptor = {}):
         RESTfulResource.__init__(self, parentObject, resourceDescriptor)
-        self._settings = self.Properties.get()
+        self._settings = self._resourceDescriptor
         self._baseObject = self.resources['baseObject']
         self._linkBaseDict = self.resources['baseObject'].resources
         self._thisURI =  self.resources['baseObject'].Properties.get('httpService') \
                     + self.resources['parentObject'].resources['parentObject'].Properties.get('pathFromBase')
         self._settings.update({'thisURI': self._thisURI})
-        self._init()
+        self._init() 
         
     def _init(self):
         pass

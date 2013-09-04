@@ -104,15 +104,15 @@ if __name__ == '__main__' :
     # configure the Observer to be an httpObserver and it's URI to PUT updates to
     # the publisher will use the scheme specified and update the URL endpoint whenever the OP is updated
     pressure.Observers.create({'resourceName': 'httpPressureObserver',\
-                                                'resourceClass': 'httpPublisher',\
-                                                'targetURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature'})  
+                                'resourceClass': 'httpPublisher',\
+                                'targetURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature'})  
 
     # test the http Subscriber, which creates a remote observer at the location observerURI
     # make a named subscriber resource
     outdoor_humidity.Observers.create({'resourceName': 'humiditySubscriber',\
-                                                        'resourceClass': 'httpSubscriber',\
-                                                        'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/sealevel_pressure', \
-                                                        'observerName': 'humiditySubObserver' })
+                                        'resourceClass': 'httpSubscriber',\
+                                        'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/sealevel_pressure', \
+                                        'observerName': 'humiditySubObserver' })
 
     # test the creation of handlers and invocation by Observers
    
@@ -120,8 +120,9 @@ if __name__ == '__main__' :
                          'resourceClass': 'logPrintHandler'})
     
     indoor_temperature.Observers.create({'resourceName': 'tempPrintObserver',\
-                                                          'resourceClass': 'callbackNotifier',\
-                                                          'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/logPrintHandler'})
+                                        'resourceClass': 'callbackNotifier',\
+                                        'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/logPrintHandler'})
+    
     #addHandler class adds 2 properties values together and stores in a third
     weather.Agent.create({'resourceName': 'addHandler',\
                          'resourceClass': 'addHandler',\
@@ -131,8 +132,8 @@ if __name__ == '__main__' :
        
     # now create a callback observer endpoint 
     indoor_temperature.Observers.create({'resourceName': 'callbackTempObserver',\
-                                                          'resourceClass': 'callbackNotifier',\
-                                                          'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/addHandler'})
+                                         'resourceClass': 'callbackNotifier',\
+                                         'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/addHandler'})
 
      
     try:
