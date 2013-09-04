@@ -145,8 +145,8 @@ if __name__ == '__main__' :
     
     # create observers to update outdoor temperature with readings from indoor temperature    
     indoor_temperature.Observers.create({'resourceName': 'httpTempObserver',\
-                                'resourceClass': 'httpPublisher',\
-                                'targetURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature'})  
+                                         'resourceClass': 'httpPublisher',\
+                                         'targetURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature'})  
 
     # make a subscriber to get updates of outdoor humidity from indoor humidity
     outdoor_humidity.Observers.create({'resourceName': 'humiditySubscriber',\
