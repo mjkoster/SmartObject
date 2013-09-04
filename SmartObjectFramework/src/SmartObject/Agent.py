@@ -88,9 +88,6 @@ class Agent(RESTfulResource):
     def __init__(self, parentObject=None, resourceDescriptor = {}):
         RESTfulResource.__init__(self, parentObject, resourceDescriptor)
         self._handlers = {}
-
-    def __init(self):
-        print 'Agent __init'
         
     def get(self, handlerName=None):
         if handlerName == None:

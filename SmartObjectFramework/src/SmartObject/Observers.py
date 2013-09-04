@@ -14,7 +14,7 @@ representing the value of the Observable Property whenever the Observable Proper
 other observer subclasses are httpSubscriber, which creates a remote httpPublisher, 
 and handlerNotifier, which invokes the handleNotify method of handler
 
-It doesn't work if you try to directly update the Property Of Interest
+It doesn't call notify if you try to directly update the Property Of Interest, POI needs to call onUpdate also
 
 An Observer is created subordinate to the Observers resource, and configured with a particular observer 
 class using a PUT (set) of a JSON (dictionary) settings object
@@ -91,10 +91,17 @@ class callbackNotifier(Observer):
 class httpSubscriber(Observer):
     # wait until settings are updated using the SET operation 
     def _init(self):
-        if self._settings.has_key('observerURI'): #means settings were passed in on constructor
-            self._updateSettings()
+        self._observerSettings = {}
+        if 'observerURI' in self._settings: # means Subscriber settings were passed in on constructor
+            self._createRemoteObserver()
             
     def _updateSettings(self):
+        if self._settings.has_key('observerURI'): # if the observerURI is in the subscriber settings
+            if not 'observerURI' in self._observerSettings : # but not in the remote observer settings
+                self._createRemoteObserver() # then make the remote Observer
+         
+            
+    def _createRemoteObserver(self):
         # this creates the remote observer instance. 
         self._thisURI = self._settings['thisURI']
         
@@ -118,7 +125,7 @@ class httpSubscriber(Observer):
         self._httpConnection.getresponse()
         return
     
-    
+
 class Observers(RESTfulResource): 
     # the Observers resource is a container for individual named Observer resources, created for each Observable Property resource
     def __init__(self, parentObject=None, resourceDescriptor = {}):

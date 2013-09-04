@@ -95,12 +95,7 @@ class RESTfulResource(Resource) :
         self._parseContentTypes = ['*/*'] 
         self._serializeContentTypes = ['*/*']
         self.defaultResources = None
-        self.__init()
         
-    def __init(self): # for post-initialization of derived classes
-        #print '__init', self.Properties.get('resourceName')
-        pass
-
     # new create takes dictionary built from JSON object POSTed to parent resource
     def create(self, resourceDescriptor):
         resourceName = resourceDescriptor['resourceName']
