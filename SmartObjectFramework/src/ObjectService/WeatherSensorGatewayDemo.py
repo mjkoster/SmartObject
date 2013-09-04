@@ -65,7 +65,7 @@ if __name__ == '__main__' :
     weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDF.type, Literal('depth')))
     
     # now create an Observable Property for each sensor output
-
+    # each with an observer to push updates to the cloud service
     outdoor_temperature = weather.create({'resourceName': 'outdoor_temperature',\
                                           'resourceClass': 'ObservableProperty'})
     
@@ -143,6 +143,17 @@ if __name__ == '__main__' :
                                  'resourceClass': 'httpPublisher',\
                                  'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/daily_rain'})
     
+    # create observers to update outdoor temperature with readings from indoor temperature    
+    indoor_temperature.Observers.create({'resourceName': 'httpTempObserver',\
+                                'resourceClass': 'httpPublisher',\
+                                'targetURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature'})  
+
+    # make a subscriber to get updates of outdoor humidity from indoor humidity
+    outdoor_humidity.Observers.create({'resourceName': 'humiditySubscriber',\
+                                        'resourceClass': 'httpSubscriber',\
+                                        'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/indoor_humidity', \
+                                        'observerName': 'humiditySubObserver' })
+
      
     try:
     # register handlers etc.    

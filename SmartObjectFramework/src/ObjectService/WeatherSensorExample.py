@@ -103,7 +103,7 @@ if __name__ == '__main__' :
     # make a named observer resource
     # configure the Observer to be an httpObserver and it's URI to PUT updates to
     # the publisher will use the scheme specified and update the URL endpoint whenever the OP is updated
-    pressure.Observers.create({'resourceName': 'httpPressureObserver',\
+    indoor_temperature.Observers.create({'resourceName': 'httpTempObserver',\
                                 'resourceClass': 'httpPublisher',\
                                 'targetURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature'})  
 
@@ -111,7 +111,7 @@ if __name__ == '__main__' :
     # make a named subscriber resource
     outdoor_humidity.Observers.create({'resourceName': 'humiditySubscriber',\
                                         'resourceClass': 'httpSubscriber',\
-                                        'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/sealevel_pressure', \
+                                        'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/indoor_humidity', \
                                         'observerName': 'humiditySubObserver' })
 
     # test the creation of handlers and invocation by Observers
