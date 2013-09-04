@@ -18,32 +18,59 @@ All Resource types potentially have Create, Delete, Set, and Get
 methods for interacting with their default functional properties.
 The precise semantic definition of those operations is content 
 dependent and defined by overriding the default methods for each 
-specific resource type. For Example, the GET method for a default 
-PropertOfInterest returns the list type containing a single instance 
-of a string or scalar. The GET method for a Description returns
-a list of RDF triples matching an abstract description. 
+specific resource type. For Example, the GET method for the Observable
+Property returns a JSON or XML structured data type by default. 
+The GET method for a Description returns a graph of RDF triples 
+matching an abstract description. 
 
-These content-specific methods may be directly exposed through
-URL-Path and URI-query mapping e.g. 
-coap:// or http:// GET from ../SmartObject/Resource?spec
-invokes the method SmartObject.Resource.get(spec)
+SmartObject Resource Encapsulation
 
-An example URI-Path mapping for a PropertyOfInterest would be 
-GET ..SmartRoom/Temperature which would be the default mapping for 
-SmartRoom.Temperature.SensorValue.get()
+The Structure of a SmartObject is as follows:
 
-In addition, resource mapping can use the semantic tags from the Description 
-class instances to route SmartObject Resources. In cases where both 
-URI-Path mapping and semantic mapping are used, the semantic mapping 
-should follow the URI-Path mapping convention.
-
+SmartObject
+  |
+SmartObject
+(...)
 SmartObject
   |
 SmartObject/Description (Default Property)
 SmartObject/Agent
+SmartObject/ObservableProperty
+(...)
 SmartObject/ObservableProperty
 				|
 			SmartObject/ObservableProperty/PropertyOfInterest (Default Property)
 			SmartObject/ObservableProperty/Description
 			SmartObject/ObservableProperty/Observers
 
+Observable Properties and the Data Model
+
+Observable Properties represent the data from sensors and other connected objects, 
+or the data used to create an indication or actuation
+
+The value is represented by a JSON object that contains string or number or other
+complex representations of the observations and controls 
+
+The Description contains RDF representing the data model of the SmartObject anf the
+connected objects it represents. There is a graph describing the overall SmartObject
+structure, and individual graphs describing each Observable Property's data model
+
+Observers, Agents, and the event model
+
+An Observer watches a resource and may perform an action when the state of the
+resource changes, for example on updates.
+
+Observers connect REST endpoints with the event model. The currently implemented
+observer classes are httpPublisher, httpSubscriber, handlerNotifier. 
+
+Http publishers and subscribers create push connections that propagate updates 
+between multiple instances of ObservableProperties that represent a particular 
+sensor or actuator value.
+
+Handler notifiers invoke software handlers that run code to locally respond to 
+state changes of ObservableProperties. For example, a thermostat handler would 
+use Observers associated with room temperature sensors and temperature setpoint
+ObservableProperties in order to update the heater controls.
+
+Agents contain the handlers that can be invoked by Observers. An Instance of a 
+software handler is created in an Agent container by specifying the handler class
