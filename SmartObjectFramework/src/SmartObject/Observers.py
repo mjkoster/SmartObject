@@ -132,12 +132,20 @@ class xivelyPublisher(Observer):
         self._requestHeader = {'Content-Type': 'application/json', 'X-ApiKey': self._settings['apiKey'] }        
         self._streamBody = {'id': self._settings['streamID'], 'current_value': 0 }    
         self._requestBody = {'version': '1.0.0', 'datastreams': [ self._streamBody ] }
+        if 'updateInterval' in self._settings:
+            self._updateInterval = self._settings['updateInterval']
+        else:
+            self._updateInterval = 1
+        self._nextUpdateDelay = 1 # always send the first update, then count down from Interval
         
     def _notify(self, resource=None):
-        self._streamBody.update({'current_value': resource.get() })
-        self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
-        self._httpConnection.request('PUT', self._uriObject.path, json.dumps(self._requestBody), self._requestHeader )
-        self._httpConnection.getresponse()
+        self._nextUpdateDelay -= 1
+        if not self._nextUpdateDelay:
+            self._nextUpdateDelay = self._updateInterval
+            self._streamBody.update({'current_value': resource.get() })
+            self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
+            self._httpConnection.request('PUT', self._uriObject.path, json.dumps(self._requestBody), self._requestHeader )
+            self._httpConnection.getresponse()
   
 
 class Observers(RESTfulResource): 
