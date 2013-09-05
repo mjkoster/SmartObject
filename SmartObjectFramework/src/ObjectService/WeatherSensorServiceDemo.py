@@ -75,6 +75,13 @@ if __name__ == '__main__' :
     pressure = weather.create({'resourceName': 'sealevel_pressure',\
                                 'resourceClass': 'ObservableProperty'})
     
+    pressure.Observers.create({'resourceName': 'xivelyObserver',\
+                               'resourceClass': 'xivelyPublisher',\
+                               'apiBase': 'https://api.xively.com/v2/feeds',\
+                               'feedID': '2141862995',\
+                               'streamID': 'sealevel_pressure',\
+                               'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek' })
+    
     indoor_temperature = weather.create({'resourceName': 'indoor_temperature',\
                                           'resourceClass': 'ObservableProperty'})
     

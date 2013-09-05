@@ -100,7 +100,6 @@ class httpSubscriber(Observer):
             if not 'observerURI' in self._observerSettings : # but not in the remote observer settings
                 self._createRemoteObserver() # then make the remote Observer
          
-            
     def _createRemoteObserver(self):
         # this creates the remote observer instance. 
         self._thisURI = self._settings['thisURI']
@@ -125,6 +124,25 @@ class httpSubscriber(Observer):
         self._httpConnection.getresponse()
         return
     
+    
+class xivelyPublisher(Observer):
+    def _init(self):
+        self._apiPath = self._settings['apiBase'] + '/' + self._settings['feedID'] + '.json'        
+        self._uriObject = urlparse(self._apiPath)
+        self._requestHeader = {'Content-Type': 'application/json', 'X-ApiKey': self._settings['apiKey'] }        
+        self._streamBody = {'id': self._settings['streamID'], 'current_value': 0 }    
+        self._requestBody = {'version': '1.0.0', 'datastreams': [ self._streamBody ] }
+        
+    def _notify(self, resource=None):
+        self._streamBody.update({'current_value': resource.get() })
+        print self._apiPath
+        print self._requestBody
+        print self._requestHeader
+        print json.dumps(self._requestBody)
+        self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
+        self._httpConnection.request('PUT', self._uriObject.path, json.dumps(self._requestBody), self._requestHeader )
+        print self._httpConnection.getresponse().read()
+  
 
 class Observers(RESTfulResource): 
     # the Observers resource is a container for individual named Observer resources, created for each Observable Property resource
