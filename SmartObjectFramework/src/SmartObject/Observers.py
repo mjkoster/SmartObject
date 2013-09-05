@@ -135,13 +135,9 @@ class xivelyPublisher(Observer):
         
     def _notify(self, resource=None):
         self._streamBody.update({'current_value': resource.get() })
-        print self._apiPath
-        print self._requestBody
-        print self._requestHeader
-        print json.dumps(self._requestBody)
         self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
         self._httpConnection.request('PUT', self._uriObject.path, json.dumps(self._requestBody), self._requestHeader )
-        print self._httpConnection.getresponse().read()
+        self._httpConnection.getresponse()
   
 
 class Observers(RESTfulResource): 
