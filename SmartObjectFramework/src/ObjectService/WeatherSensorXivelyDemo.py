@@ -70,36 +70,124 @@ if __name__ == '__main__' :
     outdoor_temperature = weather.create({'resourceName': 'outdoor_temperature',\
                                           'resourceClass': 'ObservableProperty'})
     
+    outdoor_temperature.Observers.create({'resourceName': 'xivelyObserver',\
+                                        'resourceClass': 'xivelyPublisher',\
+                                        'apiBase': 'https://api.xively.com/v2/feeds',\
+                                        'feedID': '2141862995',\
+                                        'streamID': 'outdoor_temperature',\
+                                        'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek',\
+                                        'updateInterval': pushInterval })
+    
     outdoor_humidity = weather.create({'resourceName': 'outdoor_humidity',\
                                         'resourceClass': 'ObservableProperty'})
-        
+    
+    outdoor_humidity.Observers.create({'resourceName': 'xivelyObserver',\
+                                        'resourceClass': 'xivelyPublisher',\
+                                        'apiBase': 'https://api.xively.com/v2/feeds',\
+                                        'feedID': '2141862995',\
+                                        'streamID': 'outdoor_humidity',\
+                                        'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek',\
+                                        'updateInterval': pushInterval })
+    
     sealevel_pressure = weather.create({'resourceName': 'sealevel_pressure',\
                                         'resourceClass': 'ObservableProperty'})
+    
+    sealevel_pressure.Observers.create({'resourceName': 'xivelyObserver',\
+                                        'resourceClass': 'xivelyPublisher',\
+                                        'apiBase': 'https://api.xively.com/v2/feeds',\
+                                        'feedID': '2141862995',\
+                                        'streamID': 'sealevel_pressure',\
+                                        'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek',\
+                                        'updateInterval': pushInterval })
     
     indoor_temperature = weather.create({'resourceName': 'indoor_temperature',\
                                           'resourceClass': 'ObservableProperty'})
 
+    indoor_temperature.Observers.create({'resourceName': 'xivelyObserver',\
+                                         'resourceClass': 'xivelyPublisher',\
+                                         'apiBase': 'https://api.xively.com/v2/feeds',\
+                                         'feedID': '2141862995',\
+                                         'streamID': 'indoor_temperature',\
+                                         'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek',\
+                                         'updateInterval': pushInterval })
+    
     indoor_humidity = weather.create({'resourceName': 'indoor_humidity',\
                                         'resourceClass': 'ObservableProperty'})
+    
+    indoor_humidity.Observers.create({'resourceName': 'xivelyObserver',\
+                                      'resourceClass': 'xivelyPublisher',\
+                                      'apiBase': 'https://api.xively.com/v2/feeds',\
+                                      'feedID': '2141862995',\
+                                      'streamID': 'indoor_humidity',\
+                                      'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek',\
+                                      'updateInterval': pushInterval })
     
     wind_gust = weather.create({'resourceName': 'wind_gust',\
                                 'resourceClass': 'ObservableProperty'})
     
+    wind_gust.Observers.create({'resourceName': 'xivelyObserver',\
+                                'resourceClass': 'xivelyPublisher',\
+                                'apiBase': 'https://api.xively.com/v2/feeds',\
+                                'feedID': '2141862995',\
+                                'streamID': 'wind_gust',\
+                                'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek',\
+                                'updateInterval': pushInterval })
+    
     wind_speed = weather.create({'resourceName': 'wind_speed',\
                                   'resourceClass': 'ObservableProperty'})
-        
+    
+    wind_speed.Observers.create({'resourceName': 'xivelyObserver',\
+                                 'resourceClass': 'xivelyPublisher',\
+                                 'apiBase': 'https://api.xively.com/v2/feeds',\
+                                 'feedID': '2141862995',\
+                                 'streamID': 'wind_speed',\
+                                 'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek',\
+                                 'updateInterval': pushInterval })
+    
     wind_direction = weather.create({'resourceName': 'wind_direction',\
                                     'resourceClass': 'ObservableProperty'})
+    
+    wind_direction.Observers.create({'resourceName': 'xivelyObserver',\
+                                      'resourceClass': 'xivelyPublisher',\
+                                      'apiBase': 'https://api.xively.com/v2/feeds',\
+                                      'feedID': '2141862995',\
+                                      'streamID': 'wind_direction',\
+                                      'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek',\
+                                      'updateInterval': pushInterval })
     
     current_rain = weather.create({'resourceName': 'current_rain',\
                                     'resourceClass': 'ObservableProperty'})
     
+    current_rain.Observers.create({'resourceName': 'xivelyObserver',\
+                                    'resourceClass': 'xivelyPublisher',\
+                                    'apiBase': 'https://api.xively.com/v2/feeds',\
+                                    'feedID': '2141862995',\
+                                    'streamID': 'current_rain',\
+                                    'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek',\
+                                    'updateInterval': pushInterval })
+    
     hourly_rain = weather.create({'resourceName': 'hourly_rain',\
                                   'resourceClass': 'ObservableProperty'})
+    
+    hourly_rain.Observers.create({'resourceName': 'xivelyObserver',\
+                                  'resourceClass': 'xivelyPublisher',\
+                                  'apiBase': 'https://api.xively.com/v2/feeds',\
+                                  'feedID': '2141862995',\
+                                  'streamID': 'hourly_rain',\
+                                  'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek',\
+                                  'updateInterval': pushInterval })
     
     daily_rain = weather.create({'resourceName': 'daily_rain',\
                                  'resourceClass': 'ObservableProperty'})
  
+    daily_rain.Observers.create({'resourceName': 'xivelyObserver',\
+                                 'resourceClass': 'xivelyPublisher',\
+                                 'apiBase': 'https://api.xively.com/v2/feeds',\
+                                 'feedID': '2141862995',\
+                                 'streamID': 'daily_rain',\
+                                 'apiKey': 'QUR3jvCQ24lZGG63SIVHQ6VyhakEl9aFlIKNuP8t4rpBK2ek',\
+                                 'updateInterval': pushInterval })
+    
       
     try:
     # register handlers etc.
