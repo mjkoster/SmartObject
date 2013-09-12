@@ -143,17 +143,6 @@ if __name__ == '__main__' :
                                  'resourceClass': 'httpPublisher',\
                                  'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/daily_rain'})
     
-    # create observers to update outdoor temperature with readings from indoor temperature    
-    indoor_temperature.Observers.create({'resourceName': 'httpTempObserver',\
-                                         'resourceClass': 'httpPublisher',\
-                                         'targetURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature'})  
-
-    # make a subscriber to get updates of outdoor humidity from indoor humidity
-    outdoor_humidity.Observers.create({'resourceName': 'humiditySubscriber',\
-                                        'resourceClass': 'httpSubscriber',\
-                                        'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/indoor_humidity', \
-                                        'observerName': 'humiditySubObserver' })
-
      
     try:
     # register handlers etc.    
