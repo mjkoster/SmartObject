@@ -79,6 +79,7 @@ class httpPublisher(Observer):
         self._uriObject = urlparse(self._settings['targetURI'])
         self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
         self._httpConnection.request('PUT', self._uriObject.path, self._jsonObject, {"Content-Type" : "application/json" })
+        self._httpConnection.getresponse()
         return
 
 
