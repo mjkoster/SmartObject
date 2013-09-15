@@ -65,7 +65,6 @@ if __name__ == '__main__' :
     weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDF.type, Literal('depth')))
     
     # now create an Observable Property for each sensor output
-    pushInterval = 10 # number of samples to delay each push to Xively
 
     outdoor_temperature = weather.create({'resourceName': 'outdoor_temperature',\
                                           'resourceClass': 'ObservableProperty'})
@@ -100,6 +99,13 @@ if __name__ == '__main__' :
     daily_rain = weather.create({'resourceName': 'daily_rain',\
                                  'resourceClass': 'ObservableProperty'})
  
+    mqttTestObserver = sealevel_pressure.Observers.create({'resourceName': 'mqttTestObserver',\
+                                                          'resourceClass': 'mqttObserver',\
+                                                          'connection': '10.0.0.14',\
+                                                          'subTopic': None,\
+                                                          'pubTopic': None,\
+                                                          'QoS': 0,\
+                                                          'keepAlive': 10 })
       
     try:
     # register handlers etc.

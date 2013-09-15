@@ -189,7 +189,7 @@ class mqttObserver(Observer):
         self._QoS = self._settings['QoS']
         
         # the state machine
-        self._pubs = {} # outstanding messages for filter hack
+        self._pubs = {} # outstanding topics for filter kludge, prevents cycle due to re-applying REST update
         self._connected = False
         self._subscribed = False
         self._waitConnack = False
@@ -204,7 +204,7 @@ class mqttObserver(Observer):
 
         def on_message(mosq, obj, msg):
             print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
-            if self._subTopic not in self._pubs :
+            if self._subTopic not in self._pubs : # filter to stop cycle can cause lost MQTT update
                 self._updating = True
                 # update the Observable Property 
                 self._observableProperty.set(msg.payload)
@@ -249,9 +249,11 @@ class mqttObserver(Observer):
             while self._waitSuback : pass
                         
     def _notify(self, resource):
-        if not self._pubTopic == None :
-            if not (self._updating and (self._subTopic == self._pubTopic)): # we don't want to republish the same update in progress recursively
-                self._pubs.update({self._pubTopic: None}) # indicate what we're going to publish to the kludge filter
+        if not self._pubTopic == None : # if there is a topic to publish
+            # we don't want to republish the same update in progress recursively
+            if not (self._updating and (self._pubTopic == self._subTopic)): 
+                if self._pubTopic == self._subTopic : # update the one-shot kludge filter if there is a potential cycle
+                    self._pubs.update({self._pubTopic: None}) 
                 self._mqttc.publish(self._pubTopic, resource.get(), self._QoS )
                 self._waitPuback = True
                 while self._waitPuback : pass
