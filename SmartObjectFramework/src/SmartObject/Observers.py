@@ -232,20 +232,20 @@ class mqttObserver(Observer):
         self._mqttc.on_publish = on_publish
         self._mqttc.on_subscribe = on_subscribe
         # Uncomment to enable debug messages
-        #self._mqttc.on_log = self.on_log
+        self._mqttc.on_log = on_log
         
         # start a daemon thread to run the interface
         self._mqttc.loop_start() 
         
         # open the connection
-        self._mqttc.connect(self._host, self._port, self._keepAlive)
         self._waitConnack = True
+        self._mqttc.connect(self._host, self._port, self._keepAlive)
         while self._waitConnack : pass
         
         # start the subscription from the broker if any
         if not self._subTopic == None:
-            self._mqttc.subscribe(self._subTopic, self._QoS)
             self._waitSuback = True
+            self._mqttc.subscribe(self._subTopic, self._QoS)
             while self._waitSuback : pass
                         
     def _notify(self, resource):
@@ -254,10 +254,9 @@ class mqttObserver(Observer):
             if not (self._updating and (self._pubTopic == self._subTopic)): 
                 if self._pubTopic == self._subTopic : # update the one-shot kludge filter if there is a potential cycle
                     self._pubs.update({self._pubTopic: None}) 
-                self._mqttc.publish(self._pubTopic, resource.get(), self._QoS )
                 self._waitPuback = True
+                self._mqttc.publish(self._pubTopic, resource.get(), self._QoS )
                 while self._waitPuback : pass
-        
 
 class Observers(RESTfulResource): 
     # the Observers resource is a container for individual named Observer resources, created for each Observable Property resource

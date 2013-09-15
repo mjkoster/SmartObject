@@ -102,10 +102,10 @@ if __name__ == '__main__' :
     mqttTestObserver = sealevel_pressure.Observers.create({'resourceName': 'mqttTestObserver',\
                                                           'resourceClass': 'mqttObserver',\
                                                           'connection': '10.0.0.14',\
-                                                          'subTopic': None,\
-                                                          'pubTopic': None,\
+                                                          'subTopic': 'test/sub',\
+                                                          'pubTopic': 'test/pub',\
                                                           'QoS': 0,\
-                                                          'keepAlive': 10 })
+                                                          'keepAlive': 60 })
       
     try:
     # register handlers etc.
