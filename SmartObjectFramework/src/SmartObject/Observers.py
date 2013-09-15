@@ -25,6 +25,8 @@ from RESTfulResource import RESTfulResource
 from urlparse import urlparse
 import json
 import httplib
+import mosquitto # should try and catch exception if mosquitto not installed    
+
 
 class Observer(RESTfulResource):
     def __init__(self, parentObject=None, resourceDescriptor = {}):
@@ -111,7 +113,7 @@ class httpSubscriber(Observer):
         self._observerDescriptor = {'resourceName': self._observerName,\
                                     'resourceClass': 'httpPublisher' }
         self._observerSettings = {'targetURI': self._thisURI}
-        # build and send the requests to create the remore Observer
+        # build and send the requests to create the remote Observer
         self._jsonHeader = {"Content-Type" : "application/json" }        
         self._uriObject = urlparse(self._observerURI)
         self._httpConnection = httplib.HTTPConnection(self._uriObject.netloc)
@@ -148,6 +150,106 @@ class xivelyPublisher(Observer):
             self._httpConnection.request('PUT', self._uriObject.path, json.dumps(self._requestBody), self._requestHeader )
             self._httpConnection.getresponse()
   
+class mqttObserver(Observer):
+    # mqttObserver creates a subscriber and publisher using the same connection
+    # this enables it to act as an agent to mirror the REST resource
+    # a filter prevents updates from being recursively applied
+    def _init(self):
+        # read and check settings and set defaults
+        if not 'connection' in self._settings :
+            self._settings.update[{'connection': 'localhost'}]            
+        self._connection = self._settings['connection']        
+        if ':' in self._connection :
+            self._host, self._port = self._connection.split(':')
+            self._port = int(self._port)
+        else:
+            self._host = self._connection
+            self._port = 1883        
+            
+        # parent of the Observers container is the ObservableProperty                 
+        self._objectPath = \
+        self.resources['parentObject'].resources['parentObject'].Properties.get('pathFromBase') 
+        self._observableProperty = self.resources['parentObject'].resources['parentObject']  
+        
+        # default settings to pub and sub, 60 second keepalive, QoS=0
+        if not 'subTopic' in self._settings: 
+            self._settings.update({'subTopic': self._objectPath})
+        self._subTopic = self._settings['subTopic']
+        
+        if not 'pubTopic' in self._settings:
+            self._settings.update({'pubTopic': self._objectPath})        
+        self._pubTopic = self._settings['pubTopic']        
+        
+        if not 'keepAlive' in self._settings:
+            self._settings.update({'keepAlive': 60 })
+        self._keepAlive = self._settings['keepAlive']    
+                
+        if not 'QoS' in self._settings:
+            self._settings.update({'QoS': 0})
+        self._QoS = self._settings['QoS']
+        
+        self._connected = False
+        self._subscribed = False
+        self._waitConnack = False
+        self._waitSuback = False
+        self._waitPuback = False
+        self._updating = False
+                
+        def on_connect(mosq, obj, rc):
+            print("rc: "+str(rc))
+            self._waitConnack = False
+            self._connected = True
+
+        def on_message(mosq, obj, msg):
+            print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
+            self._updating = True
+            # update the Observable Property 
+            self._observableProperty.set(msg.payload)
+            self._updating = False
+
+        def on_publish(mosq, obj, mid):
+            print("mid: "+str(mid))
+            self._waitPuback = False
+
+        def on_subscribe(mosq, obj, mid, granted_qos):
+            print("Subscribed: "+str(mid)+" "+str(granted_qos))
+            self._waitSuback = False
+            self._subscribed = True
+
+        def on_log(mosq, obj, level, string):
+            print(string)
+
+        self._mqttc = mosquitto.Mosquitto()
+        self._mqttc.on_message = on_message
+        self._mqttc.on_connect = on_connect
+        self._mqttc.on_publish = on_publish
+        self._mqttc.on_subscribe = on_subscribe
+        # Uncomment to enable debug messages
+        #self._mqttc.on_log = self.on_log
+        
+        self._mqttc.connect(self._host, self._port, self._keepAlive)
+        self._waitConnack = True
+        while self._waitConnack:
+            pass
+        
+        if not self._subTopic == None:
+            self._mqttc.subscribe(self._subTopic, self._QoS)
+            self._waitSuback = True
+            while self._waitSuback:
+                pass
+        
+        self._mqttc.loop_start() # start a daemon thread to run the interface
+            
+        return # _init
+
+    def _notify(self, resource):
+        if not self._pubTopic == None :
+            if not self._updating: # we don't want to republish the same update in progress recursively
+                self._mqttc.publish(self._pubTopic, resource.get(), self._QoS )
+                self._waitPuback = True
+                while self._waitPuback : 
+                    pass
+        
 
 class Observers(RESTfulResource): 
     # the Observers resource is a container for individual named Observer resources, created for each Observable Property resource
