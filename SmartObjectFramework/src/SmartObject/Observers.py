@@ -188,6 +188,7 @@ class mqttObserver(Observer):
             self._settings.update({'QoS': 0})
         self._QoS = self._settings['QoS']
         
+        # the state machine
         self._connected = False
         self._subscribed = False
         self._waitConnack = False
@@ -219,6 +220,7 @@ class mqttObserver(Observer):
         def on_log(mosq, obj, level, string):
             print(string)
 
+        # make a client instance, assign handlers, and startup
         self._mqttc = mosquitto.Mosquitto()
         self._mqttc.on_message = on_message
         self._mqttc.on_connect = on_connect
@@ -227,28 +229,26 @@ class mqttObserver(Observer):
         # Uncomment to enable debug messages
         #self._mqttc.on_log = self.on_log
         
+        # start a daemon thread to run the interface
+        self._mqttc.loop_start() 
+        
+        # open the connection
         self._mqttc.connect(self._host, self._port, self._keepAlive)
         self._waitConnack = True
-        while self._waitConnack:
-            pass
+        while self._waitConnack : pass
         
+        # start the subscription from the broker if any
         if not self._subTopic == None:
             self._mqttc.subscribe(self._subTopic, self._QoS)
             self._waitSuback = True
-            while self._waitSuback:
-                pass
-        
-        self._mqttc.loop_start() # start a daemon thread to run the interface
-            
-        return # _init
-
+            while self._waitSuback : pass
+                        
     def _notify(self, resource):
         if not self._pubTopic == None :
             if not self._updating: # we don't want to republish the same update in progress recursively
                 self._mqttc.publish(self._pubTopic, resource.get(), self._QoS )
                 self._waitPuback = True
-                while self._waitPuback : 
-                    pass
+                while self._waitPuback : pass
         
 
 class Observers(RESTfulResource): 
