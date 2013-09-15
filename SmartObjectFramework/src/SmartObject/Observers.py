@@ -189,6 +189,7 @@ class mqttObserver(Observer):
         self._QoS = self._settings['QoS']
         
         # the state machine
+        self._pubs = {} # outstanding messages for filter hack
         self._connected = False
         self._subscribed = False
         self._waitConnack = False
@@ -203,10 +204,14 @@ class mqttObserver(Observer):
 
         def on_message(mosq, obj, msg):
             print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
-            self._updating = True
-            # update the Observable Property 
-            self._observableProperty.set(msg.payload)
-            self._updating = False
+            if self._subTopic not in self._pubs :
+                self._updating = True
+                # update the Observable Property 
+                self._observableProperty.set(msg.payload)
+                self._updating = False
+            else :
+                self._pubs.pop(self._subTopic) # remove the entry
+            
 
         def on_publish(mosq, obj, mid):
             print("mid: "+str(mid))
@@ -245,7 +250,8 @@ class mqttObserver(Observer):
                         
     def _notify(self, resource):
         if not self._pubTopic == None :
-            if not self._updating: # we don't want to republish the same update in progress recursively
+            if not (self._updating and (self._subTopic == self._pubTopic)): # we don't want to republish the same update in progress recursively
+                self._pubs.update({self._pubTopic: None}) # indicate what we're going to publish to the kludge filter
                 self._mqttc.publish(self._pubTopic, resource.get(), self._QoS )
                 self._waitPuback = True
                 while self._waitPuback : pass
