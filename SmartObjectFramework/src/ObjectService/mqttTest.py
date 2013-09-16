@@ -99,12 +99,19 @@ if __name__ == '__main__' :
     daily_rain = weather.create({'resourceName': 'daily_rain',\
                                  'resourceClass': 'ObservableProperty'})
  
-    mqttTestObserver = sealevel_pressure.Observers.create({'resourceName': 'mqttTestObserver',\
-                                                          'resourceClass': 'mqttObserver',\
-                                                          'connection': '10.0.0.14',\
-                                                          'QoS': 0,\
-                                                          'keepAlive': 60 })
-      
+    sealevel_pressure.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': '10.0.0.14',\
+                                        'QoS': 0,\
+                                        'keepAlive': 60 })
+    
+    outdoor_temperature.Observers.create({'resourceName': 'mqttTestObserver',\
+                                          'resourceClass': 'mqttObserver',\
+                                          'connection': '10.0.0.14',\
+                                          'pubTopic': '/sensors/rhvWeather-01/sealevel_pressure',\
+                                          'subTopic': None,\
+                                          'QoS': 0,\
+                                          'keepAlive': 60 })
     try:
     # register handlers etc.
         while 1: sleep(1)

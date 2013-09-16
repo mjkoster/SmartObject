@@ -198,12 +198,12 @@ class mqttObserver(Observer):
         self._updating = False
                 
         def on_connect(mosq, obj, rc):
-            print("rc: "+str(rc))
+            print("connected: rc: "+str(rc))
             self._waitConnack = False
             self._connected = True
 
         def on_message(mosq, obj, msg):
-            print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
+            print("message: " + msg.topic +" "+str(msg.qos)+" "+str(msg.payload))
             if self._subTopic not in self._pubs : # filter to stop cycle can cause lost MQTT update
                 self._updating = True
                 # update the Observable Property 
@@ -214,11 +214,11 @@ class mqttObserver(Observer):
             
 
         def on_publish(mosq, obj, mid):
-            print("mid: "+str(mid))
+            print("puback: mid: "+str(mid))
             self._waitPuback = False
 
         def on_subscribe(mosq, obj, mid, granted_qos):
-            print("Subscribed: "+str(mid)+" "+str(granted_qos))
+            print("suback: mid, qos:"+str(mid)+" "+str(granted_qos))
             self._waitSuback = False
             self._subscribed = True
 
@@ -232,7 +232,7 @@ class mqttObserver(Observer):
         self._mqttc.on_publish = on_publish
         self._mqttc.on_subscribe = on_subscribe
         # Uncomment to enable debug messages
-        self._mqttc.on_log = on_log
+        # self._mqttc.on_log = on_log
         
         # start a daemon thread to run the interface
         self._mqttc.loop_start() 
