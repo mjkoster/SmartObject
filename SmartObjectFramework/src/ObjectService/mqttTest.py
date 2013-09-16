@@ -99,12 +99,14 @@ if __name__ == '__main__' :
     daily_rain = weather.create({'resourceName': 'daily_rain',\
                                  'resourceClass': 'ObservableProperty'})
  
+    # note that by default, a publisher and a subscriber are created with topic = object path
     sealevel_pressure.Observers.create({'resourceName': 'mqttTestObserver',\
                                         'resourceClass': 'mqttObserver',\
                                         'connection': '10.0.0.14',\
                                         'QoS': 0,\
                                         'keepAlive': 60 })
     
+    # the observer publishes on the sealevel_pressure topic, which is subscribed to by that OP ;-)
     outdoor_temperature.Observers.create({'resourceName': 'mqttTestObserver',\
                                           'resourceClass': 'mqttObserver',\
                                           'connection': '10.0.0.14',\
@@ -112,6 +114,7 @@ if __name__ == '__main__' :
                                           'subTopic': None,\
                                           'QoS': 0,\
                                           'keepAlive': 60 })
+    
     try:
     # register handlers etc.
         while 1: sleep(1)
