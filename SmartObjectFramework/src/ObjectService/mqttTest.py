@@ -102,8 +102,6 @@ if __name__ == '__main__' :
     mqttTestObserver = sealevel_pressure.Observers.create({'resourceName': 'mqttTestObserver',\
                                                           'resourceClass': 'mqttObserver',\
                                                           'connection': '10.0.0.14',\
-                                                          'subTopic': 'test/sub',\
-                                                          'pubTopic': 'test/pub',\
                                                           'QoS': 0,\
                                                           'keepAlive': 60 })
       
