@@ -206,12 +206,11 @@ class mqttObserver(Observer):
             print("message: " + msg.topic +" "+str(msg.qos)+" "+str(msg.payload))
             if self._subTopic not in self._pubs : # filter to stop cycle can cause lost MQTT update
                 self._updating = True
-                # update the Observable Property 
-                self._observableProperty.set(msg.payload)
+                # update the Observable Property assuming it's a JSON for now...
+                self._observableProperty.set(json.loads(msg.payload))
                 self._updating = False
             else :
                 self._pubs.pop(self._subTopic) # remove the entry
-            
 
         def on_publish(mosq, obj, mid):
             print("puback: mid: "+str(mid))
@@ -257,6 +256,7 @@ class mqttObserver(Observer):
                 self._waitPuback = True
                 self._mqttc.publish(self._pubTopic, resource.get(), self._QoS )
                 while self._waitPuback : pass
+
 
 class Observers(RESTfulResource): 
     # the Observers resource is a container for individual named Observer resources, created for each Observable Property resource
