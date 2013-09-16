@@ -254,7 +254,7 @@ class mqttObserver(Observer):
                 if self._pubTopic == self._subTopic : # update the one-shot kludge filter if there is a potential cycle
                     self._pubs.update({self._pubTopic: None}) 
                 self._waitPuback = True
-                self._mqttc.publish(self._pubTopic, resource.get(), self._QoS )
+                self._mqttc.publish(self._pubTopic, json.dumps(resource.get()), self._QoS )
                 while self._waitPuback : pass
 
 
