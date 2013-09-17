@@ -102,18 +102,27 @@ if __name__ == '__main__' :
     # note that by default, a publisher and a subscriber are created with topic = object path
     sealevel_pressure.Observers.create({'resourceName': 'mqttTestObserver',\
                                         'resourceClass': 'mqttObserver',\
-                                        'connection': '10.0.0.14',\
+                                        'connection': 'smartobjectservice.com',\
                                         'QoS': 0,\
                                         'keepAlive': 60 })
     
     # the observer publishes on the sealevel_pressure topic, which is subscribed to by that OP ;-)
     outdoor_temperature.Observers.create({'resourceName': 'mqttTestObserver',\
                                           'resourceClass': 'mqttObserver',\
-                                          'connection': '10.0.0.14',\
+                                          'connection': 'smartobjectservice.com',\
                                           'pubTopic': '/sensors/rhvWeather-01/sealevel_pressure',\
                                           'subTopic': None,\
                                           'QoS': 0,\
                                           'keepAlive': 60 })
+
+    outdoor_humidity.Observers.create({'resourceName': 'mqttTestObserver',\
+                                          'resourceClass': 'mqttObserver',\
+                                          'connection': 'smartobjectservice.com',\
+                                          'pubTopic': None,\
+                                          'subTopic': '/sensors/rhvWeather-01/sealevel_pressure',\
+                                          'QoS': 0,\
+                                          'keepAlive': 60 })
+    
     
     try:
     # register handlers etc.
