@@ -1,0 +1,3 @@
+Weather Sensor files are a demonstration of the SmartObject API used on both 
+an ARM PC gateway (Raspberry Pi, etc) and a cloud service to provide an API 
+to data produced by an Arduino-based, http client capable sensor endpoint.

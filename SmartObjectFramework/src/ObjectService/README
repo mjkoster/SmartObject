@@ -1,21 +1,6 @@
 ObjectService Base Classes
 
-ObjectService is a SmartObject instance which is used to store a 
-Description for the service and a number of SmartObject instances
+HttpObjectService creates a wsgi based REST object server from using restlite and restObject
 
-GatewayObjectService is an ObjectService with two service interfaces, for example 
-one interface for a constrained network e.g. a sensor net using CoAP, and 
-another interface for the internet using http.
+CoapObjectService creates a CoAP service instance
 
-The interface classes add URL-resource mapping, and content-type negotiation 
-and generation by invoking parse and serialize methods from the specific 
-resource classes.
-
-SmartObjectService is a service that is created from a Python application 
-in order to embed SmartObject resources and service endpoints into the 
-application and make the application node a deployable component of a larger
-application graph. 
-
-Weather Sensor files are a demonstration of the SmartObject API used on both 
-an ARM PC gateway (Raspberry Pi, etc) and a cloud service to provide an API 
-to data produced by an Arduino-based, http client capable sensor endpoint.
