@@ -8,7 +8,6 @@ SmartObjectService is for embedding an http smart object server in a python prog
 
 from HttpObjectService import HttpObjectService
 from CoapObjectService import CoapObjectService
-from ObjectService import ObjectService
 from restlite import restlite
 import threading
 from time import sleep
@@ -51,17 +50,3 @@ class SmartObjectService(object):
         except KeyboardInterrupt: pass
         
             
-if __name__ == '__main__' :
-    
-    server = SmartObjectService(ObjectService(),8000) # make an instance of the service
-    print 'Service created'
-    server.start() # and start the listener
-    print 'httpd started'
-
-    # start agents here
-    try:
-        # register handlers etc.
-        while 1: sleep(1)
-    except KeyboardInterrupt: pass
-    print 'got KeyboardInterrupt'
-    

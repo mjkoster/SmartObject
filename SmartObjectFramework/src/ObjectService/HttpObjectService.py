@@ -13,7 +13,6 @@ import wsgiref
 import urllib
 from restlite import restlite
 from restlite import restObject
-from ObjectService import ObjectService
 
 # Extend restObject classes with content handlers and provide a local bind method to pick up local extensions
 class Request(restObject.Request):
@@ -105,18 +104,5 @@ class HttpObjectService(object):
         return(result)
 
                   
-# Standalone service mode
-if __name__ == '__main__' :
-    import sys
-    from wsgiref.simple_server import make_server
-    # Create a Smart Object service,, return a reference to the top level resources dict
-    objectService = ObjectService()
-    httpObjectService = HttpObjectService(objectService)
-    httpd = make_server('', 8000, restlite.router(httpObjectService.routes))
-    print("Heres the server\n")
-    try: httpd.serve_forever()
-    except KeyboardInterrupt: 
-        print("stopping\n")
-        pass
-    
+   
     

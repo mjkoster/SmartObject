@@ -7,7 +7,7 @@ referencing a common ObjectService
 
 @author: mjkoster
 '''
-
+'''
 from HttpObjectService import HttpObjectService
 from CoapObjectService import CoapObjectService
 from ObjectService import ObjectService
@@ -71,4 +71,5 @@ if __name__ == '__main__' :
         while 1: sleep(1)
     except KeyboardInterrupt: pass
     print 'got KeyboardInterrupt'
+    '''
     
