@@ -14,7 +14,7 @@ from SmartObject.Observers import Observers
 from SmartObject.PropertyOfInterest import PropertyOfInterest
 from rdflib.term import Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD, OWL
-from ObjectService.SmartObjectService import SmartObjectService
+from ObjectService.HttpObjectService import HttpObjectService
 from time import sleep
 import sys
 
@@ -22,7 +22,7 @@ import sys
 if __name__ == '__main__' :
     # print 'path = ', sys.path
     baseObject = SmartObject() # create a Smart Object to serve as the base container for other Smart Objects and resources
-    server = SmartObjectService(baseObject) # make an instance of the service, baseObject is the object root
+    server = HttpObjectService(baseObject) # make an instance of the service, baseObject is the object root
     server.start(8000) # forks a server thread to listen on port 8000
     print 'httpd started at', baseObject.Properties.get('httpService')
 

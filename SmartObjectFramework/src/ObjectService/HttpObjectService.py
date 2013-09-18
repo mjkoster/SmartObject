@@ -11,8 +11,11 @@ maps to the python API identifier: object1.barometricPressure.Description.Observ
 
 import wsgiref
 import urllib
+import threading
 from restlite import restlite
 from restlite import restObject
+from socket import gethostname, getfqdn
+
 
 # Extend restObject classes with content handlers and provide a local bind method to pick up local extensions
 class Request(restObject.Request):
@@ -85,11 +88,10 @@ def bind(rootObject, users=None):
     return handler
 
 
-class HttpObjectService(object):
+class HttpHandler(object):
     
-    def __init__(self, objectService): # get a handle to the Object Service root dictionary
-        self.objectService = objectService
-        self.objectHandler = bind(self.objectService, users=None) 
+    def __init__(self, baseObject): # get a handle to the Object Service root dictionary
+        self.objectHandler = bind(baseObject, users=None) 
         #bind to root resource dictionary passed to constructor  
         #bind returns the RestObject handler which uses the Request object
         # the handler calls the overriding _handleXX methods in this module
@@ -104,5 +106,25 @@ class HttpObjectService(object):
         return(result)
 
                   
-   
-    
+class HttpObjectService(object):   
+    def __init__(self, baseObject=None, port=8000): # FIXME if no service given, create a default service object
+        self._port = port  # default port 8000
+        self._baseObject = baseObject
+        self.resources = self._baseObject.resources
+
+    def start(self, port=None): 
+        if port!=None:
+            self._port=port # override port on start if supplied
+        httpThread = threading.Thread(target = self._startHttpObjectService)
+        httpThread.daemon = True
+        httpThread.start()
+        self._baseObject.Properties.update({'httpService': 'http://' + gethostname() + ':' + repr(self._port)})
+       
+    def _startHttpObjectService(self):
+        from wsgiref.simple_server import make_server
+        # HttpObjectService constructor method creates a Smart Object service and 
+        # returns a constructor for a restlite router instance
+        self.httpObjectService = HttpHandler(self._baseObject)
+        self.httpd = make_server('', self._port, restlite.router(self.httpObjectService.routes))
+        try: self.httpd.serve_forever()
+        except KeyboardInterrupt: pass
