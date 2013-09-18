@@ -1,8 +1,55 @@
+'''
+CoapObjectService creates a CoAP service endpoint at the specified port, based on the object pointer
+passed into the constructor
+'''
+import socket
+import struct
+import logging
+import threading
+
+from socket import gethostname, getfqdn
+
+
 class CoapObjectService(object):
+    def __init__(self, baseObject=None, port=None): # FIXME if no baseObject given, create a default base object
+
+        if port == None:
+            self._port = 5683
+        else:
+            self._port = port
+            
+        if baseObject == None:
+            from SmartObject.SmartObject import SmartObject
+            self._baseObject = SmartObject()
+        else:
+            self._baseObject = baseObject
+            
+        self.resources = self._baseObject.resources
+                
+        self._host = gethostname()
+        self._baseObject.Properties.update({'coapService': 'coap://' + self._host + ':' + repr(self._port)})
+
+        self._coapHandler = CoapRequestHandler(self._baseObject)
+        self._coapServer = COAPServer(self._host, port, self._coapHandler) 
+        #starts thread as daemon, has run method loop
+
+
+class CoapRequestHandler(object):
+    def __init__(self,baseObject):
+        pass
     
-    def __init__(self):
-        return
+    def do_GET(self, path, flag):
+        pass
     
+    def do_POST(self, path, payload, flag):
+        pass
+    
+    def do_PUT(self, path, payload, flag):
+        pass
+    
+    def do_DELETE(self, path, payload, flag):
+        pass
+
 #
 # coap.py
 #
@@ -28,12 +75,12 @@ def info(msg):
 
 def exception(e):
     raise(e)
-
+'''
 import socket
 import struct
 import logging
 import threading
-
+'''
 M_PLAIN = "text/plain"
 M_JSON  = "application/json"
 
@@ -452,6 +499,7 @@ class COAPServer(threading.Thread):
         self.socket.bind(('', port))
         self.socket.settimeout(1)
         self.running = True
+        self.daemon = True
         self.start()
         
     def run(self):

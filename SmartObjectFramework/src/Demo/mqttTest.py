@@ -20,11 +20,9 @@ import sys
 
 
 if __name__ == '__main__' :
-    # print 'path = ', sys.path
-    baseObject = SmartObject() # create a Smart Object to serve as the base container for other Smart Objects and resources
-    server = HttpObjectService(baseObject) # make an instance of the service, baseObject is the object root
-    server.start(8000) # forks a server thread to listen on port 8000
-    print 'httpd started at', baseObject.Properties.get('httpService')
+    server = HttpObjectService() # make an instance of the service, default object root and default port 8000
+    print 'httpd started at', server.baseObject().Properties.get('httpService')
+    baseObject = server.baseObject()
 
     # create the weather station resource template
     # first the description 

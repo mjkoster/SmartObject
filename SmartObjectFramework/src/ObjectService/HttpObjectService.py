@@ -89,7 +89,6 @@ def bind(rootObject, users=None):
 
 
 class HttpHandler(object):
-    
     def __init__(self, baseObject): # get a handle to the Object Service root dictionary
         self.objectHandler = bind(baseObject, users=None) 
         #bind to root resource dictionary passed to constructor  
@@ -107,11 +106,27 @@ class HttpHandler(object):
 
                   
 class HttpObjectService(object):   
-    def __init__(self, baseObject=None, port=8000): # FIXME if no service given, create a default service object
-        self._port = port  # default port 8000
-        self._baseObject = baseObject
-        self.resources = self._baseObject.resources
+    def __init__(self, baseObject=None, port=None): 
 
+        if port == None:
+            self._port=8000
+        else:
+            self._port = port  # default port 8000
+            
+        if baseObject == None:
+            from SmartObject.SmartObject import SmartObject
+            self._baseObject = SmartObject()
+        else:
+            self._baseObject = baseObject
+            
+        self.resources = self._baseObject.resources
+        
+        if port != None or baseObject == None:
+            self.start()
+            
+    def baseObject(self):
+        return self._baseObject
+    
     def start(self, port=None): 
         if port!=None:
             self._port=port # override port on start if supplied
@@ -124,7 +139,7 @@ class HttpObjectService(object):
         from wsgiref.simple_server import make_server
         # HttpObjectService constructor method creates a Smart Object service and 
         # returns a constructor for a restlite router instance
-        self.httpObjectService = HttpHandler(self._baseObject)
-        self.httpd = make_server('', self._port, restlite.router(self.httpObjectService.routes))
+        self.httpObjectHandler = HttpHandler(self._baseObject)
+        self.httpd = make_server('', self._port, restlite.router(self.httpObjectHandler.routes))
         try: self.httpd.serve_forever()
         except KeyboardInterrupt: pass
