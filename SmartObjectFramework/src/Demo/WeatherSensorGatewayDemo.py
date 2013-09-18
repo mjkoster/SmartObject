@@ -14,7 +14,7 @@ from SmartObject.Observers import Observers
 from SmartObject.PropertyOfInterest import PropertyOfInterest
 from rdflib.term import Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD, OWL
-from SmartObjectService import SmartObjectService
+from ObjectService.SmartObjectService import SmartObjectService
 from time import sleep
 import sys
 
@@ -65,79 +65,87 @@ if __name__ == '__main__' :
     weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDF.type, Literal('depth')))
     
     # now create an Observable Property for each sensor output
-
+    # each with an observer to push updates to the cloud service
     outdoor_temperature = weather.create({'resourceName': 'outdoor_temperature',\
                                           'resourceClass': 'ObservableProperty'})
+    
+    outdoor_temperature.Observers.create({'resourceName':'demoServiceObserver',\
+                                          'resourceClass': 'httpPublisher',\
+                                          'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/outdoor_temperature'})
     
     outdoor_humidity = weather.create({'resourceName': 'outdoor_humidity',\
                                         'resourceClass': 'ObservableProperty'})
     
-    pressure = weather.create({'resourceName': 'sealevel_pressure',\
+    outdoor_humidity.Observers.create({'resourceName':'demoServiceObserver',\
+                                          'resourceClass': 'httpPublisher',\
+                                          'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/outdoor_humidity'})
+    
+    sealevel_pressure = weather.create({'resourceName': 'sealevel_pressure',\
                                 'resourceClass': 'ObservableProperty'})
+    
+    sealevel_pressure.Observers.create({'resourceName':'demoServiceObserver',\
+                                          'resourceClass': 'httpPublisher',\
+                                          'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/sealevel_pressure'})
     
     indoor_temperature = weather.create({'resourceName': 'indoor_temperature',\
                                           'resourceClass': 'ObservableProperty'})
     
+    indoor_temperature.Observers.create({'resourceName':'demoServiceObserver',\
+                                          'resourceClass': 'httpPublisher',\
+                                          'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/indoor_temperature'})
+    
     indoor_humidity = weather.create({'resourceName': 'indoor_humidity',\
                                         'resourceClass': 'ObservableProperty'})
+    
+    indoor_humidity.Observers.create({'resourceName':'demoServiceObserver',\
+                                      'resourceClass': 'httpPublisher',\
+                                      'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/indoor_humidity'})
     
     wind_gust = weather.create({'resourceName': 'wind_gust',\
                                 'resourceClass': 'ObservableProperty'})
     
+    wind_gust.Observers.create({'resourceName':'demoServiceObserver',\
+                                'resourceClass': 'httpPublisher',\
+                                'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/wind_gust'})
+    
     wind_speed = weather.create({'resourceName': 'wind_speed',\
                                   'resourceClass': 'ObservableProperty'})
+    
+    wind_speed.Observers.create({'resourceName':'demoServiceObserver',\
+                                 'resourceClass': 'httpPublisher',\
+                                 'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/wind_speed'})
     
     wind_direction = weather.create({'resourceName': 'wind_direction',\
                                     'resourceClass': 'ObservableProperty'})
     
+    wind_direction.Observers.create({'resourceName':'demoServiceObserver',\
+                                     'resourceClass': 'httpPublisher',\
+                                     'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/wind_direction'})
+    
     current_rain = weather.create({'resourceName': 'current_rain',\
                                     'resourceClass': 'ObservableProperty'})
+    
+    current_rain.Observers.create({'resourceName':'demoServiceObserver',\
+                                   'resourceClass': 'httpPublisher',\
+                                   'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/current_rain'})
     
     hourly_rain = weather.create({'resourceName': 'hourly_rain',\
                                   'resourceClass': 'ObservableProperty'})
     
+    hourly_rain.Observers.create({'resourceName':'demoServiceObserver',\
+                                  'resourceClass': 'httpPublisher',\
+                                  'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/hourly_rain'})
+    
     daily_rain = weather.create({'resourceName': 'daily_rain',\
                                  'resourceClass': 'ObservableProperty'})
  
-    # test the simple http observer publisher 
-    # make a named observer resource
-    # configure the Observer to be an httpObserver and it's URI to PUT updates to
-    # the publisher will use the scheme specified and update the URL endpoint whenever the OP is updated
-    indoor_temperature.Observers.create({'resourceName': 'httpTempObserver',\
-                                'resourceClass': 'httpPublisher',\
-                                'targetURI': 'http://localhost:8000/sensors/rhvWeather-01/outdoor_temperature'})  
-
-    # test the http Subscriber, which creates a remote observer at the location observerURI
-    # make a named subscriber resource
-    outdoor_humidity.Observers.create({'resourceName': 'humiditySubscriber',\
-                                        'resourceClass': 'httpSubscriber',\
-                                        'observerURI': 'http://localhost:8000/sensors/rhvWeather-01/indoor_humidity', \
-                                        'observerName': 'humiditySubObserver' })
-
-    # test the creation of handlers and invocation by Observers
-   
-    weather.Agent.create({'resourceName': 'logPrintHandler',\
-                         'resourceClass': 'logPrintHandler'})
+    daily_rain.Observers.create({'resourceName':'demoServiceObserver',\
+                                 'resourceClass': 'httpPublisher',\
+                                 'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/daily_rain'})
     
-    indoor_temperature.Observers.create({'resourceName': 'tempPrintObserver',\
-                                        'resourceClass': 'callbackNotifier',\
-                                        'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/logPrintHandler'})
-    
-    #addHandler class adds 2 properties values together and stores in a third
-    weather.Agent.create({'resourceName': 'addHandler',\
-                         'resourceClass': 'addHandler',\
-                         'addendLink1':'sensors/rhvWeather-01/indoor_temperature', \
-                         'addendLink2': 'sensors/rhvWeather-01/indoor_temperature', \
-                         'sumOutLink': 'sensors/rhvWeather-01/outdoor_humidity'})
-       
-    # now create a callback observer endpoint 
-    indoor_temperature.Observers.create({'resourceName': 'callbackTempObserver',\
-                                         'resourceClass': 'callbackNotifier',\
-                                         'handlerURI': 'callback:///sensors/rhvWeather-01/Agent/addHandler'})
-
      
     try:
-    # register handlers etc.
+    # register handlers etc.    
         while 1: sleep(1)
     except KeyboardInterrupt: pass
     print 'got KeyboardInterrupt'

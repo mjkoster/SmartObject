@@ -14,7 +14,7 @@ from SmartObject.Observers import Observers
 from SmartObject.PropertyOfInterest import PropertyOfInterest
 from rdflib.term import Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD, OWL
-from SmartObjectService import SmartObjectService
+from ObjectService.SmartObjectService import SmartObjectService
 from time import sleep
 import sys
 
@@ -65,7 +65,6 @@ if __name__ == '__main__' :
     weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDF.type, Literal('depth')))
     
     # now create an Observable Property for each sensor output
-    pushInterval = 10 # number of samples to delay each push to Xively
 
     outdoor_temperature = weather.create({'resourceName': 'outdoor_temperature',\
                                           'resourceClass': 'ObservableProperty'})
@@ -100,7 +99,31 @@ if __name__ == '__main__' :
     daily_rain = weather.create({'resourceName': 'daily_rain',\
                                  'resourceClass': 'ObservableProperty'})
  
-      
+    # note that by default, a publisher and a subscriber are created with topic = object path
+    sealevel_pressure.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com',\
+                                        'QoS': 0,\
+                                        'keepAlive': 60 })
+    
+    # the observer publishes on the sealevel_pressure topic, which is subscribed to by that OP ;-)
+    outdoor_temperature.Observers.create({'resourceName': 'mqttTestObserver',\
+                                          'resourceClass': 'mqttObserver',\
+                                          'connection': 'smartobjectservice.com',\
+                                          'pubTopic': '/sensors/rhvWeather-01/sealevel_pressure',\
+                                          'subTopic': None,\
+                                          'QoS': 0,\
+                                          'keepAlive': 60 })
+
+    outdoor_humidity.Observers.create({'resourceName': 'mqttTestObserver',\
+                                          'resourceClass': 'mqttObserver',\
+                                          'connection': 'smartobjectservice.com',\
+                                          'pubTopic': None,\
+                                          'subTopic': '/sensors/rhvWeather-01/sealevel_pressure',\
+                                          'QoS': 0,\
+                                          'keepAlive': 60 })
+    
+    
     try:
     # register handlers etc.
         while 1: sleep(1)
