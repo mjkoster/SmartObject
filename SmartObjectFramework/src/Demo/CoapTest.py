@@ -15,6 +15,7 @@ from SmartObject.PropertyOfInterest import PropertyOfInterest
 from rdflib.term import Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD, OWL
 from ObjectService.HttpObjectService import HttpObjectService
+from ObjectService.CoapObjectService import CoapObjectService
 from time import sleep
 import sys
 
@@ -23,6 +24,8 @@ if __name__ == '__main__' :
     
     baseObject = HttpObjectService().baseObject() # make an instance of the service, default object root and default port 8000
     print 'httpd started at', baseObject.Properties.get('httpService')
+    
+    coapService = CoapObjectService(baseObject)
 
     # create the weather station resource template
     # first the description 
@@ -97,30 +100,6 @@ if __name__ == '__main__' :
     daily_rain = weather.create({'resourceName': 'daily_rain',\
                                  'resourceClass': 'ObservableProperty'})
  
-    # note that by default, a publisher and a subscriber are created with topic = object path
-    sealevel_pressure.Observers.create({'resourceName': 'mqttTestObserver',\
-                                        'resourceClass': 'mqttObserver',\
-                                        'connection': 'smartobjectservice.com',\
-                                        'QoS': 0,\
-                                        'keepAlive': 60 })
-    
-    # the observer publishes on the sealevel_pressure topic, which is subscribed to by that OP ;-)
-    outdoor_temperature.Observers.create({'resourceName': 'mqttTestObserver',\
-                                          'resourceClass': 'mqttObserver',\
-                                          'connection': 'smartobjectservice.com',\
-                                          'pubTopic': '/sensors/rhvWeather-01/sealevel_pressure',\
-                                          'subTopic': None,\
-                                          'QoS': 0,\
-                                          'keepAlive': 60 })
-
-    outdoor_humidity.Observers.create({'resourceName': 'mqttTestObserver',\
-                                          'resourceClass': 'mqttObserver',\
-                                          'connection': 'smartobjectservice.com',\
-                                          'pubTopic': None,\
-                                          'subTopic': '/sensors/rhvWeather-01/sealevel_pressure',\
-                                          'QoS': 0,\
-                                          'keepAlive': 60 })
-    
     
     try:
     # register handlers etc.

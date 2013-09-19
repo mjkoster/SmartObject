@@ -6,6 +6,7 @@ import socket
 import struct
 import logging
 import threading
+import json
 
 from socket import gethostname, getfqdn
 
@@ -14,7 +15,7 @@ class CoapObjectService(object):
     def __init__(self, baseObject=None, port=None): # FIXME if no baseObject given, create a default base object
 
         if port == None:
-            self._port = 5683
+            self._port = 5683 # IETF default port for coap://
         else:
             self._port = port
             
@@ -30,25 +31,53 @@ class CoapObjectService(object):
         self._baseObject.Properties.update({'coapService': 'coap://' + self._host + ':' + repr(self._port)})
 
         self._coapHandler = CoapRequestHandler(self._baseObject)
-        self._coapServer = COAPServer(self._host, port, self._coapHandler) 
+        self._coapServer = COAPServer(self._host, self._port, self._coapHandler) 
+        print 'CoAP Service started at: ', baseObject.Properties.get('coapService')
         #starts thread as daemon, has run method loop
 
 
 class CoapRequestHandler(object):
     def __init__(self,baseObject):
-        pass
+        self._linkBaseDict = baseObject.resources
     
     def do_GET(self, path, flag):
-        pass
+        contentType='application/json'
+        return 200, json.dumps(self.getByLink(path)), contentType
     
     def do_POST(self, path, payload, flag):
-        pass
+        contentType='application/json'
+        self.setByLink(path, json.loads(payload))
+        return 200, '', contentType
     
     def do_PUT(self, path, payload, flag):
         pass
     
     def do_DELETE(self, path, payload, flag):
         pass
+    
+    def linkToRef(self, linkPath):
+        '''
+        takes a path string and walks the object tree from a base dictionary
+        returns a ref to the resource at the path endpoint
+        store translations in a hash cache for fast lookup after the first walk
+        '''
+        self._linkPath = linkPath
+        if self._linkPath in self._linkCache.keys() :
+            return self._linkCache[self._linkPath]
+        # cache miss, walk path and update cache at end
+        self._currentDict = self._linkBaseDict
+        self._pathElements = linkPath.split('/')
+        for pathElement in self._pathElements[:-1] : # all but the last, which should be the endpoint
+            self._currentDict = self._currentDict[pathElement].resources
+        self._resource = self._currentDict[self._pathElements[-1] ]
+        self._linkCache.update({ self._linkPath : self._resource })
+        return self._resource
+        
+    def getByLink(self, linkPath):
+        return self.linkToRef(linkPath).get()
+
+    def setByLink(self, linkPath, newValue):
+        self.linkToRef(linkPath).set(newValue)
 
 #
 # coap.py
