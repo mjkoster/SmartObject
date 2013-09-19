@@ -123,7 +123,7 @@ class HttpObjectService(object):
         
         if port != None or baseObject == None:
             self.start()
-            
+    @property        
     def baseObject(self):
         return self._baseObject
     

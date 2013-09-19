@@ -34,6 +34,10 @@ class CoapObjectService(object):
         self._coapServer = COAPServer(self._host, self._port, self._coapHandler) 
         print 'CoAP Service started at: ', baseObject.Properties.get('coapService')
         #starts thread as daemon, has run method loop
+        
+    @property    
+    def baseObject(self):
+        return self._baseObject
 
 
 class CoapRequestHandler(object):
