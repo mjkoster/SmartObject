@@ -42,6 +42,7 @@ class CoapObjectService(object):
 
 class CoapRequestHandler(object):
     def __init__(self,baseObject):
+        self._linkCache = {}
         self._linkBaseDict = baseObject.resources
     
     def do_GET(self, path, flag):
@@ -50,7 +51,7 @@ class CoapRequestHandler(object):
     
     def do_POST(self, path, payload, flag):
         contentType='application/json'
-        self.setByLink(path, json.loads(payload))
+        self.setByLink(path, json.loads(str(payload)))
         return 200, '', contentType
     
     def do_PUT(self, path, payload, flag):
@@ -606,9 +607,9 @@ class COAPHandler():
                 response.code =  HTTPCode2CoAPCode(code)
             response.payload = body
             response.content_format = COAPContentFormat.getCode(contentType)
-        except (GPIO.InvalidDirectionException, GPIO.InvalidChannelException, GPIO.SetupException) as e:
-            response.code = COAPResponse.FORBIDDEN
-            response.payload = "%s" % e
+        #except (GPIO.InvalidDirectionException, GPIO.InvalidChannelException, GPIO.SetupException) as e:
+            #response.code = COAPResponse.FORBIDDEN
+            #response.payload = "%s" % e
         except Exception as e:
             response.code = COAPResponse.INTERNAL_ERROR
             raise e
@@ -624,9 +625,9 @@ class COAPHandler():
                 response.code =  HTTPCode2CoAPCode(code)
             response.payload = body
             response.content_format = COAPContentFormat.getCode(contentType)
-        except (GPIO.InvalidDirectionException, GPIO.InvalidChannelException, GPIO.SetupException) as e:
-            response.code = COAPResponse.FORBIDDEN
-            response.payload = "%s" % e
+        #except (GPIO.InvalidDirectionException, GPIO.InvalidChannelException, GPIO.SetupException) as e:
+            #response.code = COAPResponse.FORBIDDEN
+            #response.payload = "%s" % e
         except Exception as e:
             response.code = COAPResponse.INTERNAL_ERROR
             raise e
