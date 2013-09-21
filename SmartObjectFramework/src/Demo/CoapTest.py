@@ -28,42 +28,45 @@ if __name__ == '__main__' :
     coapService = CoapObjectService(baseObject)
 
     # create the weather station resource template
-    # first the description 
+    # emulate the .well-known/core interface
+    baseObject.create({'resourceName': '.well-known','resourceClass': 'RESTfulResource'},\
+                        ).create({'resourceName': 'core','resourceClass': 'RESTfulResource'})
+      
+    # sensors resource under the baseObject for all sensors  
+    # top level object container for sensors, default class is SmartObject  
+    sensors = baseObject.create({'resourceName': 'sensors', 'resourceClass': 'SmartObject'}) 
+  
+    #weather resource under sensors for the weather sensor
+    # create a default class SmartObject for the weather sensor cluster 
+    weather = sensors.create({'resourceName': 'rhvWeather-01', 'resourceClass': 'SmartObject'}) 
+                        
+    # example description in simple link-format like concepts
     baseObject.Description.set((URIRef('sensors/rhvWeather-01'), RDFS.Class, Literal('SmartObject')))
     baseObject.Description.set((URIRef('sensors/rhvWeather-01'), RDFS.Resource, Literal('SensorSystem')))
     baseObject.Description.set((URIRef('sensors/rhvWeather-01'), RDF.type, Literal('WeatherSensor')))
-    
-    # sensors resource under the baseObject for all sensors    
-    sensors = baseObject.create({'resourceName': 'sensors',\
-                                 'resourceClass': 'SmartObject'}) # top level object container for sensors, default class is SmartObject
-    #weather resource under sensors for the weather sensor    
-    weather = sensors.create({'resourceName': 'rhvWeather-01', \
-                             'resourceClass': 'SmartObject'}) # create a default class SmartObject for the weather sensor cluster
-
-    # make a reference to the weather sensor object Description and build an example graph (could use the built-in reference as well)
-    weather.description = weather.Resources.get('Description')
-    weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDF.type, Literal('temperature')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_humidity'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_humidity'), RDF.type, Literal('humidity')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/sealevel_pressure'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/sealevel_pressure'), RDF.type, Literal('pressure')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/indoor_temperature'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/indoor_temperature'), RDF.type, Literal('temperature')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/indoor_humidity'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/indoor_humidity'), RDF.type, Literal('humidity')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_gust'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_gust'), RDF.type, Literal('speed')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_speed'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_speed'), RDF.type, Literal('speed')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_direction'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_direction'), RDF.type, Literal('direction')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/current_rain'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/current_rain'), RDF.type, Literal('depth')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/hourly_rain'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/hourly_rain'), RDF.type, Literal('depth')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDF.type, Literal('depth')))
+    #
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDFS.Resource, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDF.type, Literal('temperature')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/outdoor_humidity'), RDFS.Resource, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/outdoor_humidity'), RDF.type, Literal('humidity')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/sealevel_pressure'), RDFS.Resource, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/sealevel_pressure'), RDF.type, Literal('pressure')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/indoor_temperature'), RDFS.Resource, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/indoor_temperature'), RDF.type, Literal('temperature')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/indoor_humidity'), RDFS.Resource, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/indoor_humidity'), RDF.type, Literal('humidity')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_gust'), RDFS.Resource, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_gust'), RDF.type, Literal('speed')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_speed'), RDFS.Resource, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_speed'), RDF.type, Literal('speed')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_direction'), RDFS.Resource, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_direction'), RDF.type, Literal('direction')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/current_rain'), RDFS.Resource, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/current_rain'), RDF.type, Literal('depth')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/hourly_rain'), RDFS.Resource, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/hourly_rain'), RDF.type, Literal('depth')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDFS.Resource, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDF.type, Literal('depth')))
     
     # now create an Observable Property for each sensor output
 
@@ -99,7 +102,11 @@ if __name__ == '__main__' :
     
     daily_rain = weather.create({'resourceName': 'daily_rain',\
                                  'resourceClass': 'ObservableProperty'})
- 
+    
+    outdoor_temperature.Observers.create({'resourceName':'demoServiceObserver',\
+                                          'resourceClass': 'httpPublisher',\
+                                          'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/outdoor_temperature'})
+
     
     try:
     # register handlers etc.

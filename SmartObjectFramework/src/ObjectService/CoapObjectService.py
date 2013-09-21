@@ -32,7 +32,7 @@ class CoapObjectService(object):
 
         self._coapHandler = CoapRequestHandler(self._baseObject)
         self._coapServer = COAPServer(self._host, self._port, self._coapHandler) 
-        print 'CoAP Service started at: ', baseObject.Properties.get('coapService')
+        print 'CoAP Service started at', baseObject.Properties.get('coapService')
         #starts thread as daemon, has run method loop
         
     @property    
@@ -75,7 +75,7 @@ class CoapRequestHandler(object):
         for pathElement in self._pathElements[:-1] : # all but the last, which should be the endpoint
             self._currentDict = self._currentDict[pathElement].resources
         self._resource = self._currentDict[self._pathElements[-1] ]
-        self._linkCache.update({ self._linkPath : self._resource })
+        #self._linkCache.update({ self._linkPath : self._resource })
         return self._resource
         
     def getByLink(self, linkPath):
