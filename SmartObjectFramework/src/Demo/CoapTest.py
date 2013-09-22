@@ -12,6 +12,7 @@ from SmartObject.Description import Description
 from SmartObject.ObservableProperty import ObservableProperty
 from SmartObject.Observers import Observers
 from SmartObject.PropertyOfInterest import PropertyOfInterest
+#from SmartObject.LinkFormatProxy import LinkFormatProxy
 from rdflib.term import Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD, OWL
 from ObjectService.HttpObjectService import HttpObjectService
@@ -29,8 +30,8 @@ if __name__ == '__main__' :
 
     # create the weather station resource template
     # emulate the .well-known/core interface
-    baseObject.create({'resourceName': '.well-known','resourceClass': 'RESTfulResource'},\
-                        ).create({'resourceName': 'core','resourceClass': 'RESTfulResource'})
+    baseObject.create({'resourceName': '.well-known','resourceClass': 'SmartObject'},\
+                        ).create({'resourceName': 'core','resourceClass': 'LinkFormatProxy'})
       
     # sensors resource under the baseObject for all sensors  
     # top level object container for sensors, default class is SmartObject  

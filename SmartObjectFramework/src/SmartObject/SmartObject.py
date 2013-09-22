@@ -23,6 +23,7 @@ from Agent import Agent
 from ObservableProperty import ObservableProperty
 from Observers import Observers
 from PropertyOfInterest import PropertyOfInterest
+from LinkFormatProxy import LinkFormatProxy
 
 class SmartObject(RESTfulResource):
     
