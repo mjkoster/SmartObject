@@ -58,7 +58,7 @@ class CoapRequestHandler(object):
         self._currentResource = self.linkToRef(path)
         if hasattr(self._currentResource, 'serialize'):
             self._contentType=self._currentResource._serializeContentTypes[0]
-            self._currentResource.set( self.currentResource.parse(str(payload), self._contentType) )
+            self._currentResource.set( self._currentResource.parse(str(payload), self._contentType) )
             return 200, '', self._contentType     
         else:    
             self._contentType='application/json'

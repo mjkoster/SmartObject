@@ -27,11 +27,11 @@ class LinkFormatProxy (RESTfulResource):
         self.fmt = { 'application/link-format': 'linkFormat' }
         
         # attribute - predicate bindings RDF - core-link-format
-        self._attrToPred = {'"rt"': RDFS.Resource,
-                            '"if"': RDF.type }
+        self._attrToPred = {'rt': RDFS.Resource,
+                            'if': RDF.type }
         
-        self._predToAttr = {RDFS.Resource: '"rt"',
-                            RDF.type: '"if"' }
+        self._predToAttr = {RDFS.Resource: 'rt',
+                            RDF.type: 'if' }
 
 
     def get(self, query=None):
@@ -62,7 +62,7 @@ class LinkFormatProxy (RESTfulResource):
                 self._attr, self._objs = self._link.split('=')
                 self._objs = self._objs.split(' ')
                 for self._obj in self._objs:
-                    g.add( (URIRef(self._subject), self._attrToPred[self._attr], Literal(self._obj) ))            
+                    g.add( ( URIRef(self._subject), self._attrToPred[self._attr], Literal(self._obj) ) )            
         return g 
     
     def serialize(self, graph, cType):
@@ -76,6 +76,7 @@ class LinkFormatProxy (RESTfulResource):
                 self._subjString += ';' + self._predToAttr[self._pred] + '='
                 self._objs = []
                 for self._obj in graph.objects(self._subj, self._pred):
+                    self._obj = '"' + self._obj + '"'
                     self._objs.append(self._obj)
                     self._subjString += ' '.join(self._objs)
             graph.remove((self._subj, None, None))
