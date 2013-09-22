@@ -49,7 +49,7 @@ class Description (RESTfulResource):
             self.graph.set(newValue)
         else :
             for triple in self.newValue.triples((None,None,None)):
-                self.graph.set(triple)
+                self.graph.add(triple)
     
     # add new triple or add new graph
     def create(self, newValue):    
