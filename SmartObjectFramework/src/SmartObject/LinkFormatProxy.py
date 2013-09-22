@@ -45,7 +45,8 @@ class LinkFormatProxy (RESTfulResource):
     
     def set(self, newGraph):
         # update description graph with new subgraph
-        self.graph += newGraph
+        for self._triple in newGraph.triples((None,None,None)):
+            self.graph.set(self._triple)
         
     # exposed methods for converting sub graphs to and from specified representation
     def parse(self, source, cType):

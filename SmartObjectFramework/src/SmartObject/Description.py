@@ -43,19 +43,20 @@ class Description (RESTfulResource):
             g.add(triple)
         return g
     
-    # set existing triple (remove + add) or add sub-graph
+    # set existing triples (remove + add) 
     def set(self, newValue):
         if type(newValue) is tuple :
             self.graph.set(newValue)
         else :
-            self.graph += newValue
+            for triple in self.newValue.triples((None,None,None)):
+                self.graph.set(triple)
     
-    # add new triple or replace graph
+    # add new triple or add new graph
     def create(self, newValue):    
         if type(newValue) is tuple :
             self.graph.add(newValue)
         else :
-            self.graph = newValue
+            self.graph += newValue
     
     # remove triple or remove sub-graph
     def delete(self, newValue):
