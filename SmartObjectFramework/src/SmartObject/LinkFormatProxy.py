@@ -54,17 +54,18 @@ class LinkFormatProxy (RESTfulResource):
         self._linkFormatString = source
         self._graphs = self._linkFormatString.split(',')
         for self._graph in self._graphs:
-            self._subject, self._links = self._graph.split(';')
+            self._links = self._graph.split(';')
+            self._subject = self._links[0]
             self._subject = self._subject.strip('<')
             self._subject = self._subject.strip('>')
-            for self._link in self._links:
+            for self._link in self._links[1:]:
                 self._attr, self._objs = self._link.split('=')
-                self._objs = self.objs._split(' ')
+                self._objs = self._objs.split(' ')
                 for self._obj in self._objs:
-                    g.add( URIRef(self._subject), self._attrToPred[self._attr], self._obj )            
+                    g.add( (URIRef(self._subject), self._attrToPred[self._attr], Literal(self._obj) ))            
         return g 
     
-    def serialize(self, graph, cType): 
+    def serialize(self, graph, cType):
         # assume format = link-format
         self._linkFormatString = ''
         self._subjStrings = []
@@ -80,7 +81,6 @@ class LinkFormatProxy (RESTfulResource):
             graph.remove((self._subj, None, None))
             self._subjStrings.append(self._subjString)
         self._linkFormatString = str(','.join(self._subjStrings))
-        print self._linkFormatString
         return self._linkFormatString
        
     def serializeContentTypes(self) :
