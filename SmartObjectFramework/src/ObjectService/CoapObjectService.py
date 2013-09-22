@@ -46,13 +46,24 @@ class CoapRequestHandler(object):
         self._linkBaseDict = baseObject.resources
     
     def do_GET(self, path, flag):
-        contentType='application/json'
-        return 200, json.dumps(self.getByLink(path)), contentType
+        self._currentResource = self.linkToRef(path)
+        if hasattr(self._currentResource, 'serialize'):
+            self._contentType = self._currentResource._serializeContentTypes[0]
+            return 200, self._currentResource.serialize(self._currentResource.get(), self._contentType), self._contentType
+        else:
+            self._contentType='application/json'
+            return 200, json.dumps(self._currentResource.get()), self._contentType
     
     def do_POST(self, path, payload, flag):
-        contentType='application/json'
-        self.setByLink(path, json.loads(str(payload)))
-        return 200, '', contentType
+        self._currentResource = self.linkToRef(path)
+        if hasattr(self._currentResource, 'serialize'):
+            self._contentType=self._currentResource._serializeContentTypes[0]
+            self._currentResource.set( self.currentResource.parse(str(payload), self._contentType) )
+            return 200, '', self._contentType     
+        else:    
+            self._contentType='application/json'
+            self._currentResource.set(json.loads(str(payload)))
+            return 200, '', self._contentType
     
     def do_PUT(self, path, payload, flag):
         pass
