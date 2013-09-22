@@ -63,6 +63,7 @@ class LinkFormatProxy (RESTfulResource):
                 self._attr, self._objs = self._link.split('=')
                 self._objs = self._objs.split(' ')
                 for self._obj in self._objs:
+                    self._obj = self._obj.strip('"')
                     g.add( ( URIRef(self._subject), self._attrToPred[self._attr], Literal(self._obj) ) )            
         return g 
     
