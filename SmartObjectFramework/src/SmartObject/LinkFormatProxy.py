@@ -41,7 +41,6 @@ class LinkFormatProxy (RESTfulResource):
         for self._pred in self._predToAttr:
             for triple in self.graph.triples((None, self._pred, None)) :
                 g.add(triple)
-        print g.triples()
         return g
     
     def set(self, newGraph):
@@ -68,14 +67,20 @@ class LinkFormatProxy (RESTfulResource):
     def serialize(self, graph, cType): 
         # assume format = link-format
         self._linkFormatString = ''
+        self._subjStrings = []
         for self._subj in graph.subjects(None, None):
-            self._linkFormatString += '<' + str(self._subj) + '>'
+            self._subjString = ''
+            self._subjString += '<' + str(self._subj) + '>'
             for self._pred in graph.predicates(self._subj, None):
-                self._linkFormatString += ';' + self._predToAttr[self._pred] + '='
+                self._subjString += ';' + self._predToAttr[self._pred] + '='
+                self._objs = []
                 for self._obj in graph.objects(self._subj, self._pred):
-                    self._linkFormatString += self._obj + ' '
-            self._linkFormatString += ',' # is the trailing space in values and trailing comma here OK?
-            print self._linkFormatString
+                    self._objs.append(self._obj)
+                    self._subjString += ' '.join(self._objs)
+            graph.remove((self._subj, None, None))
+            self._subjStrings.append(self._subjString)
+        self._linkFormatString = str(','.join(self._subjStrings))
+        print self._linkFormatString
         return self._linkFormatString
        
     def serializeContentTypes(self) :

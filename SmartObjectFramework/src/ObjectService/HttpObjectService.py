@@ -61,19 +61,23 @@ class RestObject(restObject.RestObject):
     def _handlePUT(self, currentResource):
         if hasattr(currentResource, 'parse') :
             responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.parseContentTypes() )
-            currentResource.set( currentResource.parse( self.getBody() , responseType ))
+            currentResource.set( currentResource.parse( self.request.getBody() , responseType ))
         else :
             restObject.RestObject._handlePUT(self, currentResource) # default PUT
     
     def _handlePOST(self, currentResource):
         if hasattr(currentResource, 'parse') :
             responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.parseContentTypes() )
-            currentResource.create( currentResource.parse( self.getBody() , responseType ))
+            currentResource.create( currentResource.parse( self.request.getBody() , responseType ))
         else :
             restObject.RestObject._handlePOST(self, currentResource) # default POST
     
     def _handleDELETE(self, currentResource):
-        restObject.RestObject._handleDELETE(self, currentResource) # default DELETE
+        if hasattr(currentResource, 'parse') :
+            responseType = self.contentTypeNegotiate(self.env['HTTP_ACCEPT'], currentResource.parseContentTypes() )
+            currentResource.delete( currentResource.parse( self.request.getBody() , responseType ))
+        else :
+            restObject.RestObject._handleDELETE(self, currentResource) # default DELETE
 
 
 def bind(rootObject, users=None):
