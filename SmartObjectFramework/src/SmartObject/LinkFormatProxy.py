@@ -37,10 +37,15 @@ class LinkFormatProxy (RESTfulResource):
     def get(self, query=None):
         # return a sub-graph consisting of the triples with predicates in the attribute binding
         # filtered by the query 
-        g = Graph()
-        for self._pred in self._predToAttr:
-            for triple in self.graph.triples((None, self._pred, None)) :
-                g.add(triple)
+        g = Graph()        
+        if query == None:
+            for self._pred in self._predToAttr:
+                for triple in self.graph.triples((None, self._pred, None)) :
+                    g.add(triple)
+        else:
+            self._attr, self._obj = query.split('=')
+            for triple in self.graph.triples( (None, self._attrToPred[self._attr], Literal(self._obj)) ) :
+                g.add(triple)           
         return g
     
     def set(self, newGraph):
