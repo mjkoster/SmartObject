@@ -63,7 +63,7 @@ class LinkFormatProxy (RESTfulResource):
                 self._attr, self._objs = self._link.split('=')
                 self._objs = self._objs.split(' ')
                 for self._obj in self._objs:
-                    self._obj = self._obj.strip('"')
+                    self._obj = self._obj.strip('"') # remove quotes from RDF literal
                     g.add( ( URIRef(self._subject), self._attrToPred[self._attr], Literal(self._obj) ) )            
         return g 
     
@@ -78,10 +78,10 @@ class LinkFormatProxy (RESTfulResource):
                 self._subjString += ';' + self._predToAttr[self._pred] + '='
                 self._objs = []
                 for self._obj in graph.objects(self._subj, self._pred):
-                    self._obj = '"' + self._obj + '"'
+                    self._obj = '"' + self._obj + '"' # add quotes to link-format value
                     self._objs.append(self._obj)
                     self._subjString += ' '.join(self._objs)
-            graph.remove((self._subj, None, None))
+            graph.remove((self._subj, None, None)) # remove subjects to avoid duplicate output
             self._subjStrings.append(self._subjString)
         self._linkFormatString = str(','.join(self._subjStrings))
         return self._linkFormatString
