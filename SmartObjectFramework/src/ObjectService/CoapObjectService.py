@@ -45,16 +45,21 @@ class CoapRequestHandler(object):
         self._linkCache = {}
         self._linkBaseDict = baseObject.resources
     
-    def do_GET(self, path, flag):
+    def do_GET(self, path, options=None):
+        self._query=None
+        for option in options:
+            (number, value) = option.values()
+            if number == COAPOption.URI_QUERY:
+                self._query = value
         self._currentResource = self.linkToRef(path)
         if hasattr(self._currentResource, 'serialize'):
             self._contentType = self._currentResource._serializeContentTypes[0]
-            return 200, self._currentResource.serialize(self._currentResource.get(), self._contentType), self._contentType
+            return 200, self._currentResource.serialize(self._currentResource.get(self._query), self._contentType), self._contentType
         else:
             self._contentType='application/json'
             return 200, json.dumps(self._currentResource.get()), self._contentType
     
-    def do_POST(self, path, payload, flag):
+    def do_POST(self, path, payload, options=None):
         self._currentResource = self.linkToRef(path)
         if hasattr(self._currentResource, 'serialize'):
             self._contentType=self._currentResource._serializeContentTypes[0]
@@ -223,6 +228,7 @@ class COAPMessage():
         self.host    = ""
         self.port    = 5683
         self.uri_path = ""
+        self.uri_query = None
         self.content_format = None
         self.payload = None
         
@@ -420,6 +426,8 @@ class COAPMessage():
             (number, value) = option.values()
             if number == COAPOption.URI_PATH:
                 self.uri_path += "/%s" % value
+            if number == COAPOption.URI_QUERY:
+                self.uri_query = value
 
 
 class COAPRequest(COAPMessage):
@@ -609,7 +617,7 @@ class COAPHandler():
     
     def do_GET(self, request, response):
         try:
-            (code, body, contentType) = self.handler.do_GET(request.uri_path[1:], True)
+            (code, body, contentType) = self.handler.do_GET(request.uri_path[1:], request.options)
             if code == 0:
                 response.code = COAPResponse.NOT_FOUND
             elif code == 200:
@@ -627,7 +635,7 @@ class COAPHandler():
         
     def do_POST(self, request, response):
         try:
-            (code, body, contentType) = self.handler.do_POST(request.uri_path[1:], request.payload, True)
+            (code, body, contentType) = self.handler.do_POST(request.uri_path[1:], request.payload, request.options)
             if code == 0:
                 response.code = COAPResponse.NOT_FOUND
             elif code == 200:
