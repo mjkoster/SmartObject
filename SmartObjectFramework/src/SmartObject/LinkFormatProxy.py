@@ -44,8 +44,10 @@ class LinkFormatProxy (RESTfulResource):
                     g.add(triple)
         else:
             self._attr, self._obj = query.split('=')
-            for triple in self.graph.triples( (None, self._attrToPred[self._attr], Literal(self._obj)) ) :
-                g.add(triple)           
+            for (self._subject, p, o) in self.graph.triples( (None, self._attrToPred[self._attr], Literal(self._obj)) ) :
+                for self._pred in self._predToAttr:
+                    for triple in self.graph.triples((self._subject, self._pred, None)) :
+                        g.add(triple)          
         return g
     
     def set(self, newGraph):
