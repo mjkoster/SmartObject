@@ -45,6 +45,7 @@ class LinkFormatProxy (RESTfulResource):
         else:
             self._attr, self._obj = query.split('=')
             for (self._subject, p, o) in self.graph.triples( (None, self._attrToPred[self._attr], Literal(self._obj)) ) :
+                # return all links for all attributes in the binding that have matching subjects
                 for self._pred in self._predToAttr:
                     for triple in self.graph.triples((self._subject, self._pred, None)) :
                         g.add(triple)          

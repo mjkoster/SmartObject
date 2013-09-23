@@ -46,12 +46,16 @@ class CoapRequestHandler(object):
         self._linkBaseDict = baseObject.resources
     
     def do_GET(self, path, options=None):
-        self._query=None
+        self._query = None
+        self._observing = False
         for option in options:
             (number, value) = option.values()
             if number == COAPOption.URI_QUERY:
                 self._query = value
+            if number == COAPOption.OBSERVE:
+                self._observing = True
         self._currentResource = self.linkToRef(path)
+        
         if hasattr(self._currentResource, 'serialize'):
             self._contentType = self._currentResource._serializeContentTypes[0]
             return 200, self._currentResource.serialize(self._currentResource.get(self._query), self._contentType), self._contentType
@@ -116,7 +120,9 @@ class CoapRequestHandler(object):
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
+'''
+added options passed to handler, added Observe (6) to options 
+'''
 #from webiopi.utils.version import PYTHON_MAJOR
 PYTHON_MAJOR=2
 #from webiopi.utils.logger import info, exception 
@@ -183,6 +189,7 @@ class COAPOption():
                3: "Uri-Host",
                4: "ETag",
                5: "If-None-Match",
+               6: "Observe",
                7: "Uri-Port",
                8: "Location-Path",
                11: "Uri-Path",
@@ -199,6 +206,7 @@ class COAPOption():
     URI_HOST = 3
     ETAG = 4
     IF_NONE_MATCH = 5
+    OBSERVE=6
     URI_PORT = 7
     LOCATION_PATH = 8
     URI_PATH = 11
@@ -228,7 +236,6 @@ class COAPMessage():
         self.host    = ""
         self.port    = 5683
         self.uri_path = ""
-        self.uri_query = None
         self.content_format = None
         self.payload = None
         
@@ -426,9 +433,7 @@ class COAPMessage():
             (number, value) = option.values()
             if number == COAPOption.URI_PATH:
                 self.uri_path += "/%s" % value
-            if number == COAPOption.URI_QUERY:
-                self.uri_query = value
-
+ 
 
 class COAPRequest(COAPMessage):
     CODES = {0: None,
@@ -556,7 +561,7 @@ class COAPServer(threading.Thread):
         self.start()
         
     def run(self):
-        info("CoAP Server binded on coap://%s:%s/" % (self.host, self.port))
+        info("CoAP Server at coap://%s:%s/" % (self.host, self.port))
         while self.running == True:
             try:
                 (request, client) = self.socket.recvfrom(1500)
@@ -584,7 +589,7 @@ class COAPServer(threading.Thread):
             pass
         mreq = struct.pack("4sl", socket.inet_aton(self.multicast_ip), socket.INADDR_ANY)
         self.socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-        info("CoAP Server binded on coap://%s:%s/ (MULTICAST)" % (self.multicast_ip, self.port))
+        info("CoAP Server at coap://%s:%s/ (MULTICAST)" % (self.multicast_ip, self.port))
                 
     def stop(self):
         self.running = False

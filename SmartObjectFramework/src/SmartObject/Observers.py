@@ -150,6 +150,7 @@ class xivelyPublisher(Observer):
             self._httpConnection.request('PUT', self._uriObject.path, json.dumps(self._requestBody), self._requestHeader )
             self._httpConnection.getresponse()
   
+  
 class mqttObserver(Observer):
     # mqttObserver creates a subscriber and publisher using the same connection
     # this enables it to act as an agent to mirror the REST resource
@@ -256,6 +257,25 @@ class mqttObserver(Observer):
                 self._waitPuback = True
                 self._mqttc.publish(self._pubTopic, json.dumps(resource.get()), self._QoS )
                 while self._waitPuback : pass
+
+
+class coapNotifier(Observer):
+    # created when a CoAP GET with Observe option is accepted
+    # when notified of a resource update, sends a CoAP response packet to the client
+    def _init(self):
+        self._client = None
+        self._token = None
+        self._seqNo = None
+        self._maxAge = None
+        pass
+    
+    def _notify(self, resource):
+        # send a 200 response to the client
+        pass
+    
+    def delete(self):
+        # send 400 response and remove resources
+        pass
 
 
 class Observers(RESTfulResource): 
