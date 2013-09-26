@@ -104,10 +104,6 @@ if __name__ == '__main__' :
     daily_rain = weather.create({'resourceName': 'daily_rain',\
                                  'resourceClass': 'ObservableProperty'})
     
-    outdoor_temperature.Observers.create({'resourceName':'demoServiceObserver',\
-                                          'resourceClass': 'httpPublisher',\
-                                          'targetURI': 'http://smartobjectservice.com:8000/sensors/rhvWeather-01/outdoor_temperature'})
-
     
     try:
     # register handlers etc.
