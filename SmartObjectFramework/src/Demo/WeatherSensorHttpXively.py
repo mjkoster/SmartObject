@@ -15,55 +15,59 @@ from SmartObject.PropertyOfInterest import PropertyOfInterest
 from rdflib.term import Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD, OWL
 from ObjectService.HttpObjectService import HttpObjectService
+from ObjectService.CoapObjectService import CoapObjectService
 from time import sleep
 import sys
 
 
 if __name__ == '__main__' :
-    # print 'path = ', sys.path
-    baseObject = SmartObject() # create a Smart Object to serve as the base container for other Smart Objects and resources
-    server = HttpObjectService(baseObject) # make an instance of the service, baseObject is the object root
-    server.start(8000) # forks a server thread to listen on port 8000
+    
+    baseObject = HttpObjectService().baseObject # make an instance of the service, default object root and default port 8000
     print 'httpd started at', baseObject.Properties.get('httpService')
+    
+    coapService = CoapObjectService(baseObject)
 
     # create the weather station resource template
-    # first the description 
+    # emulate the .well-known/core interface
+    baseObject.create({'resourceName': '.well-known','resourceClass': 'SmartObject'},\
+                        ).create({'resourceName': 'core','resourceClass': 'LinkFormatProxy'})
+      
+    # sensors resource under the baseObject for all sensors  
+    # top level object container for sensors, default class is SmartObject  
+    sensors = baseObject.create({'resourceName': 'sensors', 'resourceClass': 'SmartObject'}) 
+  
+    #weather resource under sensors for the weather sensor
+    # create a default class SmartObject for the weather sensor cluster 
+    weather = sensors.create({'resourceName': 'rhvWeather-01', 'resourceClass': 'SmartObject'}) 
+                        
+    # example description in simple link-format like concepts
     baseObject.Description.set((URIRef('sensors/rhvWeather-01'), RDFS.Class, Literal('SmartObject')))
-    baseObject.Description.set((URIRef('sensors/rhvWeather-01'), RDFS.Resource, Literal('SensorSystem')))
-    baseObject.Description.set((URIRef('sensors/rhvWeather-01'), RDF.type, Literal('WeatherSensor')))
-    
-    # sensors resource under the baseObject for all sensors    
-    sensors = baseObject.create({'resourceName': 'sensors',\
-                                 'resourceClass': 'SmartObject'}) # top level object container for sensors, default class is SmartObject
-    #weather resource under sensors for the weather sensor    
-    weather = sensors.create({'resourceName': 'rhvWeather-01', \
-                             'resourceClass': 'SmartObject'}) # create a default class SmartObject for the weather sensor cluster
-
-    # make a reference to the weather sensor object Description and build an example graph (could use the built-in reference as well)
-    weather.description = weather.Resources.get('Description')
-    weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDF.type, Literal('temperature')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_humidity'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/outdoor_humidity'), RDF.type, Literal('humidity')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/sealevel_pressure'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/sealevel_pressure'), RDF.type, Literal('pressure')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/indoor_temperature'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/indoor_temperature'), RDF.type, Literal('temperature')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/indoor_humidity'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/indoor_humidity'), RDF.type, Literal('humidity')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_gust'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_gust'), RDF.type, Literal('speed')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_speed'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_speed'), RDF.type, Literal('speed')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_direction'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/wind_direction'), RDF.type, Literal('direction')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/current_rain'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/current_rain'), RDF.type, Literal('depth')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/hourly_rain'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/hourly_rain'), RDF.type, Literal('depth')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDFS.Resource, Literal('sensor')))
-    weather.description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDF.type, Literal('depth')))
-    
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01'), RDF.type, Literal('SensorSystem')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01'), RDFS.Resource, Literal('Weather')))
+    #
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDF.type, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/outdoor_temperature'), RDFS.Resource, Literal('temperature')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/outdoor_humidity'), RDF.type, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/outdoor_humidity'), RDFS.Resource, Literal('humidity')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/sealevel_pressure'), RDF.type, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/sealevel_pressure'), RDFS.Resource, Literal('pressure')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/indoor_temperature'), RDF.type, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/indoor_temperature'), RDFS.Resource, Literal('temperature')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/indoor_humidity'), RDF.type, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/indoor_humidity'), RDFS.Resource, Literal('humidity')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_gust'), RDF.type, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_gust'), RDFS.Resource, Literal('speed')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_speed'), RDF.type, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_speed'), RDFS.Resource, Literal('speed')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_direction'), RDF.type, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/wind_direction'), RDFS.Resource, Literal('direction')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/current_rain'), RDF.type, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/current_rain'), RDFS.Resource, Literal('depth')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/hourly_rain'), RDF.type, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/hourly_rain'), RDFS.Resource, Literal('depth')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDF.type, Literal('sensor')))
+    baseObject.Description.set((URIRef('sensors/rhvWeather-01/daily_rain'), RDFS.Resource, Literal('depth')))
+        
     # now create an Observable Property for each sensor output
     pushInterval = 10 # number of samples to delay each push to Xively
 
