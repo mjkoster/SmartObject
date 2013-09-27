@@ -70,40 +70,85 @@ if __name__ == '__main__' :
     
     
     # now create an Observable Property for each sensor output
+    pushInterval = 10 # number of samples to delay each push to Xively
 
     outdoor_temperature = weather.create({'resourceName': 'outdoor_temperature',\
                                           'resourceClass': 'ObservableProperty'})
     
+    outdoor_temperature.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com'})
+     
     outdoor_humidity = weather.create({'resourceName': 'outdoor_humidity',\
                                         'resourceClass': 'ObservableProperty'})
         
+    outdoor_humidity.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com'})
+     
     sealevel_pressure = weather.create({'resourceName': 'sealevel_pressure',\
                                         'resourceClass': 'ObservableProperty'})
     
+    sealevel_pressure.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com'})
+     
     indoor_temperature = weather.create({'resourceName': 'indoor_temperature',\
                                           'resourceClass': 'ObservableProperty'})
 
+    indoor_temperature.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com'})
+     
     indoor_humidity = weather.create({'resourceName': 'indoor_humidity',\
                                         'resourceClass': 'ObservableProperty'})
     
+    indoor_humidity.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com'})
+     
     wind_gust = weather.create({'resourceName': 'wind_gust',\
                                 'resourceClass': 'ObservableProperty'})
     
+    wind_gust.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com'})
+     
     wind_speed = weather.create({'resourceName': 'wind_speed',\
                                   'resourceClass': 'ObservableProperty'})
         
+    wind_speed.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com'})
+     
     wind_direction = weather.create({'resourceName': 'wind_direction',\
                                     'resourceClass': 'ObservableProperty'})
     
+    wind_direction.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com'})
+     
     current_rain = weather.create({'resourceName': 'current_rain',\
                                     'resourceClass': 'ObservableProperty'})
     
+    current_rain.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com'})
+     
     hourly_rain = weather.create({'resourceName': 'hourly_rain',\
                                   'resourceClass': 'ObservableProperty'})
     
+    hourly_rain.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com'})
+     
     daily_rain = weather.create({'resourceName': 'daily_rain',\
                                  'resourceClass': 'ObservableProperty'})
  
+    daily_rain.Observers.create({'resourceName': 'mqttTestObserver',\
+                                        'resourceClass': 'mqttObserver',\
+                                        'connection': 'smartobjectservice.com'})
+     
       
     try:
     # register handlers etc.
