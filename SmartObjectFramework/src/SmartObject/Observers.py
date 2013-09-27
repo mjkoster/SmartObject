@@ -243,13 +243,13 @@ class mqttObserver(Observer):
         while self._waitConnack : pass
         
         # start the subscription from the broker if any
-        if not self._subTopic == None:
+        if not self._subTopic == '':
             self._waitSuback = True
             self._mqttc.subscribe(self._subTopic, self._QoS)
             while self._waitSuback : pass
                         
     def _notify(self, resource):
-        if not self._pubTopic == None : # if there is a topic to publish
+        if not self._pubTopic == '' : # if there is a topic to publish
             # we don't want to republish the same update in progress recursively
             if not (self._updating and (self._pubTopic == self._subTopic)): 
                 if self._pubTopic == self._subTopic : # update the one-shot kludge filter if there is a potential cycle
