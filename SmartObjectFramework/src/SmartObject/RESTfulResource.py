@@ -19,6 +19,18 @@ to content types
 '''
 from Resource import Resource
 
+class ResourceList(object):
+    def __init__(self, listObject):
+        self._object = listObject
+        self.resources = {}
+        
+    def get(self, recursive=None):
+        self._list = []
+        for self._resource in self._object.resources: #only list child objects
+            if self._resource not in ('l', 'Properties', 'thisObject', 'baseObject', 'parentObject' ):
+                self._list.append({'resourceName': self._object.resources[self._resource].Properties.get('resourceName'), \
+                                   'resourceClass': self._object.resources[self._resource].Properties.get('resourceClass')})
+        return self._list
     
 class RESTfulDictEndpoint(object): # create a resource endpoint from a property reference
     def __init__(self, dictReference):
@@ -95,6 +107,8 @@ class RESTfulResource(Resource) :
         self._parseContentTypes = ['*/*'] 
         self._serializeContentTypes = ['*/*']
         self.defaultResources = None
+        
+        self.resources.update({'l': ResourceList(self)})
         
     # new create takes dictionary built from JSON object POSTed to parent resource
     def create(self, resourceDescriptor):
