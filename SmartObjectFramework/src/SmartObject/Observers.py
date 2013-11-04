@@ -158,7 +158,7 @@ class mqttObserver(Observer):
     def _init(self):
         # read and check settings and set defaults
         if not 'connection' in self._settings :
-            self._settings.update[{'connection': 'localhost'}]            
+            self._settings.update({'connection': 'localhost'})            
         self._connection = self._settings['connection']        
         if ':' in self._connection :
             self._host, self._port = self._connection.split(':')
